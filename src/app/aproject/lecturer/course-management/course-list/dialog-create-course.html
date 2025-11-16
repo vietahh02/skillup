@@ -1,0 +1,101 @@
+<div class="create-dialog-box">
+    <div class="title d-flex align-items-center justify-content-space-between">
+        <h4 class="mb-0">Add Course </h4>
+        <button class="close-btn bg-transparent p-0 border-none" (click)="close()"><i class="flaticon-close"></i></button>
+    </div>
+    <form [formGroup]="courseForm">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="d-block fw-semibold">Course Name<span class="text-danger">*</span></label>
+                    <input type="text" class="input-control" placeholder="Enter Course Name" formControlName="name">
+                    <div *ngIf="courseForm.get('name')?.hasError('required') && courseForm.get('name')?.touched" class="error-message">
+                        Course name is required
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="d-block fw-semibold">Duration (days)<span class="text-danger">*</span></label>
+                    <input type="number" class="input-control" placeholder="Enter Duration" formControlName="duration">
+                    <div *ngIf="courseForm.get('duration')?.hasError('required') && courseForm.get('duration')?.touched" class="error-message">
+                        Duration is required
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="d-block fw-semibold">Course Type<span class="text-danger">*</span></label>
+                    <select class="input-control" formControlName="courseType" placeholder="Select Course Type">
+                        <option *ngFor="let courseType of listCourseTypes" [value]="courseType">
+                            {{ courseType }}
+                        </option>
+                    </select>
+                    <div *ngIf="courseForm.get('courseType')?.hasError('required') && courseForm.get('courseType')?.touched" class="error-message">
+                        Course type is required
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label class="d-block fw-semibold">Level<span class="text-danger">*</span></label>
+                    <select class="input-control" formControlName="level" placeholder="Select Level">
+                        <option *ngFor="let level of listLevels" [value]="level">
+                            {{ level }}
+                        </option>
+                    </select>
+                    <div *ngIf="courseForm.get('level')?.hasError('required') && courseForm.get('level')?.touched" class="error-message">
+                        Level is required
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="d-block fw-semibold">Course Image<span class="text-danger">*</span></label>
+                    <div class="image-upload-container">
+                        <input 
+                            type="file" 
+                            id="courseImage" 
+                            class="input-control file-input" 
+                            accept="image/*"
+                            (change)="onImageSelected($event)"
+                            #fileInput
+                        >
+                        <div class="image-preview-wrapper" *ngIf="!selectedImage">
+                            <div class="image-placeholder" (click)="fileInput.click()">
+                                <i class="ri-image-add-line"></i>
+                                <span>Click to upload course image</span>
+                            </div>
+                        </div>
+                        <div class="image-preview-container" *ngIf="selectedImage">
+                            <img [src]="selectedImage" alt="Course Preview" class="preview-image">
+                            <div class="image-overlay">
+                                <button type="button" class="btn-change-image" (click)="fileInput.click()">
+                                    <i class="ri-edit-2-line"></i> Change
+                                </button>
+                                <button type="button" class="btn-remove-image" (click)="removeImage()">
+                                    <i class="ri-delete-bin-line"></i> Remove
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div *ngIf="courseForm.get('image')?.hasError('required') && courseForm.get('image')?.touched" class="error-message">
+                        Course image is required
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="d-block fw-semibold">Description</label>
+                    <textarea class="input-control input-des" placeholder="Course Description" formControlName="description"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="text-end">
+            <button type="button" class="gray" (click)="close()"><i class="ri-close-fill"></i> Cancel</button>
+            <button type="button" (click)="onSubmit()">
+                <i class="ri-add-fill"></i> Save
+            </button>
+        </div>
+    </form>
+</div>

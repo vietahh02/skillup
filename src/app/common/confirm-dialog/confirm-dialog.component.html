@@ -1,0 +1,25 @@
+<div style="
+    width: min(80vw, 420px);
+    border-radius: 16px;
+    background: white;
+  " >
+<h2 mat-dialog-title class="m-0 flex items-center gap-2">
+  <!-- <mat-icon [ngClass]="iconClass()">{{ icon() }}</mat-icon> -->
+  <span>{{ data.title || 'Confirmation' }}</span>
+</h2>
+
+<div mat-dialog-content class="pt-3">
+  <p>{{ data.message || 'Are you sure?' }}</p>
+</div>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button color="primary" (click)="close(false)" class="clear-btn">
+    {{ data.cancelText || 'Cancel' }}
+  </button>
+
+  <button mat-flat-button color="primary" class="apply-btn" (click)="close(true)">
+    {{ data.confirmText || (data.type === 'success' ? 'OK' : 'Confirm') }}
+  </button>
+</mat-dialog-actions>
+
+</div>

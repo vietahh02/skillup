@@ -1,0 +1,191 @@
+.loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10000000;
+}
+
+.main-content {
+    overflow: hidden;
+    min-height: 100vh;
+    transition: var(--transition);
+    padding: {
+        top: 114px;
+        left: 325px;
+        right: 25px;
+    };
+    &.active {
+        padding-left: 85px; // Giảm từ 85px xuống 25px để tối ưu khoảng trống
+    }
+    &.right-sidebar {
+        padding: {
+            left: 25px;
+            right: 285px;
+        };
+        &.active {
+            padding-right: 85px; // Giảm từ 85px xuống 25px
+        }
+    }
+    &.hide-sidebar {
+        padding: {
+            left: 25px;
+            right: 25px;
+        };
+    }
+}
+
+
+// Utility classes for BTS Management
+.d-flex {
+    display: flex !important;
+}
+
+.align-items-center {
+    align-items: center !important;
+}
+
+.justify-content-between {
+    justify-content: space-between !important;
+}
+
+.justify-content-center {
+    justify-content: center !important;
+}
+
+.mb-0 { margin-bottom: 0 !important; }
+.mb-1 { margin-bottom: 0.25rem !important; }
+.mb-2 { margin-bottom: 0.5rem !important; }
+.mb-3 { margin-bottom: 1rem !important; }
+.mb-4 { margin-bottom: 1.5rem !important; }
+
+.mt-0 { margin-top: 0 !important; }
+.mt-1 { margin-top: 0.25rem !important; }
+.mt-2 { margin-top: 0.5rem !important; }
+.mt-3 { margin-top: 1rem !important; }
+.mt-4 { margin-top: 1.5rem !important; }
+
+.p-0 { padding: 0 !important; }
+.p-1 { padding: 0.25rem !important; }
+.p-2 { padding: 0.5rem !important; }
+.p-3 { padding: 1rem !important; }
+.p-4 { padding: 1.5rem !important; }
+
+.text-muted {
+    color: #6c757d !important;
+}
+
+.bg-white {
+    background-color: #ffffff !important;
+}
+
+.box-shadow {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+// Row and column system
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+}
+
+.col-12 {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+.col-lg-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+@media (max-width: 1600px) {
+    .main-content {
+        padding-left: 285px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .main-content {
+        padding-left: 25px;
+    }
+}
+
+
+@media (max-width: 991.98px) {
+    .col-lg-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+// Responsive utilities
+@media (max-width: 768px) {
+    .row {
+        margin-right: -10px;
+        margin-left: -10px;
+    }
+    
+    .col-12,
+    .col-lg-6 {
+        padding-right: 10px;
+        padding-left: 10px;
+    }
+}
+
+::ng-deep .custom-snackbar {
+    .mdc-snackbar__surface{
+        font-weight: 500 !important;
+        font-size: 16px !important;
+        padding-top: 5px !important;
+        padding-bottom: 5px;
+        .mat-mdc-button {
+            color: #fff !important;  
+            background-color: transparent !important;  
+            &:hover {
+                background-color: transparent !important;
+                box-shadow: none !important;
+            }  
+        }
+    }
+}
+
+::ng-deep .success-snackbar {
+    .mdc-snackbar__surface{
+        background-color: #4caf50 !important;
+        color: #fff !important;
+    }
+}
+
+::ng-deep .error-snackbar {
+    .mdc-snackbar__surface{
+        background-color: #f44336 !important;
+        color: #fff !important;
+    }
+}
+
+::ng-deep .warning-snackbar {
+    .mdc-snackbar__surface{
+        background-color: #ff9800 !important;
+        color: #fff !important;
+    }
+}
+
+::ng-deep .info-snackbar {
+    .mdc-snackbar__surface{
+        background-color: #2196f3 !important; 
+        color: #fff !important;
+    }
+}
+
+::ng-deep .mat-mdc-form-field-error-wrapper {
+    margin: 0 !important;
+    padding: 0 !important;
+}

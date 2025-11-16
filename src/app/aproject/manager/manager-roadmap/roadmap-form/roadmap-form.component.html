@@ -1,0 +1,223 @@
+<!-- Header Toolbar -->
+<mat-toolbar class="form-toolbar">
+  <button mat-icon-button (click)="onCancel()" class="back-btn">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span class="toolbar-title">
+    {{isEditMode ? 'Edit Roadmap' : 'Create New Roadmap'}}
+  </span>
+  <div class="toolbar-spacer"></div>
+  <div class="selected-courses-count">
+    {{selectedCourseCount}} courses selected
+  </div>
+</mat-toolbar>
+
+<!-- Main Content -->
+<div class="">
+  <mat-card class="form-card">
+    <mat-tab-group class="roadmap-tabs">
+      <!-- Roadmap Information Tab -->
+      <mat-tab label="Roadmap Information">
+        <div class="tab-content">
+          <form [formGroup]="roadmapForm" class="roadmap-form">
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Roadmap Title</mat-label>
+                <input matInput formControlName="title" placeholder="Enter roadmap title">
+                <mat-error *ngIf="roadmapForm.get('title')?.hasError('required')">
+                  Title is required
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Description</mat-label>
+                <textarea matInput formControlName="description" rows="4" 
+                         placeholder="Describe the roadmap learning objectives and outcomes"></textarea>
+                <mat-error *ngIf="roadmapForm.get('description')?.hasError('required')">
+                  Description is required
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="half-width">
+                <mat-label>Category</mat-label>
+                <mat-select formControlName="category" (selectionChange)="onCategoryChange()">
+                  <mat-option value="Frontend">Frontend</mat-option>
+                  <mat-option value="Backend">Backend</mat-option>
+                  <mat-option value="Full-Stack">Full-Stack</mat-option>
+                  <mat-option value="Mobile">Mobile</mat-option>
+                  <mat-option value="DevOps">DevOps</mat-option>
+                  <mat-option value="Data Science">Data Science</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="half-width">
+                <mat-label>Level</mat-label>
+                <mat-select formControlName="level">
+                  <mat-option value="Beginner">Beginner</mat-option>
+                  <mat-option value="Intermediate">Intermediate</mat-option>
+                  <mat-option value="Advanced">Advanced</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="half-width">
+                <mat-label>Estimated Duration</mat-label>
+                <input matInput formControlName="duration" placeholder="e.g., 12 weeks">
+                <mat-hint>Auto-calculated based on selected courses</mat-hint>
+              </mat-form-field>
+            </div>
+
+          </form>
+        </div>
+      </mat-tab>
+
+      <!-- Course Selection Tab -->
+      <mat-tab label="Select & Order Courses">
+        <div class="tab-content">
+          <!-- Course Selection Section -->
+          <div class="course-selection-section">
+            <h3 class="section-title">Available Courses</h3>
+            
+            <!-- Search and Filter -->
+            <div class="course-filters">
+              <mat-form-field appearance="outline" class="search-field">
+                <mat-label>Search courses</mat-label>
+                <input matInput [(ngModel)]="courseSearchTerm" (input)="filterCourses()" 
+                       placeholder="Search by title, instructor, or skills">
+                <mat-icon matSuffix>search</mat-icon>
+              </mat-form-field>
+              
+              <div class="selection-actions">
+                <span class="available-count">{{filteredCourses.length}} available</span>
+                <button mat-button (click)="toggleAllCourses()" [disabled]="filteredCourses.length === 0">
+                  {{allFilteredCoursesSelected ? 'Deselect All' : 'Select All'}}
+                </button>
+              </div>
+            </div>
+
+            <!-- Available Courses List -->
+            <div class="courses-list">
+              <div class="course-item" *ngFor="let course of filteredCourses">
+                <mat-checkbox [(ngModel)]="course.isSelected" (change)="onCourseSelection()">
+                </mat-checkbox>
+                
+                <div class="course-info">
+                  <div class="course-header">
+                    <h4 class="course-title">{{course.title}}</h4>
+                    <span class="course-level" [ngClass]="getLevelClass(course.level)">{{course.level}}</span>
+                  </div>
+                  <p class="course-description">{{course.description}}</p>
+                  <div class="course-meta">
+                    <span class="course-instructor">
+                      <mat-icon>person</mat-icon>
+                      {{course.instructor}}
+                    </span>
+                    <span class="course-duration">
+                      <mat-icon>schedule</mat-icon>
+                      {{course.duration}}
+                    </span>
+                    <span class="course-category">
+                      <mat-icon>category</mat-icon>
+                      {{course.category}}
+                    </span>
+                  </div>
+                  <div class="course-skills">
+                    <mat-chip *ngFor="let skill of course.skills.slice(0, 4)">{{skill}}</mat-chip>
+                    <span class="more-skills" *ngIf="course.skills.length > 4">+{{course.skills.length - 4}} more</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" *ngIf="filteredCourses.length === 0">
+              <mat-icon>school</mat-icon>
+              <p>No courses found matching your criteria</p>
+            </div>
+          </div>
+
+          <!-- Selected Courses Section -->
+          <div class="selected-courses-section" *ngIf="selectedCourses.length > 0">
+            <div class="section-header">
+              <h3 class="section-title">Selected Courses ({{selectedCourses.length}})</h3>
+              <p class="section-subtitle">Drag to reorder the learning sequence</p>
+            </div>
+            
+            <div class="selected-courses-list" 
+                 cdkDropList 
+                 (cdkDropListDropped)="dropCourse($event)">
+              <div class="selected-course-item" 
+                   *ngFor="let course of selectedCourses; let i = index"
+                   cdkDrag>
+                <div class="course-order">
+                  <span class="order-number">{{i + 1}}</span>
+                  <mat-icon cdkDragHandle class="drag-handle">drag_indicator</mat-icon>
+                </div>
+                
+                <div class="selected-course-info">
+                  <div class="selected-course-header">
+                    <h4 class="selected-course-title">{{course.title}}</h4>
+                    <div class="selected-course-actions">
+                      <span class="selected-course-level" [ngClass]="getLevelClass(course.level)">{{course.level}}</span>
+                      <button mat-icon-button (click)="removeCourse(course)" class="remove-btn">
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div class="selected-course-meta">
+                    <span>
+                      <mat-icon>person</mat-icon>
+                      {{course.instructor}}
+                    </span>
+                    <span>
+                      <mat-icon>schedule</mat-icon>
+                      {{course.duration}}
+                    </span>
+                  </div>
+                  
+                  <div class="selected-course-skills">
+                    <mat-chip *ngFor="let skill of course.skills.slice(0, 3)">{{skill}}</mat-chip>
+                    <span class="more-skills" *ngIf="course.skills.length > 3">+{{course.skills.length - 3}} more</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty Selected State -->
+          <div class="empty-selected-state" *ngIf="selectedCourses.length === 0">
+            <mat-icon>playlist_add</mat-icon>
+            <h4>No courses selected</h4>
+            <p>Select courses from the available list above to build your roadmap</p>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card>
+</div>
+
+<!-- Action Buttons -->
+<div class="form-actions">
+  <button mat-button (click)="onCancel()" class="cancel-btn">
+    Cancel
+  </button>
+  <div class="action-spacer"></div>
+  <div class="summary-info">
+    <span class="courses-summary">{{selectedCourseCount}} courses selected</span>
+    <span class="validation-status" *ngIf="roadmapForm.invalid || selectedCourseCount === 0">
+      Complete all required fields and select at least one course
+    </span>
+  </div>
+  <button mat-raised-button 
+          color="primary" 
+          [disabled]="roadmapForm.invalid || selectedCourseCount === 0 || isSubmitting"
+          (click)="onSubmit()"
+          class="submit-btn">
+    <mat-icon *ngIf="isSubmitting">hourglass_empty</mat-icon>
+    <span>{{isSubmitting ? 'Saving...' : (isEditMode ? 'Update Roadmap' : 'Create Roadmap')}}</span>
+  </button>
+</div>

@@ -1,0 +1,21 @@
+.not-found {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+}
+
+@media only screen and (max-width : 767px) {
+
+    .not-found {
+        padding: {
+            top: 50px;
+            bottom: 50px;
+        };
+        p {
+            max-width: 100%;
+        }
+    }
+
+}

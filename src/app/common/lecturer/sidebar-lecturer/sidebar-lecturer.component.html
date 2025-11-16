@@ -1,0 +1,39 @@
+<div
+    class="sidebar-area bg-white box-shadow"
+    [ngClass]="{'active': isToggled}"
+>
+    <div class="logo bg-white">
+        <a routerLink="/lecturer/courses" class="d-flex align-items-center">
+            <img src="img/logo-icon.png" alt="logo">
+            <span>Skill Up</span>
+        </a>
+    </div>
+    <div class="burger-menu" (click)="toggle()" [ngClass]="{'active': isToggled}">
+        <span class="top-bar"></span>
+        <span class="middle-bar"></span>
+        <span class="bottom-bar"></span>
+    </div>
+    <ng-scrollbar visibility="hover" style="height: 100vh;">
+        <div class="sidebar-inner">
+            <div class="sidebar-menu">
+                <mat-accordion>
+                    <span class="sub-title gray-color">Lecturer</span>
+                    <mat-expansion-panel [expanded]="isActive('/lecturer')" hideToggle>
+                    <mat-expansion-panel-header 
+                        class="sidemenu-link"
+                        routerLink="/lecturer/courses"
+                        routerLinkActive="active"
+                        [routerLinkActiveOptions]="{ exact: true }"
+                    >
+                        <mat-panel-title>
+                            <i class="flaticon-menu-1"></i>
+                            <span class="title">Courses</span>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    </mat-expansion-panel>
+                    
+                </mat-accordion>
+            </div>
+        </div>
+    </ng-scrollbar>
+</div>

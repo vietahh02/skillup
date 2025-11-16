@@ -1,0 +1,109 @@
+<div class="document-dialog-container">
+    <h2 mat-dialog-title class="dialog-title">
+      <mat-icon>description</mat-icon>
+      Course Documents
+    </h2>
+    
+    <mat-dialog-content class="dialog-content">
+      <!-- Upload Section -->
+      <div class="upload-section">
+        <h3>Upload New Document</h3>
+        <div class="upload-area" 
+             (click)="fileInput.click()" 
+             (dragover)="onDragOver($event)" 
+             (dragleave)="onDragLeave($event)" 
+             (drop)="onDrop($event)"
+             [class.drag-over]="isDragOver">
+          <input #fileInput type="file" (change)="onFileSelect($event)" 
+                 multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.txt,.xlsx,.xls" style="display: none;">
+          <div class="upload-content">
+            <mat-icon class="upload-icon">cloud_upload</mat-icon>
+            <p class="upload-text">Click to select files or drag and drop</p>
+            <p class="upload-hint">Supported: PDF, DOC, DOCX, PPT, PPTX, TXT, XLS, XLSX</p>
+          </div>
+        </div>
+        
+        <!-- Selected Files Preview -->
+        <div *ngIf="selectedFiles.length > 0" class="selected-files">
+          <h4>Selected Files:</h4>
+          <div *ngFor="let file of selectedFiles; let i = index" class="selected-file-item">
+            <mat-icon [ngSwitch]="getFileType(file.name)" class="file-icon">
+              <span *ngSwitchCase="'pdf'">picture_as_pdf</span>
+              <span *ngSwitchCase="'doc'">description</span>
+              <span *ngSwitchCase="'excel'">grid_on</span>
+              <span *ngSwitchCase="'ppt'">slideshow</span>
+              <span *ngSwitchDefault>insert_drive_file</span>
+            </mat-icon>
+            <div class="file-info">
+              <span class="file-name">{{file.name}}</span>
+              <span class="file-size">{{formatFileSize(file.size)}}</span>
+            </div>
+            <button mat-icon-button (click)="removeSelectedFile(i)" class="remove-btn">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+          <div class="upload-actions">
+            <button mat-raised-button color="primary" (click)="uploadFiles()" [disabled]="isUploading">
+              <mat-icon>upload</mat-icon>
+              {{isUploading ? 'Uploading...' : 'Upload Files'}}
+            </button>
+            <button mat-button (click)="clearSelectedFiles()">Clear All</button>
+          </div>
+        </div>
+      </div>
+
+      <mat-divider></mat-divider>
+
+      <!-- Documents List Section -->
+      <div class="documents-list">
+        <div class="list-header">
+          <h3>Uploaded Documents ({{documents.length}})</h3>
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Search documents...</mat-label>
+            <input matInput [(ngModel)]="searchTerm" (input)="filterDocuments()">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <div *ngIf="filteredDocuments.length === 0" class="empty-state">
+          <mat-icon>folder_open</mat-icon>
+          <p>No documents uploaded yet</p>
+        </div>
+
+        <div *ngIf="filteredDocuments.length > 0" class="documents-grid">
+          <div *ngFor="let doc of filteredDocuments" class="document-card">
+            <div class="document-header">
+              <mat-icon [ngSwitch]="doc.fileType" class="doc-type-icon">
+                <span *ngSwitchCase="'pdf'">picture_as_pdf</span>
+                <span *ngSwitchCase="'doc'">description</span>
+                <span *ngSwitchCase="'excel'">grid_on</span>
+                <span *ngSwitchCase="'ppt'">slideshow</span>
+                <span *ngSwitchDefault>insert_drive_file</span>
+              </mat-icon>
+              <button mat-icon-button class="delete-btn" (click)="deleteDocument(doc)" 
+                      matTooltip="Delete document">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+            <div class="document-info">
+              <h4 class="document-name">{{doc.fileName}}</h4>
+              <p class="document-meta">
+                <span class="size">{{doc.fileSizeFormatted}}</span>
+                <span class="date">{{doc.createdAt | date:'short'}}</span>
+              </p>
+            </div>
+            <div class="document-actions">
+              <button mat-button (click)="downloadDocument(doc)" class="action-btn">
+                <mat-icon>download</mat-icon>
+                Download
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions class="dialog-actions">
+      <button mat-button (click)="close()">Close</button>
+    </mat-dialog-actions>
+  </div>
