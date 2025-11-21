@@ -1,6 +1,6 @@
 <div class="create-dialog-box">
     <div class="title d-flex align-items-center justify-content-space-between">
-        <h4 class="mb-0">Add Course </h4>
+        <h4 class="mb-0">{{ isEdit ? 'Edit Course' : 'Add Course' }} </h4>
         <button class="close-btn bg-transparent p-0 border-none" (click)="close()"><i class="flaticon-close"></i></button>
     </div>
     <form [formGroup]="courseForm">
@@ -27,8 +27,8 @@
                 <div class="form-group">
                     <label class="d-block fw-semibold">Course Type<span class="text-danger">*</span></label>
                     <select class="input-control" formControlName="courseType" placeholder="Select Course Type">
-                        <option *ngFor="let courseType of listCourseTypes" [value]="courseType">
-                            {{ courseType }}
+                        <option *ngFor="let courseType of listCourseTypes" [value]="courseType.courseTypeId">
+                            {{ courseType.name }}
                         </option>
                     </select>
                     <div *ngIf="courseForm.get('courseType')?.hasError('required') && courseForm.get('courseType')?.touched" class="error-message">
@@ -39,12 +39,12 @@
             <div class="col-md-6">
                 <div class="form-group">
                     <label class="d-block fw-semibold">Level<span class="text-danger">*</span></label>
-                    <select class="input-control" formControlName="level" placeholder="Select Level">
-                        <option *ngFor="let level of listLevels" [value]="level">
-                            {{ level }}
+                    <select class="input-control" formControlName="targetLevel" placeholder="Select Level">
+                        <option *ngFor="let level of listLevels" [value]="level.levelId">
+                            {{ level.name }}
                         </option>
                     </select>
-                    <div *ngIf="courseForm.get('level')?.hasError('required') && courseForm.get('level')?.touched" class="error-message">
+                    <div *ngIf="courseForm.get('targetLevel')?.hasError('required') && courseForm.get('targetLevel')?.touched" class="error-message">
                         Level is required
                     </div>
                 </div>
@@ -60,6 +60,7 @@
                             accept="image/*"
                             (change)="onImageSelected($event)"
                             #fileInput
+                            style="display: none;"
                         >
                         <div class="image-preview-wrapper" *ngIf="!selectedImage">
                             <div class="image-placeholder" (click)="fileInput.click()">

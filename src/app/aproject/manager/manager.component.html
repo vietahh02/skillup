@@ -7,7 +7,9 @@
         [ngClass]="{'active': isToggled}"
     >
         <app-header-manager />
-        <router-outlet />
+        <div class="body-skill">
+            <router-outlet />
+        </div>
         <div class="flex-grow-1"></div>
         <app-footer />
     </div>

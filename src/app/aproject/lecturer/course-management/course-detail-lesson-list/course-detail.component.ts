@@ -2,12 +2,12 @@ import { Component, inject, Inject } from '@angular/core';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatIcon } from "@angular/material/icon";
-import { MatCard, MatCardHeader, MatCardContent, MatCardModule } from "@angular/material/card";
+import { MatCardModule } from "@angular/material/card";
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -21,51 +21,7 @@ import { CreateSubLesson } from './sub-lesson-dialog/dialog-creat-sublesson';
 import { Lesson, SubLesson } from '../../../../models/course.models';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ApiCourseServices } from '../../../../services/course.service';
-
-const ELEMENT_DATA: Lesson[] = [
-  { 
-    id: 1, 
-    title: 'Introduction about Angular', 
-    description: 'Basic concepts and getting started with Angular framework',
-    duration: '45 min',
-    subLessons: [
-      { id: 1, name: 'What is Angular?', duration: '15 min', description: 'Overview of Angular framework' },
-      { id: 2, name: 'Setting up Development Environment', duration: '20 min', description: 'Install Node.js, Angular CLI and VS Code' },
-      { id: 3, name: 'Creating First Angular App', duration: '10 min', description: 'Generate and run your first Angular application' }
-    ]
-  },
-  { 
-    id: 2, 
-    title: 'Angular HTML Templates', 
-    description: 'Learn about Angular templates, data binding and directives',
-    duration: '60 min',
-    subLessons: [
-      { id: 4, name: 'Template Syntax', duration: '20 min', description: 'Understanding Angular template syntax' },
-      { id: 5, name: 'Data Binding', duration: '25 min', description: 'One-way and two-way data binding' },
-      { id: 6, name: 'Structural Directives', duration: '15 min', description: 'Using *ngIf, *ngFor and other directives' }
-    ]
-  },
-  { 
-    id: 3, 
-    title: 'Angular SCSS Styling', 
-    description: 'Styling Angular components with SCSS and CSS',
-    duration: '40 min',
-    subLessons: [
-      { id: 7, name: 'Component Styles', duration: '15 min', description: 'Understanding component-scoped styles' },
-      { id: 8, name: 'SCSS Features', duration: '25 min', description: 'Variables, mixins and nested styles' }
-    ]
-  },
-  { 
-    id: 4, 
-    title: 'Angular TypeScript', 
-    description: 'Working with TypeScript in Angular applications',
-    duration: '50 min',
-    subLessons: [
-      { id: 9, name: 'TypeScript Basics', duration: '20 min', description: 'Types, interfaces and classes' },
-      { id: 10, name: 'Angular Components', duration: '30 min', description: 'Creating and managing Angular components' }
-    ]
-  }
-];
+import { ConfirmDialogComponent } from '../../../../common/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-drag-table',
@@ -74,32 +30,118 @@ const ELEMENT_DATA: Lesson[] = [
   imports: [MatCardModule, MatButtonModule, MatMenuModule, MatTableModule, MatPaginatorModule, MatIcon, DragDropModule, CommonModule, FormsModule, RouterLink, MatDialogModule, MatFormFieldModule, MatInputModule, MatDividerModule, MatTooltipModule, MatExpansionModule, MatChipsModule, ReactiveFormsModule]
 })
 export class LecturerCourseDetail {
-  constructor(public dialog: MatDialog, public router: Router, private route: ActivatedRoute) {}
+  constructor(public dialog: MatDialog, public router: Router, private route: ActivatedRoute, private courseService: ApiCourseServices, private snack: MatSnackBar) {}
   id!: string;
 
-  dataSource = new MatTableDataSource(ELEMENT_DATA);
+  dataSource = new MatTableDataSource();
   searchTerm = '';
-  lessons: Lesson[] = ELEMENT_DATA;
+  lessons: Lesson[] = [];
 
   ngOnInit() {
     this.id = this.route.snapshot.paramMap.get('id')!;
-    console.log(this.id);
+    this.getLessons();
   }
 
-  drop(event: CdkDragDrop<Lesson[]>) {
-    const prev = this.dataSource.data;
-    moveItemInArray(prev, event.previousIndex, event.currentIndex);
-    this.dataSource.data = [...prev];
+  getLessons() {
+    this.courseService.getLessons(this.id).subscribe((lessons: Lesson[]) => {
+      this.lessons = lessons;
+    });
+  }
+
+  deleteLesson(lessonId: number | string) {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '420px',
+      data: {
+        type: 'warning',
+        title: 'Delete Lesson',
+        message: 'Are you sure you want to delete this lesson?',
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        destructive: true
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.courseService.deleteLesson(lessonId).subscribe({
+          next: () => {
+          this.getLessons();
+          this.snack.open('Lesson deleted successfully', '', {
+            duration: 3000,
+            panelClass: ['success-snackbar', 'custom-snackbar'],
+            horizontalPosition: 'right',
+            verticalPosition: 'top'
+          });
+        },
+        error: (error: any) => {
+          this.snack.open('Failed to delete lesson', '', {
+            duration: 3000,
+            panelClass: ['error-snackbar', 'custom-snackbar'],
+            horizontalPosition: 'right',
+            verticalPosition: 'top'
+          });
+        }
+      });
+      }
+    });
   }
 
   dropLesson(event: CdkDragDrop<Lesson[]>) {
+    // Lưu orderIndex của 2 lesson cần swap
+    const prev = this.lessons[event.previousIndex];
+    const current = this.lessons[event.currentIndex];
+
+    const previousOrderIndex = prev.orderIndex;
+    const currentOrderIndex = current.orderIndex;
+    
+    // Move items in array
     moveItemInArray(this.lessons, event.previousIndex, event.currentIndex);
-    this.lessons = [...this.lessons];
+    
+    // Swap orderIndex của 2 lesson
+    current.orderIndex = previousOrderIndex;
+    prev.orderIndex = currentOrderIndex;
+    
+    this.courseService.reorderLessons({
+      courseId: Number(this.id),
+      lessons: this.lessons.map((lesson: Lesson) => ({
+        lessonId: lesson.lessonId as number,
+        orderIndex: lesson.orderIndex as number
+      }))
+    }).subscribe({
+      next: () => {
+        this.snack.open('Lessons reordered successfully', '', {
+          duration: 3000,
+          panelClass: ['success-snackbar', 'custom-snackbar'],
+          horizontalPosition: 'right',
+          verticalPosition: 'top'
+        });
+      },
+      error: (error: any) => {
+        this.snack.open('Failed to reorder lessons', '', {
+          duration: 3000,
+          panelClass: ['error-snackbar', 'custom-snackbar'],
+          horizontalPosition: 'right',
+          verticalPosition: 'top'
+        });
+      }
+    });
   }
 
   dropSubLesson(event: CdkDragDrop<SubLesson[]>, lesson: Lesson) {
     if (lesson.subLessons) {
+      // Lưu orderIndex của 2 sub-lesson cần swap
+      const previousOrderIndex = lesson.subLessons[event.previousIndex].orderIndex;
+      const currentOrderIndex = lesson.subLessons[event.currentIndex].orderIndex;
+      
+      // Move items in array
       moveItemInArray(lesson.subLessons, event.previousIndex, event.currentIndex);
+      
+      // Swap orderIndex của 2 sub-lesson
+      if (previousOrderIndex !== undefined && currentOrderIndex !== undefined) {
+        lesson.subLessons[event.currentIndex].orderIndex = previousOrderIndex;
+        lesson.subLessons[event.previousIndex].orderIndex = currentOrderIndex;
+      }
+      
       this.lessons = [...this.lessons];
     }
   }
@@ -121,6 +163,11 @@ export class LecturerCourseDetail {
           lesson, 
           courseId: this.id
         }
+    },
+    ).afterClosed().subscribe(result => {
+      if (result) {
+        this.getLessons();
+      }
     });
   }
 
@@ -142,13 +189,58 @@ export class LecturerCourseDetail {
         exitAnimationDuration,
         data: {
           lesson,
-          courseId: this.id
+          courseId: this.id,
+          load: () => this.getLessons(),
+          subLesson
         }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.handleSubLessonResult(lesson, result, subLesson);
+      }
+    });
+  }
+
+  deleteSubLesson(subLessonId: number | string) {
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '420px',
+      data: {
+        type: 'warning',
+        title: 'Delete Sub Lesson',
+        message: 'Are you sure you want to delete this sub lesson?',
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        destructive: true
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.courseService.deleteSubLesson(subLessonId).subscribe({
+          next: () => {
+            this.lessons = this.lessons.map((lesson: Lesson) => {
+              if (lesson.subLessons) {
+                lesson.subLessons = lesson.subLessons.filter(subLesson => subLesson.id !== subLessonId);
+              }
+              return lesson;
+            });
+            this.snack.open('Sub lesson deleted successfully', '', {
+              duration: 3000,
+              panelClass: ['success-snackbar', 'custom-snackbar'],
+              horizontalPosition: 'right',
+              verticalPosition: 'top'
+            });
+          },
+          error: (error: any) => {
+            this.snack.open('Failed to delete sub lesson', '', {
+              duration: 3000,
+              panelClass: ['error-snackbar', 'custom-snackbar'],
+              horizontalPosition: 'right',
+              verticalPosition: 'top'
+            });
+          }
+        });
       }
     });
   }
@@ -185,41 +277,65 @@ export class LecturerCourseDetail {
 })
 export class CreateCourse {
 
-    constructor(
-        public dialogRef: MatDialogRef<CreateCourse>, @Inject(MAT_DIALOG_DATA) public data: any,
-        private snack: MatSnackBar,
-        private courseService: ApiCourseServices,
-        private route: ActivatedRoute
-    ) {}
+  constructor(
+    public dialogRef: MatDialogRef<CreateCourse>, @Inject(MAT_DIALOG_DATA) public data: any,
+    private snack: MatSnackBar,
+    private courseService: ApiCourseServices,
+  ) {}
 
-    courseId!: number | string;
+  courseId!: number | string;
+  lessonId!: number | string;
 
-    fb = inject(FormBuilder);
-    lessonForm = this.fb.group({
-      name: ['', [Validators.required]],
-      description: ['', []],
-    });
-    isEdit = false;
-    
-    ngOnInit() {
-      this.courseId = this.data.courseId;
-      if (this.data.lesson) {
-        this.isEdit = true;
+  fb = inject(FormBuilder);
+  lessonForm = this.fb.group({
+    name: ['', [Validators.required]],
+    description: ['', []],
+  });
+  isEdit = false;
+  
+  ngOnInit() {
+    this.courseId = this.data.courseId;
+    this.lessonId = this.data.lesson?.lessonId;
+    if (this.lessonId) {
+      this.isEdit = true;
+      this.courseService.detailLesson(this.lessonId).subscribe((lesson: Lesson) => {
         this.lessonForm.patchValue({
-          name: this.data.lesson.name,
-          description: this.data.lesson.description,
+          name: lesson.title,
+          description: lesson.description,
         });
-      }
+      });
     }
+  }
 
-    onSubmit() {
-      this.lessonForm.markAllAsTouched();
-      if (!this.lessonForm.valid) return;
+  onSubmit() {
+    this.lessonForm.markAllAsTouched();
+    if (!this.lessonForm.valid) return;
 
-      const payload = {
-        title: this.lessonForm.value.name,
-        description: this.lessonForm.value.description,
-      } as Lesson;
+    const payload = {
+      title: this.lessonForm.value.name,
+      description: this.lessonForm.value.description,
+    } as Lesson;
+    if (this.isEdit) {
+      this.courseService.updateLesson(this.lessonId as number, payload).subscribe({
+        next: (lesson: Lesson) => {
+          this.snack.open('Lesson updated successfully', '', {
+            duration: 3000,
+            panelClass: ['success-snackbar', 'custom-snackbar'],
+            horizontalPosition: 'right',
+            verticalPosition: 'top'
+          });
+          this.dialogRef.close(true);
+        },
+        error: (error: any) => {
+          this.snack.open('Failed to update lesson', '', {
+            duration: 3000,
+            panelClass: ['error-snackbar', 'custom-snackbar'],
+            horizontalPosition: 'right',
+            verticalPosition: 'top'
+          });
+        }
+      });
+    } else {
       this.courseService.createLesson(this.courseId, payload).subscribe({
         next: (lesson: Lesson) => {
           this.snack.open('Lesson created successfully', '', {
@@ -240,9 +356,10 @@ export class CreateCourse {
         }
       });
     }
+  }
 
-    close(){
-        this.dialogRef.close(true);
-    }
+  close(){
+      this.dialogRef.close(true);
+  }
 
 }

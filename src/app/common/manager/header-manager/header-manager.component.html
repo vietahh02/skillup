@@ -139,7 +139,7 @@
             <!-- Profile Menu - Show when authenticated -->
             <li *ngIf="currentUser$ | async as user">
                 <button mat-icon-button [matMenuTriggerFor]="profileMenu" class="profile-btn main-color border-none bg-transparent position-relative">
-                    <img src="{{ user.avatarUrl || 'img/admin.jpg' }}" class="rounded-circle avatar" alt="admin">
+                    <img src="{{ user.avatarUrl || 'img/user/user12.jpg' }}" class="rounded-circle avatar" alt="admin">
                    
                     <span class="fw-semibold">{{ user.fullName }}</span>
                 </button>

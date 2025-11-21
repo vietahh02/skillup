@@ -1,9 +1,6 @@
-import { QuestionType } from "../enums/api.enums";
-import { Quiz } from "./quiz.models";
-
 export interface Course {
     courseId: number;
-    name: string;
+    courseName: string;
     description: string;
     status: CourseStatus;
     courseType: CourseType;
@@ -38,40 +35,62 @@ enum CourseStatus {
   }
 
 export interface CourseDetail {
-    id: number;
+    courseId: number;
     name: string;
     description: string;
-    image: string;
+    status: string;
+    courseType: string;
+    courseTypeId: number;
+    targetLevel: string;
+    targetLevelId: number;
+    imageUrl: string;
     duration: number;
-    category: string;
-    level: string;
+    createdBy: number;
+    createdByName: string;
+    createdAt: string;
+    isEnrolled: boolean;
+    lessons: Lesson[];
+    quizzes: Quiz;
+    documents: DocumentItem[];
 }
+
+
 
 export interface CourseCreateEdit {
     name: string;
     description?: string;
-    image: File | null;
+    courseTypeId: number | string;
+    targetLevelId: number | string;
     duration: number;
-    category: string;
-    level: string;
+    imageUrl: File;
 }
 
 export interface Lesson {
-    id?: number;
+    lessonId: number;
+    courseId: number;
     title: string;
-    description?: string;
-    duration?: string;
-    subLessons?: SubLesson[];
+    description: string;
+    contentType: string;
+    url: string;
+    publicId: string;
+    orderIndex: number;
+    totalDuration: number;
+    subLessons: SubLesson[];
 }
 
 export interface SubLesson {
     id: number;
-    name: string;
-    videoUrl?: string;
-    videoFile?: File;
-    duration?: string;
-    description?: string;
-    // quizId?: number;
+    title: string;
+    description: string;
+    duration: number;
+    orderIndex: number;
+    contentType: string;
+    contentUrl: string;
+    publicId: string;
+    fileSizeBytes: number;
+    createdBy: number;
+    createdAt: string;
+    updatedAt: string;
 }
 
 export interface SubLessonCreateEdit {
@@ -92,3 +111,77 @@ export interface CourseDetailManager {
     level: string;
     quizzes?: Quiz[];
 }
+
+export interface SubLessonCreateEdit {
+    title: string;
+    videoUrl?: string;
+    videoFile: File | null;
+    duration?: string;
+    description?: string;
+}
+
+export interface CourseUserView {
+    courseId: number;
+    courseName: string;
+    level: string;
+    totalLesson: number;
+    totalDuration: number;
+    creatorName: string;
+    imageUrl: string;
+    isEnrolled: boolean;
+}
+
+export interface reorder {
+    courseId: number;
+    lessons: {
+        lessonId: number;
+        orderIndex: number;
+    }[]
+}
+
+export interface DocumentItem {
+    documentId: number;
+    courseId: number;
+    courseName: string;
+    fileName: string;
+    fileType: string;
+    fileSize: number;
+    fileSizeFormatted: string;
+    fileUrl: string;
+    publicId: string;
+    createdBy: number;
+    createdByName: string;
+    createdAt: string;
+    updatedAt: string;
+  }
+  
+  /* ------------ QUIZZES ------------ */
+  
+  export interface Quiz {
+    quizId: number;
+    courseId: number;
+    courseName: string;
+    title: string;
+    passScore: number;
+    attemptLimit: number;
+    createdAt: string;
+    updatedAt: string;
+    questions: Question[];
+  }
+  
+  export interface Question {
+    questionId: number;
+    quizId: number;
+    title: string;
+    questionType: string;
+    points: number;
+    orderIndex: number;
+    answerOptions: AnswerOption[];
+  }
+  
+  export interface AnswerOption {
+    optionId: number;
+    questionId: number;
+    content: string;
+    isCorrect: boolean;
+  }

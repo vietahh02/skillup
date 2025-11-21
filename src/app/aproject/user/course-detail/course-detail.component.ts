@@ -4,21 +4,36 @@ import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatMenuModule } from '@angular/material/menu';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
+import { ApiCourseServices } from '../../../services/course.service';
+import { CourseDetail } from '../../../models/course.models';
+import { CommonModule } from '@angular/common';
 
 @Component({
     selector: 'app-course-detail',
-    imports: [RouterLink, MatCardModule, MatButtonModule, MatMenuModule, MatCheckboxModule, MatExpansionModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule],
+    imports: [CommonModule,RouterLink, MatCardModule, MatButtonModule, MatMenuModule, MatCheckboxModule, MatExpansionModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule],
     templateUrl: './course-detail.component.html',
     styleUrls: ['./course-detail.component.scss'],
 })
-export class CourseDetail {
+export class CourseDetailComponent {
     
-    constructor() {}
+    constructor(private courseService: ApiCourseServices, private route: ActivatedRoute) {}
+
+    course!: CourseDetail;
+    id!: string;
+    totalDuration!: number;
+
+    ngOnInit(): void {
+        this.id = this.route.snapshot.paramMap.get('id')!;
+        this.courseService.getCourseById(Number(this.id)).subscribe((course : any) => {
+            this.course = course;
+            this.totalDuration = this.course.lessons.reduce((acc, lesson) => acc + lesson.totalDuration, 0);
+        });
+    }
 
     toggleReply(feedbackId: string): void {
         const replyElement = document.getElementById(`reply-${feedbackId}`);

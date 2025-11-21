@@ -1,5 +1,8 @@
 // Some CSS is Available on the Style.scss file because of Angular Material CSS didn't work in Component CSS.
 .course-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: top;
     padding: 50px;
     background-color: var(--heraBlueColor);
     margin: {
@@ -13,7 +16,7 @@
         margin-bottom: 40px;
     }
     h3 {
-        font-size: 28px;
+        font-size: 40px;
         max-width: 510px;
     }
     p {

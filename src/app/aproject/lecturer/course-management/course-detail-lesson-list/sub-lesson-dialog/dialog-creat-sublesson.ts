@@ -12,6 +12,8 @@ import { FormBuilder } from "@angular/forms";
 import { Validators } from "@angular/forms";
 import { Inject } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { SubLesson, SubLessonCreateEdit } from "../../../../../models/course.models";
+import { ApiCourseServices } from "../../../../../services/course.service";
 
 @Component({
     selector: 'create-sublesson',
@@ -23,12 +25,17 @@ export class CreateSubLesson implements OnDestroy {
     subLessonForm: FormGroup;
     selectedVideo: File | null = null;
     selectedVideoUrl: string | null = null;
+    isEdit = false;
+    lessonId: number | string = '';
+    isDeleteVideo = false;
+    fileSizeBytes: number = 0;
     
     constructor(
         public dialogRef: MatDialogRef<CreateSubLesson>, 
         @Inject(MAT_DIALOG_DATA) public data: any,
         private fb: FormBuilder,
-        private snack: MatSnackBar
+        private snack: MatSnackBar,
+        private courseService: ApiCourseServices
     ) {
         this.subLessonForm = this.fb.group({
             name: ['', Validators.required],
@@ -38,7 +45,24 @@ export class CreateSubLesson implements OnDestroy {
     }
 
     ngOnInit() {
-        console.log('SubLesson dialog data:', this.data);
+        console.log(this.data);
+        this.lessonId = this.data.lesson.lessonId;
+        this.isEdit = this.data.subLesson ? true : false;
+        if (this.isEdit) {
+            this.courseService.detailSubLesson(this.data.subLesson.id).subscribe((subLesson: SubLesson) => {
+                this.subLessonForm.patchValue({
+                    name: subLesson.title,
+                    description: subLesson.description,
+                    videoFile: new File([], subLesson.contentUrl || ''),
+                });
+                this.selectedVideoUrl = subLesson.contentUrl || null;
+                this.selectedVideo = new File([], subLesson.contentUrl || '');
+                this.fileSizeBytes = subLesson.fileSizeBytes || 0;
+                (this.selectedVideo as any).name = subLesson.contentUrl?.split('/').pop() || '';
+                this.subLessonForm.get('videoFile')?.updateValueAndValidity();
+            });
+        }
+
     }
 
     isFieldInvalid(fieldName: string): boolean {
@@ -47,12 +71,57 @@ export class CreateSubLesson implements OnDestroy {
     }
 
     onSubmit(): void {
-        if (this.subLessonForm.valid) {
-            this.dialogRef.close(this.subLessonForm.value);
+        this.subLessonForm.markAllAsTouched();
+        if (!this.subLessonForm.valid) {
+            return;
+        }
+        const payload = {
+            title: this.subLessonForm.value.name,
+            videoFile: this.selectedVideo,
+            description: this.subLessonForm.value.description,
+        } as SubLessonCreateEdit;
+
+        if (this.isEdit) {
+            this.courseService.updateSubLesson(this.data.subLesson.id, payload, this.isDeleteVideo).subscribe({
+                next: (subLesson: SubLesson) => {
+                    this.data.load();
+                    this.dialogRef.close(true);
+                    this.snack.open('Sub lesson updated successfully', '', {
+                        duration: 3000,
+                        panelClass: ['success-snackbar', 'custom-snackbar'],
+                        horizontalPosition: 'right',
+                        verticalPosition: 'top'
+                    });
+                },
+                error: (error: any) => {
+                    this.snack.open('Failed to update sub lesson', '', {
+                        duration: 3000,
+                        panelClass: ['error-snackbar', 'custom-snackbar'],
+                        horizontalPosition: 'right',
+                        verticalPosition: 'top'
+                    });
+                }
+            });
         } else {
-            // Mark all fields as touched to show validation errors
-            Object.keys(this.subLessonForm.controls).forEach(key => {
-                this.subLessonForm.get(key)?.markAsTouched();
+            this.courseService.createSubLesson(payload, this.lessonId).subscribe({
+                next: (subLesson: SubLesson) => {
+                    this.data.load();
+                    this.dialogRef.close(true);
+                    this.snack.open('Sub lesson created successfully', '', {
+                        duration: 3000,
+                        panelClass: ['success-snackbar', 'custom-snackbar'],
+                        horizontalPosition: 'right',
+                        verticalPosition: 'top'
+                    });
+                },
+                error: (error: any) => {
+                    this.snack.open('Failed to create sub lesson', '', {
+                        duration: 3000,
+                        panelClass: ['error-snackbar', 'custom-snackbar'],
+                        horizontalPosition: 'right',
+                        verticalPosition: 'top'
+                    });
+                }
             });
         }
     }
@@ -61,9 +130,6 @@ export class CreateSubLesson implements OnDestroy {
         this.dialogRef.close();
     }
 
-    /**
-     * Handle video file selection and preview
-     */
     onVideoSelected(event: Event): void {
         const input = event.target as HTMLInputElement;
         if (input.files && input.files[0]) {
@@ -98,14 +164,12 @@ export class CreateSubLesson implements OnDestroy {
         }
     }
 
-    /**
-     * Remove selected video
-     */
     removeVideo(): void {
         if (this.selectedVideoUrl) {
             URL.revokeObjectURL(this.selectedVideoUrl);
         }
-        
+        this.fileSizeBytes = 0;
+        this.isDeleteVideo = true;
         this.selectedVideo = null;
         this.selectedVideoUrl = null;
         this.subLessonForm.patchValue({ videoFile: null });
@@ -117,11 +181,9 @@ export class CreateSubLesson implements OnDestroy {
         }
     }
 
-    /**
-     * Format file size for display
-     */
     getFileSize(bytes: number): string {
-        if (bytes === 0) return '0 Bytes';
+        bytes = this.fileSizeBytes === 0 ? bytes : this.fileSizeBytes;
+        if (bytes === 0 && this.fileSizeBytes === 0) return '0 Bytes';
         
         const k = 1024;
         const sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -129,10 +191,7 @@ export class CreateSubLesson implements OnDestroy {
         
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
-
-    /**
-     * Clean up object URLs on component destroy
-     */
+    
     ngOnDestroy(): void {
         if (this.selectedVideoUrl) {
             URL.revokeObjectURL(this.selectedVideoUrl);

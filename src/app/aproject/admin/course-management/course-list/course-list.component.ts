@@ -7,8 +7,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { Router } from '@angular/router';
+import { ApiCourseServices } from '../../../../services/course.service';
 
 @Component({
     selector: 'app-admin-course-list',
@@ -38,134 +40,77 @@ export class AdminCourseList implements AfterViewInit {
         'name',
         'type',
         'createdBy',
-        'createdDate',
+        'createdAt',
         'status',
         'action',
     ];
 
-    data = new MatTableDataSource<any>(fakeCourses);
+    data = new MatTableDataSource<any>();
     searchTerm = '';
-
+    totalItems = 0;
+    currentPage = 1;
+    pageSize = 10;
     @ViewChild(MatPaginator) paginator!: MatPaginator;
+
+    constructor(private router: Router, private courseService: ApiCourseServices) {}
 
     ngAfterViewInit() {
         this.data.paginator = this.paginator;
 
         this.data.filterPredicate = (data, filter) =>
             data.name.toLowerCase().includes(filter) || data.email.toLowerCase().includes(filter);
+
+        this.loadCourses();
+    }
+
+    loadCourses() {
+        this.courseService.getCourseListManager(this.currentPage, this.pageSize, this.searchTerm).subscribe({
+            next: (response: any) => {
+                this.data.data = response.items || [];
+                this.totalItems = response.total || 0;
+                this.currentPage = response.page || 1;
+                this.pageSize = response.pageSize || 10;
+            },
+            error: (error: any) => {
+                this.totalItems = 0;
+            }
+        });
+    }
+
+    getDate(date: string) {
+        return date.split('T')[0];
     }
 
     search() {
-        this.data.filter = this.searchTerm.trim().toLowerCase();
-        if (this.data.paginator) {
-            this.data.paginator.firstPage();
+        this.currentPage = 1;
+        if (this.paginator) {
+        this.paginator.pageIndex = 0;
         }
+        this.loadCourses();
     }
-}
 
-const fakeCourses = [
-    {
-        id: 1,
-        name: 'Introduction to React',
-        type: 'Programming',
-        createdBy: 'John Smith',
-        createdDate: '2025-01-15',
-        status: 'Approved',
-    },
-    {
-        id: 2,
-        name: 'Advanced JavaScript',
-        type: 'Programming',
-        createdBy: 'Emma Wilson',
-        createdDate: '2025-02-20',
-        status: 'Pending',
-    },
-    {
-        id: 3,
-        name: 'Digital Marketing Basics',
-        type: 'Marketing',
-        createdBy: 'Sarah Johnson',
-        createdDate: '2025-03-10',
-        status: 'Approved',
-    },
-    {
-        id: 4,
-        name: 'Web Design Fundamentals',
-        type: 'Design',
-        createdBy: 'Mike Brown',
-        createdDate: '2025-03-15',
-        status: 'Rejected',
-    },
-    {
-        id: 5,
-        name: 'Data Science with Python',
-        type: 'Data Science',
-        createdBy: 'Lisa Anderson',
-        createdDate: '2025-04-01',
-        status: 'Approved',
-    },
-    {
-        id: 6,
-        name: 'UI/UX Design Principles',
-        type: 'Design',
-        createdBy: 'Alex Thompson',
-        createdDate: '2025-04-15',
-        status: 'Pending',
-    },
-    {
-        id: 7,
-        name: 'Social Media Marketing',
-        type: 'Marketing',
-        createdBy: 'Emily Davis',
-        createdDate: '2025-05-01',
-        status: 'Rejected',
-    },
-    {
-        id: 8,
-        name: 'Machine Learning Fundamentals',
-        type: 'Data Science',
-        createdBy: 'David Wilson',
-        createdDate: '2025-05-15',
-        status: 'Approved',
-    },
-    {
-        id: 9,
-        name: 'Node.js Backend Development',
-        type: 'Programming',
-        createdBy: 'Michael Chen',
-        createdDate: '2025-06-01',
-        status: 'Pending',
-    },
-    {
-        id: 10,
-        name: 'Mobile App Design',
-        type: 'Design',
-        createdBy: 'Sophie Martin',
-        createdDate: '2025-06-15',
-        status: 'Approved',
-    },
-    {
-        id: 11,
-        name: 'Email Marketing Strategies',
-        type: 'Marketing',
-        createdBy: 'Oliver Taylor',
-        createdDate: '2025-07-01',
-        status: 'Rejected',
-    },
-    {
-        id: 12,
-        name: 'Python for Data Analysis',
-        type: 'Data Science',
-        createdBy: 'Anna White',
-        createdDate: '2025-07-15',
-        status: 'Approved',
-    },
-    {
-        id: 13,
-        name: 'Vue.js Frontend Development',
-        type: 'Programming',
-        createdBy: 'James Lee',
-        createdDate: '2025-08-01',
-        status: 'Pending',
-    },
-];
+    viewCourseDetail(course: any) {
+        this.router.navigate(['/admin/courses', course.courseId]);
+    }
+
+    onPageChange(p: number) {
+        if (p < 1) return;
+        this.currentPage = p;
+        this.loadCourses();
+      }
+    
+      onPageSizeChange(s: number) {
+        this.pageSize = s;
+        this.currentPage = 1;
+        this.loadCourses();
+      }
+    
+    onPaginatorChange(event: PageEvent) {
+        if (event.pageSize !== this.pageSize) {
+            this.onPageSizeChange(event.pageSize);
+          } else {
+            this.onPageChange(event.pageIndex + 1);
+          }
+    }
+
+}

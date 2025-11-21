@@ -14,30 +14,32 @@
 <mat-card class="mb-25 tagus-card">
     <mat-card-content>
         <div class="course-details-header mb-25 border-radius">
-            <div class="d-md-flex mb-25 align-items-center">
-                <img src="img/lms/lms1.jpg" class="border-radius" width="100" alt="lms">
-                <h3 class="mb-0 ms-20 text-white">Node.js for Beginners: Go From Zero to Hero with Node.js</h3>
+            <div class="d-md-flex mb-25 align-items-top">
+                <img [src]="course.imageUrl || 'img/lms/lms1.jpg'" class="border-radius" width="200" alt="lms">
+                <h3 class="mb-0 ms-20 text-white">{{course.name || ''}}</h3>
             </div>
-            <p class="text-white">Node.js for Beginners: Alias animi labque, deserunt distinctio eum excepturi fuga iure labore magni molestias mollitia natus, officia pofro quis sunt temporibus veritatis voluptatem voluptatum.</p>
-            <a mat-raised-button routerLink="/course/learn/1" class="tagus mt-10">Enroll Now</a>
+            <!-- <p class="text-white">{{course.description || ''}}</p> -->
+             <div>
+                 <a mat-raised-button routerLink="/course/learn/{{course.courseId}}" class="tagus mt-10" >{{course.isEnrolled ? 'Continue' : 'Enroll Now'}}</a>
+             </div>
         </div>
         <div class="course-details-desc">
             <div class="d-md-flex meta mb-25 pb-25 justify-content-space-between align-items-center">
                 <ul class="list mb-0 d-md-flex mt-0 ps-0">
                     <li class="gray-color fw-semibold">
                         Course For
-                        <span class="d-block fw-semibold position-relative"><i class="ri-bar-chart-2-line"></i> Beginner</span>
+                        <span class="d-block fw-semibold position-relative"><i class="ri-bar-chart-2-line"></i> {{course.targetLevel || ''}}</span>
                     </li>
                     <li class="gray-color fw-semibold">
                         Lecturer
                         <div class="d-flex align-items-center">
                             <img src="img/user/user2.jpg" class="rounded-circle" width="30" alt="user">
-                            <span class="d-block fw-semibold">Jonathan Andrews</span>
+                            <span class="d-block fw-semibold">{{course.createdByName || ''}}</span>
                         </div>
                     </li>
                     <li class="gray-color fw-semibold">
                         Course Duration
-                        <span class="d-block fw-semibold position-relative"><i class="ri-time-line"></i> 32h 50m</span>
+                        <span class="d-block fw-semibold position-relative"><i class="ri-time-line"></i> {{totalDuration || 0}}s</span>
                     </li>
                 </ul>
                 <!-- <div class="rating-box text-end">
@@ -55,78 +57,21 @@
                 <div class="col-lg-6 col-md-12">
                     <h5 class="mb-25">Table Of Contents</h5>
                     <mat-accordion>
-                        <mat-expansion-panel>
+                        <mat-expansion-panel *ngFor="let lesson of course.lessons">
                             <mat-expansion-panel-header>
                                 <mat-panel-title>
-                                    Course Overview
+                                    {{lesson.title}}
                                 </mat-panel-title>
                             </mat-expansion-panel-header>
                             <ul class="mb-0 mt-0 ps-0 content-list">
-                                <li class="d-flex align-items-center justify-content-space-between">
-                                    <span class="d-block gray-color fw-medium position-relative"><i class="ri-play-circle-line"></i> Introduction to Node.js</span>
-                                    <span class="d-block gray-color fw-medium">20m 15s</span>
+                                <li class="d-flex align-items-center justify-content-space-between" *ngFor="let subLesson of lesson.subLessons">
+                                    <span class="d-block gray-color fw-medium position-relative"><i class="ri-play-circle-line"></i> {{subLesson.title}}</span>
+                                    <span class="d-block gray-color fw-medium">{{subLesson.duration}}s</span>
                                 </li>
-                                <li class="d-flex align-items-center justify-content-space-between">
-                                    <span class="d-block gray-color fw-medium position-relative"><i class="ri-play-circle-line"></i> Introduction to Node.js</span>
-                                    <span class="d-block gray-color fw-medium">20m 15s</span>
-                                </li>
-                                <li class="d-flex align-items-center justify-content-space-between">
-                                    <span class="d-block gray-color fw-medium position-relative"><i class="ri-play-circle-line"></i> Introduction to Node.js</span>
-                                    <span class="d-block gray-color fw-medium">20m 15s</span>
-                                </li>
+                                
                             </ul>
                         </mat-expansion-panel>
-                        <mat-expansion-panel>
-                            <mat-expansion-panel-header>
-                                <mat-panel-title>
-                                    Getting Started with Node.js
-                                </mat-panel-title>
-                            </mat-expansion-panel-header>
-                            <ul class="mb-0 mt-0 ps-0 content-list">
-                                <li class="d-flex align-items-center justify-content-space-between">
-                                    <span class="d-block gray-color fw-medium position-relative"><i class="ri-play-circle-line"></i> Introduction to Node.js</span>
-                                    <span class="d-block gray-color fw-medium">20m 15s</span>
-                                </li>
-                            </ul>
-                        </mat-expansion-panel>
-                        <mat-expansion-panel>
-                            <mat-expansion-panel-header>
-                                <mat-panel-title>
-                                    Creating And Communication Between Angular Node.js
-                                </mat-panel-title>
-                            </mat-expansion-panel-header>
-                            <ul class="mb-0 mt-0 ps-0 content-list">
-                                <li class="d-flex align-items-center justify-content-space-between">
-                                    <span class="d-block gray-color fw-medium position-relative"><i class="ri-play-circle-line"></i> Introduction to Node.js</span>
-                                    <span class="d-block gray-color fw-medium">20m 15s</span>
-                                </li>
-                            </ul>
-                        </mat-expansion-panel>
-                        <mat-expansion-panel>
-                            <mat-expansion-panel-header>
-                                <mat-panel-title>
-                                    Exploring The Node.js Template Syntax
-                                </mat-panel-title>
-                            </mat-expansion-panel-header>
-                            <ul class="mb-0 mt-0 ps-0 content-list">
-                                <li class="d-flex align-items-center justify-content-space-between">
-                                    <span class="d-block gray-color fw-medium position-relative"><i class="ri-information-line"></i> Introduction</span>
-                                    <span class="d-block gray-color fw-medium">15m 20s</span>
-                                </li>
-                                <li class="d-flex align-items-center justify-content-space-between">
-                                    <span class="d-block gray-color fw-medium position-relative"><i class="ri-play-circle-line"></i> Introduction to Node.js</span>
-                                    <span class="d-block gray-color fw-medium">20m 15s</span>
-                                </li>
-                                <li class="d-flex align-items-center justify-content-space-between">
-                                    <span class="d-block gray-color fw-medium position-relative"><i class="ri-checkbox-line"></i> Comparing to Angular to Node.js</span>
-                                    <span class="d-block gray-color fw-medium">1h 20m</span>
-                                </li>
-                                <li class="d-flex align-items-center justify-content-space-between">
-                                    <span class="d-block gray-color fw-medium position-relative"><i class="ri-star-line"></i> Quiz: Getting Started with Node.js</span>
-                                    <span class="d-block gray-color fw-medium">25m 13s</span>
-                                </li>
-                            </ul>
-                        </mat-expansion-panel>
+                        
                         <mat-expansion-panel>
                             <mat-expansion-panel-header>
                                 <mat-panel-title>
@@ -135,8 +80,8 @@
                             </mat-expansion-panel-header>
                             <ul class="mb-0 mt-0 ps-0 content-list">
                                 <li class="d-flex align-items-center justify-content-space-between">
-                                    <span class="d-block gray-color fw-medium position-relative"><i class="ri-star-line"></i> Quiz: Getting Started with Node.js</span>
-                                    <span class="d-block gray-color fw-medium">45m</span>
+                                    <span class="d-block gray-color fw-medium position-relative"><i class="ri-star-line"></i> Quiz: {{course.name}}</span>
+                                    <span class="d-block gray-color fw-medium">{{course.quizzes.attemptLimit}}s</span>
                                 </li>
                             </ul>
                         </mat-expansion-panel>
@@ -145,15 +90,15 @@
                 <div class="col-lg-6 col-md-12">
                     <div class="p-md-25">
                         <h5 class="mb-12">About The Course :</h5>
-                        <p>This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer. Some quick example text to build on the card title and make up the bulk of the card's content. Some quick example text to build on the card title and make up.</p>
-                        <h5 class="mt-25 mb-18">What You Will Learn :</h5>
+                        <p>{{course.description || ''}}</p>
+                        <!-- <h5 class="mt-25 mb-18">What You Will Learn :</h5>
                         <span class="d-block gray-color fw-semibold mb-12">Become an expert in Statistics</span>
                         <span class="d-block gray-color fw-semibold mb-12">Gather, organize, data</span>
                         <span class="d-block gray-color fw-semibold mb-12">Present information KPIs</span>
                         <span class="d-block gray-color fw-semibold mb-12">Analyze current data</span>
                         <span class="d-block gray-color fw-semibold mb-12">Understand the fundamentals</span>
                         <span class="d-block gray-color fw-semibold mb-12">Boost your resume with skills</span>
-                        <span class="d-block gray-color fw-semibold mb-0">Use data for improved</span>
+                        <span class="d-block gray-color fw-semibold mb-0">Use data for improved</span> -->
                     </div>
                 </div>
             </div>

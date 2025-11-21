@@ -24,7 +24,7 @@ import { FormsModule } from '@angular/forms';
 export class ManagerUserList {
   constructor(private router: Router,public dialog: MatDialog, private apiUserServices: ApiUserServices, private snack: MatSnackBar) {}
 
-  displayedColumns: string[] = ['user', 'email', 'level', 'role', 'status', 'action'];
+  displayedColumns: string[] = ['user','progress', 'email', 'level','courses', 'role', 'status', 'action'];
   dataSource = new MatTableDataSource<UserManager>([]);
   searchTerm = '';
   

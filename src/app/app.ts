@@ -4,10 +4,11 @@ import { CommonModule, ViewportScroller } from '@angular/common';
 import { RouterOutlet, Router, Event, NavigationEnd } from '@angular/router';
 import { MatProgressBar } from "@angular/material/progress-bar";
 import { LoadingService } from './common/context/loading.service';
+import { ChatBoxComponent } from './shared/chat-box/chat-box.component';
 
 @Component({
     selector: 'app-root',
-    imports: [RouterOutlet, CommonModule, MatProgressBar],
+    imports: [RouterOutlet, CommonModule, MatProgressBar, ChatBoxComponent],
     templateUrl: './app.html',
     styleUrl: './app.scss'
 })
@@ -42,6 +43,22 @@ export class App {
         this.loadingService.isLoading$.subscribe(loading => {
             this.loading = loading;
         });
+    }
+
+    isBlankPage(): boolean {
+        const blankPages = [
+            '/error-500',
+            '/authentication/reset-password',
+            '/authentication/forgot-password',
+            '/authentication',
+            '/authentication/register',
+            '/authentication/signin-signup',
+            '/authentication/logout',
+            '/authentication/confirm-mail',
+            '/authentication/lock-screen',
+            '/coming-soon'
+        ];
+        return blankPages.includes(this.router.url);
     }
 
 }

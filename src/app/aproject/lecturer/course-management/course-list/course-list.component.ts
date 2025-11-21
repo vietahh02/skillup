@@ -14,7 +14,10 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { DialogService } from '../../../../services/dialog.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ApiCourseServices } from '../../../../services/course.service';
-import { Course, CoursePaginatedResponse } from '../../../../models/course.models';
+import { Course, CourseCreateEdit, CoursePaginatedResponse } from '../../../../models/course.models';
+import { CourseType } from '../../../../models/lookup.model';
+import { Level } from '../../../../models/lookup.model';
+import { ApiLookupServices } from '../../../../services/lookup.service';
 
 @Component({
     selector: 'app-lecturer-course-list',
@@ -38,7 +41,7 @@ import { Course, CoursePaginatedResponse } from '../../../../models/course.model
     templateUrl: './course-list.component.html',
     styleUrls: ['./course-list.component.scss'],
 })
-export class LecturerCourseList implements AfterViewInit {
+export class LecturerCourseList {
     displayedColumns: string[] = [
         'courseId',
         'name',
@@ -56,24 +59,37 @@ export class LecturerCourseList implements AfterViewInit {
     currentPage = 1;
     pageSize = 10;
 
-    constructor(public dialog: MatDialog, private dialogService: DialogService, private courseService: ApiCourseServices) {}
+    constructor(public dialog: MatDialog, private dialogService: DialogService, private courseService: ApiCourseServices, private snack: MatSnackBar) {}
 
     ngOnInit() {
         this.loadCourses();
     }
 
     loadCourses(page: number = 1, pageSize: number = 10, searchTerm?: string) {
-      this.courseService.getCourseListCreator(page, pageSize, searchTerm).subscribe((response: any) => {
-        this.data = response;
-        this.totalItems = response.total;
+      this.courseService.getCourseListCreator(page, pageSize, searchTerm).subscribe({
+        next: (response: any) => {
+          this.data = response.items || [];
+          this.totalItems = response.total || 0;
+          this.currentPage = response.page || 1;
+          this.pageSize = response.pageSize || 10;
+        },
+        error: (error) => {
+          this.snack.open(error.error || 'Failed to load courses', '', {
+            duration: 3000,
+            panelClass: ['error-snackbar', 'custom-snackbar'],
+            horizontalPosition: 'right',
+            verticalPosition: 'top'
+          });
+          this.data = [];
+          this.totalItems = 0;
+        }
       });
     }
 
     @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-    ngAfterViewInit() {}
-
     search() {
+      this.currentPage = 1; // Reset to first page when searching
       this.loadCourses(this.currentPage, this.pageSize, this.searchTerm);
     }
 
@@ -82,13 +98,20 @@ export class LecturerCourseList implements AfterViewInit {
     }
 
     openAddEditEventDialog(enterAnimationDuration: string, exitAnimationDuration: string, id? : string | number): void {
-      this.dialog.open(CreateCourse, {
+      const dialogRef = this.dialog.open(CreateCourse, {
           width: '600px',
           enterAnimationDuration,
           exitAnimationDuration,
           data:{
             id : id
           }
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          // Reload courses list after successful create/edit
+          this.loadCourses(this.currentPage, this.pageSize, this.searchTerm);
+        }
       });
     }
 
@@ -103,8 +126,30 @@ export class LecturerCourseList implements AfterViewInit {
         if (!ok) {
           return;
         }
-        this.data = this.data.filter((c: Course) => c.courseId !== course.courseId);
-        this.totalItems--;
+        
+        // Call API to delete course
+        this.courseService.deleteCourse(course.courseId).subscribe({
+          next: () => {
+            // Reload the courses list to get updated data from server
+            this.loadCourses(this.currentPage, this.pageSize, this.searchTerm);
+            this.snack.open('Course deleted successfully', '', {
+              duration: 3000,
+              panelClass: ['success-snackbar', 'custom-snackbar'],
+              horizontalPosition: 'right',
+              verticalPosition: 'top'
+            });
+          },
+          error: (error) => {
+            console.error('Error deleting course:', error);
+            // Could show error snackbar here if needed
+            this.snack.open(error.error || 'Failed to delete course', '', {
+              duration: 3000,
+              panelClass: ['error-snackbar', 'custom-snackbar'],
+              horizontalPosition: 'right',
+              verticalPosition: 'top'
+            });
+          }
+        });
       });
     }
 
@@ -126,10 +171,10 @@ export class CreateCourse {
     fb = inject(FormBuilder);
     courseForm = this.fb.group({
       name: ['', [Validators.required]],
-      duration: [null as number | null, [Validators.required]],
-      category: ['', [Validators.required]],
-      level: ['', [Validators.required]],
       description: ['', []],
+      courseType: ['', [Validators.required]],
+      targetLevel: ['', [Validators.required]],
+      duration: [null as number | null, [Validators.required]],
       image: [null as File | null, [Validators.required]],
     });
 
@@ -139,40 +184,79 @@ export class CreateCourse {
 
     constructor(
         public dialogRef: MatDialogRef<CreateCourse>, @Inject(MAT_DIALOG_DATA) public data: any,
-        private snack: MatSnackBar
+        private snack: MatSnackBar,
+        private courseService: ApiCourseServices,
+        private lookupService: ApiLookupServices
     ) {}
 
     ngOnInit() {
+      this.loadOptions();
       if (this.data.id) {
         this.isEdit = true;
-        this.courseForm.patchValue({
-          name: this.data.name,
-          duration: this.data.duration,
-          category: this.data.category,
-          level: this.data.level,
-          description: this.data.description,
-          image: this.data.image,
+        this.courseService.getCourseById(this.data.id).subscribe((response: any) => {
+          this.courseForm.patchValue({
+            name: response.name,
+            duration: response.duration,
+            courseType: response.courseType,
+            targetLevel: response.targetLevel,
+            description: response.description,
+            image: new File([], response.imageUrl),
+          });
+          this.selectedImage = response.imageUrl;
         });
       }
     }
 
     close(){
-        this.dialogRef.close(true);
+      this.dialogRef.close(true);
     }
 
     onSubmit(): void {
       this.courseForm.markAllAsTouched();
       if (!this.courseForm.valid) return;
 
+      const payload : CourseCreateEdit = {
+        name: this.courseForm.value.name as string,
+        description: this.courseForm.value.description as string,
+        courseTypeId: this.courseForm.value.courseType as string,
+        targetLevelId: this.courseForm.value.targetLevel as string,
+        duration: this.courseForm.value.duration as number,
+        imageUrl: this.courseForm.value.image as File,
+      };
+
       if (this.isEdit) {
-        this.snack.open('Course updated successfully', '', {
-          duration: 3000,
-          panelClass: ['success-snackbar', 'custom-snackbar']
+        this.courseService.updateCourse(this.data.id, payload).subscribe((response: any) => {
+          this.snack.open('Course updated successfully', '', {
+            duration: 3000,
+            panelClass: ['success-snackbar', 'custom-snackbar'],
+            horizontalPosition: 'right',
+            verticalPosition: 'top'
+          });
+          this.dialogRef.close(true);
+        }, (error: any) => {
+          this.snack.open(error.error || 'Failed to update course', '', {
+            duration: 3000,
+            panelClass: ['error-snackbar', 'custom-snackbar'],
+            horizontalPosition: 'right',
+            verticalPosition: 'top'
+          });
         });
       } else {
-        this.snack.open('Course created successfully', '', {
-          duration: 3000,
-          panelClass: ['success-snackbar', 'custom-snackbar']
+        this.courseService.createCourse(payload).subscribe((response: any) => {
+          this.snack.open('Course created successfully', '', {
+            duration: 3000,
+            panelClass: ['success-snackbar', 'custom-snackbar'],
+            horizontalPosition: 'right',
+            verticalPosition: 'top'
+          });
+          this.dialogRef.close(true);
+        }, (error: any) => {
+          this.snack.open(error.error || 'Failed to create course', '', {
+            duration: 3000,
+            panelClass: ['error-snackbar', 'custom-snackbar'],
+            horizontalPosition: 'right',
+            verticalPosition: 'top'
+          });
         });
       }
     }
@@ -186,7 +270,9 @@ export class CreateCourse {
         if (!file.type.startsWith('image/')) {
             this.snack.open('Please select a valid image file', '', {
               duration: 3000,
-              panelClass: ['error-snackbar', 'custom-snackbar']
+              panelClass: ['error-snackbar', 'custom-snackbar'],
+              horizontalPosition: 'right',
+              verticalPosition: 'top'
             });
             return;
         }
@@ -195,7 +281,9 @@ export class CreateCourse {
         if (file.size > 5 * 1024 * 1024) {
             this.snack.open('File size must be less than 5MB', '', {
               duration: 3000,
-              panelClass: ['error-snackbar', 'custom-snackbar']
+              panelClass: ['error-snackbar', 'custom-snackbar'],
+              horizontalPosition: 'right',
+              verticalPosition: 'top'
             });
             return;
         }
@@ -218,147 +306,28 @@ export class CreateCourse {
      * Remove selected image
      */
     removeImage(): void {
-        this.selectedImage = null;
-        this.selectedFile = null;
-        this.courseForm.patchValue({ image: null });
-        
-        // Reset file input
-        const fileInput = document.getElementById('courseImage') as HTMLInputElement;
-        if (fileInput) {
-            fileInput.value = '';
-        }
+      this.selectedImage = null;
+      this.selectedFile = null;
+      this.courseForm.patchValue({ image: null });
+      
+      // Reset file input
+      const fileInput = document.getElementById('courseImage') as HTMLInputElement;
+      if (fileInput) {
+          fileInput.value = '';
+      }
     }
 
-    listCourseTypes: string[] = [
-      'JavaScript',
-      'Python',
-      'Java',
-      'C#',
-      'C++',
-      'TypeScript',
-      'Go',
-      'Rust',
-      'Kotlin',
-      'Swift',
-      'Other',
-    ];
+    listCourseTypes: CourseType[] = [];
 
-    listLevels: string[] = [
-      'Intern',
-      'Fresher',
-      'Junior',
-      'Middle',
-      'Senior',
-      'Other',
-    ];
+    listLevels: Level[] = [];
 
-
+    loadOptions() {
+      this.lookupService.getLevels().subscribe((response: Level[]) => {
+        this.listLevels = response;
+      });
+      this.lookupService.getCourseTypes().subscribe((response: CourseType[]) => {
+        this.listCourseTypes = response;
+      });
+    }
 }
-
-const fakeCourses = [
-  {
-    id: 1,
-    name: 'Introduction to React',
-    type: 'JavaScript',
-    time: 30,
-    role: 'Intern',
-    status: 'Approved',
-  },
-  {
-    id: 2,
-    name: 'Advanced JavaScript',
-    type: 'JavaScript',
-    time: 45,
-    role: 'Junior',
-    status: 'Pending',
-  },
-  {
-    id: 3,
-    name: 'Spring Boot for Beginners',
-    type: 'Java',
-    time: 60,
-    role: 'Fresher',
-    status: 'Approved',
-  },
-  {
-    id: 4,
-    name: 'Building APIs with Go',
-    type: 'Go',
-    time: 25,
-    role: 'Middle',
-    status: 'Rejected',
-  },
-  {
-    id: 5,
-    name: 'Data Science with Python',
-    type: 'Python',
-    time: 75,
-    role: 'Senior',
-    status: 'Approved',
-  },
-  {
-    id: 6,
-    name: 'Mobile Development with Kotlin',
-    type: 'Kotlin',
-    time: 40,
-    role: 'Fresher',
-    status: 'Draft',
-  },
-  {
-    id: 7,
-    name: 'Swift for iOS Development',
-    type: 'Swift',
-    time: 35,
-    role: 'Junior',
-    status: 'Rejected',
-  },
-  {
-    id: 8,
-    name: 'Rust for Systems Programming',
-    type: 'Rust',
-    time: 50,
-    role: 'Senior',
-    status: 'Approved',
-  },
-  {
-    id: 9,
-    name: 'C# Backend Development',
-    type: 'C#',
-    time: 42,
-    role: 'Middle',
-    status: 'Pending',
-  },
-  {
-    id: 10,
-    name: 'C++ Game Engine Development',
-    type: 'C++',
-    time: 65,
-    role: 'Other',
-    status: 'Draft',
-  },
-  {
-    id: 11,
-    name: 'TypeScript in Depth',
-    type: 'TypeScript',
-    time: 28,
-    role: 'Fresher',
-    status: 'Rejected',
-  },
-  {
-    id: 12,
-    name: 'Python for Data Analysis',
-    type: 'Python',
-    time: 80,
-    role: 'Middle',
-    status: 'Approved',
-  },
-  {
-    id: 13,
-    name: 'Modern Web Development with TypeScript',
-    type: 'TypeScript',
-    time: 55,
-    role: 'Intern',
-    status: 'Draft',
-  },
-];
 

@@ -1,0 +1,117 @@
+<!-- Chat Box Container -->
+<div class="chat-box-container" [class.expanded]="isExpanded" [class.minimized]="isMinimized">
+  
+  <!-- Minimized Chat Button -->
+  <button 
+    *ngIf="isMinimized" 
+    mat-fab 
+    color="primary" 
+    class="chat-button"
+    (click)="toggleChat()"
+    [matBadge]="unreadCount > 0 ? unreadCount : null"
+    matBadgeColor="warn"
+    matBadgeSize="small"
+    matBadgePosition="above before">
+    <mat-icon>chat</mat-icon>
+  </button>
+
+  <!-- Expanded Chat Window -->
+  <mat-card *ngIf="!isMinimized" class="chat-window" [class.collapsed]="!isExpanded">
+    
+    <!-- Chat Header -->
+    <div class="chat-header">
+      <div class="header-info">
+        <div class="bot-avatar">
+          <!-- <mat-icon>smart_toy</mat-icon> -->
+          <img src="img/user/bot.png" class="message-avatar-img" alt="user">
+        </div>
+        <div class="bot-info">
+          <h4 class="bot-name">SkillUp Assistant</h4>
+          <p class="bot-status">
+            <span class="status-dot online"></span>
+            Active
+          </p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button mat-icon-button (click)="toggleChat()" class="toggle-btn">
+          <mat-icon>{{ isExpanded ? 'expand_less' : 'expand_more' }}</mat-icon>
+        </button>
+        <button mat-icon-button (click)="minimizeChat()" class="close-btn">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Chat Messages -->
+    <div *ngIf="isExpanded" class="chat-body">
+      <div #messagesContainer class="messages-container">
+        <div *ngFor="let message of messages" 
+             class="message-wrapper"
+             [class.user-message]="!message.isBot"
+             [class.bot-message]="message.isBot">
+          
+          <!-- Bot Message -->
+          <div *ngIf="message.isBot" class="message bot">
+            <div class="message-avatar">
+              <!-- <mat-icon>smart_toy</mat-icon> -->
+              <img src="img/user/bot.png" class="message-avatar-img" alt="user">
+            </div>
+            <div class="message-content">
+              <div *ngIf="!message.typing" class="message-bubble">
+                {{ message.text }}
+              </div>
+              <div *ngIf="message.typing" class="typing-indicator">
+                <div class="typing-dots">
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </div>
+              </div>
+              <div *ngIf="!message.typing" class="message-time">
+                {{ formatTime(message.timestamp) }}
+              </div>
+            </div>
+          </div>
+
+          <!-- User Message -->
+          <div *ngIf="!message.isBot" class="message user">
+            <div class="message-content">
+              <div class="message-bubble">
+                {{ message.text }}
+              </div>
+              <div class="message-time">
+                {{ formatTime(message.timestamp) }}
+              </div>
+            </div>
+            <div class="message-avatar">
+              <!-- <mat-icon>person</mat-icon> -->
+              <img [src]="currentUser?.avatarUrl ?? 'img/user/user12.jpg'" class="message-avatar-img" alt="user">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Input -->
+      <div class="chat-input">
+        <mat-form-field appearance="outline" class="message-input">
+          <input 
+            matInput 
+            [(ngModel)]="newMessage"
+            (keypress)="onKeyPress($event)"
+            placeholder="Nhập tin nhắn..."
+            autocomplete="off">
+        </mat-form-field>
+        <button 
+          mat-icon-button 
+          color="primary"
+          (click)="sendMessage()"
+          [disabled]="!newMessage.trim()"
+          class="send-button">
+          <mat-icon>send</mat-icon>
+        </button>
+      </div>
+    </div>
+
+  </mat-card>
+</div>

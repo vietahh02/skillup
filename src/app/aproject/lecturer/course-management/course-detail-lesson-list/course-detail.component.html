@@ -50,7 +50,7 @@
               <div class="lesson-meta">
                 <mat-chip color="accent" selected>
                   <mat-icon matChipAvatar>schedule</mat-icon>
-                  {{lesson.duration}}
+                  {{lesson.totalDuration}}
                 </mat-chip>
                 <mat-chip color="primary" selected>
                   <mat-icon matChipAvatar>video_library</mat-icon>
@@ -65,7 +65,7 @@
                 <button mat-icon-button matTooltip="Edit Lesson" (click)="openAddEventDialog('300ms', '100ms', lesson); $event.stopPropagation()">
                   <mat-icon>edit</mat-icon>
                 </button>
-                <button mat-icon-button matTooltip="Delete Lesson" (click)="$event.stopPropagation()">
+                <button mat-icon-button matTooltip="Delete Lesson" (click)="deleteLesson(lesson.lessonId || 0); $event.stopPropagation()">
                   <mat-icon>delete</mat-icon>
                 </button>
               </div>
@@ -95,7 +95,7 @@
                   <mat-icon class="play-icon">play_circle_filled</mat-icon>
                 </div>
                 <div class="sub-lesson-info">
-                  <h6 class="sub-lesson-name">{{subLesson.name}}</h6>
+                  <h6 class="sub-lesson-name">{{subLesson.title}}</h6>
                   <p class="sub-lesson-description">{{subLesson.description}}</p>
                   <div class="sub-lesson-meta">
                     <mat-chip color="accent" selected size="small">
@@ -109,7 +109,7 @@
                 <button mat-icon-button matTooltip="Edit Video" (click)="openSubLessonDialog('300ms', '100ms', lesson, subLesson)">
                   <mat-icon>edit</mat-icon>
                 </button>
-                <button mat-icon-button matTooltip="Delete Video">
+                <button mat-icon-button matTooltip="Delete Video" (click)="deleteSubLesson(subLesson.id || 0); $event.stopPropagation()">
                   <mat-icon>delete</mat-icon>
                 </button>
               </div>
@@ -119,10 +119,6 @@
           <div *ngIf="!lesson.subLessons || lesson.subLessons.length === 0" class="no-sub-lessons">
             <mat-icon>video_library</mat-icon>
             <p>No video lessons available for this lesson</p>
-            <button mat-raised-button color="primary" class="add-video-btn" (click)="openSubLessonDialog('300ms', '100ms', lesson)">
-              <mat-icon>add</mat-icon>
-              Add Video
-            </button>
           </div>
         </div>
       </mat-expansion-panel>
