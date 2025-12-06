@@ -250,7 +250,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.tokenService.setupAutoRefresh();
         this.navigateByRole(this.authService.getCurrentUser()?.roles[0] || 'User');
     }, err => {
-        this.snack.open(err.error || 'Login failed', '', { 
+        this.snack.open(err.error.message || 'Login failed', '', { 
           duration: 3000, 
           panelClass: ['error-snackbar', 'custom-snackbar'], 
           horizontalPosition: 'right', 
