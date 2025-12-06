@@ -12,6 +12,7 @@ import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { ApiCourseServices } from '../../../../services/course.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatTooltip } from "@angular/material/tooltip";
 
 @Component({
     selector: 'app-manager-course-list',
@@ -31,6 +32,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     ReactiveFormsModule,
     MatIconModule,
     MatButtonModule,
+    MatTooltip
 ],
     templateUrl: './course-list.component.html',
     styleUrls: ['./course-list.component.scss'],
@@ -62,6 +64,15 @@ export class ManagerCourseList implements AfterViewInit {
             data.name.toLowerCase().includes(filter) || data.email.toLowerCase().includes(filter);
 
         this.loadCourses();
+    }
+
+    
+    maxLengthText(text: string) : boolean {
+        return text.length > 20;
+    }
+
+    formatText(text: string) : string {
+        return this.maxLengthText(text) ? text.substring(0, 20) + '...' : text;
     }
 
     loadCourses() {

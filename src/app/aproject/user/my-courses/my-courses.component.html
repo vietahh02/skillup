@@ -20,7 +20,7 @@
                     <td mat-cell *matCellDef="let element" class="col-course">
                         <div class="d-flex align-items-center course-info">
                             <img [src]="element.image || 'assets/images/course-default.png'" class="border-radius" alt="course">
-                            <a (click)="detailCourse(element)">{{element.name}}</a>
+                            <a (click)="detailCourse(element)" [matTooltip]="maxLengthText(element.name) ? element.name : ''">{{formatText(element.name)}}</a>
                         </div>
                     </td>
                 </ng-container>
@@ -29,7 +29,7 @@
                 <ng-container matColumnDef="instructor">
                     <th mat-header-cell *matHeaderCellDef>Lecturer</th>
                     <td mat-cell *matCellDef="let element">
-                        {{element.createdByName}}
+                        <span [matTooltip]="maxLengthText(element.createdByName) ? element.createdByName : ''">{{formatText(element.createdByName)}}</span>
                     </td>
                 </ng-container>
 

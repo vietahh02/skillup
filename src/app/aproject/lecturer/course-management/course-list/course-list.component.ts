@@ -18,6 +18,7 @@ import { Course, CourseCreateEdit, CourseDetail, CoursePaginatedResponse } from 
 import { CourseType } from '../../../../models/lookup.model';
 import { Level } from '../../../../models/lookup.model';
 import { ApiLookupServices } from '../../../../services/lookup.service';
+import { MatTooltip } from "@angular/material/tooltip";
 
 @Component({
     selector: 'app-lecturer-course-list',
@@ -37,6 +38,7 @@ import { ApiLookupServices } from '../../../../services/lookup.service';
     ReactiveFormsModule,
     MatIconModule,
     MatButtonModule,
+    MatTooltip
 ],
     templateUrl: './course-list.component.html',
     styleUrls: ['./course-list.component.scss'],
@@ -64,6 +66,15 @@ export class LecturerCourseList {
     ngOnInit() {
         this.loadCourses();
     }
+
+    
+    maxLengthText(text: string) : boolean {
+      return text.length > 20;
+  }
+
+  formatText(text: string) : string {
+      return this.maxLengthText(text) ? text.substring(0, 20) + '...' : text;
+  }
 
     loadCourses(page: number = 1, pageSize: number = 10, searchTerm?: string) {
       this.courseService.getCourseListCreator(page, pageSize, searchTerm).subscribe({

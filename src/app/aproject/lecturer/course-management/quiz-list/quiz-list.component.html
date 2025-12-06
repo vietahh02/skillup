@@ -25,13 +25,13 @@
                 <!-- Quiz Title Column -->
                 <ng-container matColumnDef="title">
                     <th mat-header-cell *matHeaderCellDef>Quiz Title</th>
-                    <td mat-cell *matCellDef="let element">{{element.title}}</td>
+                    <td mat-cell *matCellDef="let element" [matTooltip]="maxLengthText(element.title) ? element.title : ''">{{formatText(element.title)}}</td>
                 </ng-container>
 
                 <!-- Course Name Column -->
                 <ng-container matColumnDef="courseName">
                     <th mat-header-cell *matHeaderCellDef>Course</th>
-                    <td mat-cell *matCellDef="let element">{{element.courseName}}</td>
+                    <td mat-cell *matCellDef="let element" [matTooltip]="maxLengthText(element.courseName) ? element.courseName : ''">{{formatText(element.courseName)}}</td>
                 </ng-container>
 
                 <!-- Questions Count Column -->

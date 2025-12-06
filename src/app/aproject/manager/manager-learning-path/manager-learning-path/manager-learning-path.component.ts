@@ -83,6 +83,15 @@ export class ManagerLearningPathComponent implements OnInit {
     this.loadUserProgress();
   }
 
+  
+  maxLengthText(text: string) : boolean {
+    return text.length > 20;
+}
+
+formatText(text: string) : string {
+    return this.maxLengthText(text) ? text.substring(0, 20) + '...' : text;
+}
+
   loadLearningPaths(): void {
     this.isLoading = true;
     this.learningPathService.getLearningPaths(this.currentPage, this.pageSize, this.searchTerm).subscribe({

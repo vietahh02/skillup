@@ -16,26 +16,28 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Level } from '../../../../models/lookup.model';
 import { ApiCourseServices } from '../../../../services/course.service';
+import { MatTooltip } from "@angular/material/tooltip";
 
 @Component({
     selector: 'app-admin-user-list',
     imports: [
-        FormsModule,
-        MatCardModule,
-        MatButtonModule,
-        MatMenuModule,
-        MatTableModule,
-        MatPaginatorModule,
-        MatFormFieldModule,
-        MatCardModule,
-        MatFormFieldModule,
-        MatInputModule,
-        FormsModule,
-        ReactiveFormsModule,
-        MatIconModule,
-        MatButtonModule,
-        CommonModule
-    ],
+    FormsModule,
+    MatCardModule,
+    MatButtonModule,
+    MatMenuModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatFormFieldModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatIconModule,
+    MatButtonModule,
+    CommonModule,
+    MatTooltip
+],
     templateUrl: './user-list.component.html',
     styleUrls: ['./user-list.component.scss'],
 })
@@ -71,6 +73,14 @@ export class AdminUserList implements OnInit, AfterViewInit {
 
     ngOnInit() {
         this.loadUsers();
+    }
+
+    maxLengthText(text: string) : boolean {
+        return text.length > 20;
+    }
+
+    formatText(text: string) : string {
+        return this.maxLengthText(text) ? text.substring(0, 20) + '...' : text;
     }
 
     loadUsers(page: number = 1, pageSize: number = 10, searchTerm?: string) {

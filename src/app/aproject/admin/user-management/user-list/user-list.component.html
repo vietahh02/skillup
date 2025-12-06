@@ -33,13 +33,13 @@
                 <!-- Name Column -->
                 <ng-container matColumnDef="name">
                     <th mat-header-cell *matHeaderCellDef>Name</th>
-                    <td mat-cell *matCellDef="let element">{{element.fullName}}</td>
+                    <td mat-cell *matCellDef="let element" [matTooltip]="maxLengthText(element.fullName) ? element.fullName : ''">{{formatText(element.fullName)}}</td>
                 </ng-container>
 
                 <!-- Email Column -->
                 <ng-container matColumnDef="email">
                     <th mat-header-cell *matHeaderCellDef>Email</th>
-                    <td mat-cell *matCellDef="let element">{{element.email}}</td>
+                    <td mat-cell *matCellDef="let element" [matTooltip]="maxLengthText(element.email) ? element.email : ''">{{element.email}}</td>
                 </ng-container>
 
                 <!-- Role Column -->

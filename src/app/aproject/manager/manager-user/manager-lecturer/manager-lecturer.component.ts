@@ -14,10 +14,11 @@ import { UserManager } from '../../../../models/user.models';
 import { ApiUserServices } from '../../../../services/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatTooltip } from "@angular/material/tooltip";
 
 @Component({
     selector: 'app-manager-lecturer',
-    imports: [FormsModule, MatCardModule, MatButtonModule, MatMenuModule, MatTableModule, MatPaginatorModule, MatProgressBarModule, MatCheckboxModule, CommonModule, MatIcon, MatIconModule],
+    imports: [FormsModule, MatCardModule, MatButtonModule, MatMenuModule, MatTableModule, MatPaginatorModule, MatProgressBarModule, MatCheckboxModule, CommonModule, MatIcon, MatIconModule, MatTooltip],
     templateUrl: './manager-lecturer.component.html',
     styleUrls: ['./manager-lecturer.component.scss']
 })
@@ -49,6 +50,15 @@ export class ManagerLecturer {
   ngOnInit() {
       this.loadUsers();
   }
+
+  
+  maxLengthText(text: string) : boolean {
+    return text.length > 20;
+}
+
+formatText(text: string) : string {
+    return this.maxLengthText(text) ? text.substring(0, 20) + '...' : text;
+}
 
   loadUsers(page: number = 1, pageSize: number = 10, searchTerm?: string) {
     this.isLoading = true;

@@ -54,6 +54,14 @@ export class QuizListComponent implements OnInit {
     this.loadQuizzes();
   }
 
+  maxLengthText(text: string) : boolean {
+    return text.length > 20;
+  }
+
+  formatText(text: string) : string {
+    return this.maxLengthText(text) ? text.substring(0, 20) + '...' : text;
+  }
+
   loadQuizzes(): void {
     this.isLoading = true;
     this.quizService.getQuizzes(this.currentPage, this.pageSize, this.searchTerm).subscribe({

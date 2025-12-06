@@ -8,10 +8,11 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ApiCourseServices } from '../../../services/course.service';
 import { CourseEnrollment } from '../../../models/course.models';
+import { MatTooltip } from "@angular/material/tooltip";
 
 @Component({
     selector: 'app-my-courses',
-    imports: [MatTableModule, MatButtonModule, MatMenuModule, MatPaginatorModule, MatCard, MatCardContent, FormsModule],
+    imports: [MatTableModule, MatButtonModule, MatMenuModule, MatPaginatorModule, MatCard, MatCardContent, FormsModule, MatTooltip],
     templateUrl: './my-courses.component.html',
     styleUrls: ['./my-courses.component.scss']
 })
@@ -29,6 +30,15 @@ export class MyCoursesComponent implements OnInit {
 
     ngOnInit() {
         this.getCourseEnrollment();
+    }
+
+    
+    maxLengthText(text: string) : boolean {
+        return text.length > 20;
+    }
+
+    formatText(text: string) : string {
+        return this.maxLengthText(text) ? text.substring(0, 20) + '...' : text;
     }
 
     getDate(date: string) {

@@ -5,10 +5,11 @@ import { Router } from '@angular/router';
 import { ApiCourseServices } from '../../../services/course.service';
 import { CourseUserView } from '../../../models/course.models';
 import { CommonModule } from '@angular/common';
+import { MatTooltip } from "@angular/material/tooltip";
 
 @Component({
     selector: 'app-home',
-    imports: [CommonModule,MatCard, MatCardContent, MatButtonModule],
+    imports: [CommonModule, MatCard, MatCardContent, MatButtonModule, MatTooltip],
     templateUrl: './home.component.html',
     styleUrls: ['./home.component.scss'],
 })
@@ -20,6 +21,23 @@ export class Home {
         this.courseService.getCoursesUserView().subscribe((courses) => {
             this.courses = courses;
         });
+    }
+
+    
+    maxLengthText(text: string) : boolean {
+        return text.length > 20;
+    }
+
+    formatText(text: string) : string {
+        return this.maxLengthText(text) ? text.substring(0, 20) + '...' : text;
+    }
+
+    maxLengthTextName(text: string) : boolean {
+        return text.length > 8;
+    }
+
+    formatName(name: string) : string {
+        return this.maxLengthTextName(name) ? name.substring(0, 8) + '...' : name;
     }
 
     detailCourse(course: CourseUserView) {
