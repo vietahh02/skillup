@@ -15,11 +15,13 @@ export class ApiDocumentServices {
     return this.http.get<DocumentModel[]>(`${API_URLS.GET_DOCUMENTS}/${courseId}`);
   }
 
-  uploadDocument(courseId: number | string, document: any): Observable<DocumentModel> {
+  uploadDocument(courseId: number | string, document: File[]): Observable<any> {
     const formData = new FormData();
     formData.append('courseId', courseId.toString());
-    formData.append('file', document[0]);
-    return this.http.post<DocumentModel>(`${API_URLS.UPLOAD_DOCUMENT}`, formData);
+    document.forEach(file => {
+      formData.append('files', file);
+    });
+    return this.http.post<any>(`${API_URLS.UPLOAD_DOCUMENT}`, formData);
   }
 
   deleteDocument(documentId: number): Observable<any> {

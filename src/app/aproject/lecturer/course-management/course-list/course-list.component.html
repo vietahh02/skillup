@@ -75,23 +75,35 @@
                             matTooltip="View Details"
                             (click)="detailCourse(element.courseId)"
                         >
-                            <mat-icon>visibility</mat-icon>
+                            <mat-icon style="color: green;">visibility</mat-icon>
                         </button>
-                        @if(element.status != 'Approved' && element.status != 'Pending') {
+                        
+                        @if(element.status == 'Draft' || element.status == 'Rejected') {
                             <button
-                                mat-icon-button
+                            mat-icon-button
                                 matTooltip="Edit"
                                 (click)="openAddEditEventDialog('300ms', '100ms', element.courseId)"
                             >
-                                <mat-icon>edit</mat-icon>
+                                <mat-icon style="color: #007bff;">edit</mat-icon>
                             </button>
-                            <button
+                            }
+                            @if(element.status == 'Draft') {
+                                <button
                                 mat-icon-button
                                 matTooltip="Delete"
                                 (click)="onDelete(element)"
                             >
-                                <mat-icon>delete</mat-icon>
+                                <mat-icon style="color: red;">delete</mat-icon>
                             </button> 
+                        }
+                        @if(element.status == 'Rejected') {
+                            <button
+                                mat-icon-button
+                                matTooltip="Reason Reject"
+                                (click)="reasonReject(element)"
+                            >
+                                <mat-icon style="color: red;">disabled_by_default</mat-icon>
+                            </button>
                         }
                         </div>
                     </td>

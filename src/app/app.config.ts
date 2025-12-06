@@ -7,8 +7,8 @@ import { provideAnimationsAsync } from '@angular/platform-browser/animations/asy
 import { environment } from '../environments/environment';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './services/auth.interceptor';
-import { AuthService } from './common/context/auth.service';
-import { TokenService } from './common/context/token.service';
+import { AuthService } from './context/auth.service';
+import { TokenService } from './context/token.service';
 
 export const appConfig: ApplicationConfig = {
     providers: [

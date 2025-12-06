@@ -3,18 +3,24 @@
         <h4 class="mb-0">Create New User</h4>
         <button class="close-btn bg-transparent p-0 border-none" (click)="close()"><i class="flaticon-close"></i></button>
     </div>
-    <form>
+    <form [formGroup]="lecturerForm" (ngSubmit)="onSubmit()">
         <div class="row">
-            <div class="col-lg-6 col-md-6">
+            <!-- <div class="col-lg-6 col-md-6">
                 <div class="form-group">
                     <label class="d-block fw-semibold">Image</label>
                     <input type="file" class="input-control">
                 </div>
-            </div>
+            </div> -->
             <div class="col-lg-6 col-md-6">
                 <div class="form-group">
-                    <label class="d-block fw-semibold">Name</label>
-                    <input type="text" class="input-control" placeholder="Name">
+                    <label class="d-block fw-semibold">Name <span class="text-danger">*</span></label>
+                    <input type="text" class="input-control" placeholder="Name" formControlName="fullName">
+                    <div *ngIf="lecturerForm.get('fullName')?.hasError('required') && lecturerForm.get('fullName')?.touched" class="error-message">
+                        Name is required
+                    </div>
+                    <div *ngIf="lecturerForm.get('fullName')?.hasError('maxlength') && lecturerForm.get('fullName')?.touched" class="error-message">
+                        Name must be less than 255 characters
+                    </div>
                 </div>
             </div>
             <!-- <div class="col-lg-6 col-md-6">
@@ -25,8 +31,17 @@
             </div> -->
             <div class="col-lg-6 col-md-6">
                 <div class="form-group">
-                    <label class="d-block fw-semibold">Email</label>
-                    <input type="email" class="input-control" placeholder="Email">
+                    <label class="d-block fw-semibold">Email <span class="text-danger">*</span></label>
+                    <input type="email" class="input-control" placeholder="Email" formControlName="email">
+                    <div *ngIf="lecturerForm.get('email')?.hasError('required') && lecturerForm.get('email')?.touched" class="error-message">
+                        Email is required
+                    </div>
+                    <div *ngIf="lecturerForm.get('email')?.hasError('email') && lecturerForm.get('email')?.touched" class="error-message">
+                        Invalid email address
+                    </div>
+                    <div *ngIf="lecturerForm.get('email')?.hasError('maxlength') && lecturerForm.get('email')?.touched" class="error-message">
+                        Email must be less than 255 characters
+                    </div>
                 </div>
             </div>
             <!-- <div class="col-lg-6 col-md-6">
@@ -35,7 +50,7 @@
                     <input type="number" class="input-control" placeholder="Phone">
                 </div>
             </div> -->
-            <div class="col-lg-6 col-md-6">
+            <!-- <div class="col-lg-6 col-md-6">
                 <div class="form-group">
                     <label class="d-block fw-semibold">Role</label>
                     <select class="input-control">
@@ -44,7 +59,7 @@
                         </option>
                     </select>
                 </div>
-            </div>
+            </div> -->
         </div>
         <div class="text-end">
             <button type="button" class="gray" (click)="close()"><i class="ri-close-fill"></i> Cancel</button>

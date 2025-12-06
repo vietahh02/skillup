@@ -259,6 +259,10 @@
     }
   }
 
+  .none {
+    display: none !important;
+  }
+
   @media (max-width: 768px) {
     .document-dialog-container .dialog-content {
       .documents-list .list-header {

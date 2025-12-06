@@ -6,7 +6,7 @@
     
     <mat-dialog-content class="dialog-content">
       <!-- Upload Section -->
-      <div class="upload-section">
+      <div class="upload-section" *ngIf="isDraftCourse">
         <h3>Upload New Document</h3>
         <div class="upload-area" 
              (click)="fileInput.click()" 
@@ -52,7 +52,7 @@
         </div>
       </div>
 
-      <mat-divider></mat-divider>
+      <mat-divider *ngIf="isDraftCourse"></mat-divider>
 
       <!-- Documents List Section -->
       <div class="documents-list">
@@ -80,7 +80,7 @@
                 <span *ngSwitchCase="'ppt'">slideshow</span>
                 <span *ngSwitchDefault>insert_drive_file</span>
               </mat-icon>
-              <button mat-icon-button class="delete-btn" (click)="deleteDocument(doc)" 
+              <button mat-icon-button class="delete-btn" *ngIf="isDraftCourse" (click)="deleteDocument(doc)" 
                       matTooltip="Delete document">
                 <mat-icon>delete</mat-icon>
               </button>

@@ -12,6 +12,9 @@
                     <div *ngIf="courseForm.get('name')?.hasError('required') && courseForm.get('name')?.touched" class="error-message">
                         Course name is required
                     </div>
+                    <div *ngIf="courseForm.get('name')?.hasError('maxlength') && courseForm.get('name')?.touched" class="error-message">
+                        Course name must be less than 255 characters
+                    </div>
                 </div>
             </div>
             <div class="col-md-6">
@@ -20,6 +23,9 @@
                     <input type="number" class="input-control" placeholder="Enter Duration" formControlName="duration">
                     <div *ngIf="courseForm.get('duration')?.hasError('required') && courseForm.get('duration')?.touched" class="error-message">
                         Duration is required
+                    </div>
+                    <div *ngIf="courseForm.get('duration')?.hasError('min') && courseForm.get('duration')?.touched" class="error-message">
+                        Duration must be greater than 0
                     </div>
                 </div>
             </div>
@@ -72,10 +78,10 @@
                             <img [src]="selectedImage" alt="Course Preview" class="preview-image">
                             <div class="image-overlay">
                                 <button type="button" class="btn-change-image" (click)="fileInput.click()">
-                                    <i class="ri-edit-2-line"></i> Change
+                                    Change
                                 </button>
                                 <button type="button" class="btn-remove-image" (click)="removeImage()">
-                                    <i class="ri-delete-bin-line"></i> Remove
+                                    Remove
                                 </button>
                             </div>
                         </div>
@@ -87,8 +93,14 @@
             </div>
             <div class="col-md-12">
                 <div class="form-group">
-                    <label class="d-block fw-semibold">Description</label>
+                    <label class="d-block fw-semibold">Description <span class="text-danger">*</span></label>
                     <textarea class="input-control input-des" placeholder="Course Description" formControlName="description"></textarea>
+                    <div *ngIf="courseForm.get('description')?.hasError('required') && courseForm.get('description')?.touched" class="error-message">
+                        Description is required
+                    </div>
+                    <div *ngIf="courseForm.get('description')?.hasError('maxlength') && courseForm.get('description')?.touched" class="error-message">
+                        Description must be less than 1000 characters
+                    </div>
                 </div>
             </div>
         </div>

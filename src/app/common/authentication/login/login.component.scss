@@ -24,6 +24,7 @@
             padding: 17px 25px 17px 60px !important;
             min-width: 500px !important;
             color: #0d1015;
+            transition: all 0.3s ease;
 
             img {
                 top: 50%;
@@ -32,10 +33,21 @@
                 margin: {
                     left: -35px;
                 };
+                transition: transform 0.3s ease;
             }
             &.gray {
                 border: 1px solid #EDEFF5 !important;
                 background-color: var(--whiteColor) !important;
+
+                &:hover {
+                    border: 2px solid #4285F4 !important;
+                    box-shadow: 0 2px 8px rgba(66, 133, 244, 0.3);
+                    transform: translateY(-2px);
+
+                    img {
+                        transform: translateY(-50%) scale(1.1);
+                    }
+                }
             }
         }
     }

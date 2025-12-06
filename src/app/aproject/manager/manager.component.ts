@@ -3,7 +3,7 @@ import { Component, signal } from '@angular/core';
 import { Event, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { SidebarManagerComponent } from "../../common/manager/sidebar-manager/sidebar-manager.component";
 import { HeaderManagerComponent } from "../../common/manager/header-manager/header-manager.component";
-import { ToggleService } from '../../common/context/toggle.service';
+import { ToggleService } from '../../context/toggle.service';
 import { FooterComponent } from '../../common/footer/footer.component';
 
 

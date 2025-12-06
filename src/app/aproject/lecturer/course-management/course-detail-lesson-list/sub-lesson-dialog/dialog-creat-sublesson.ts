@@ -139,7 +139,9 @@ export class CreateSubLesson implements OnDestroy {
             if (!file.type.startsWith('video/')) {
                 this.snack.open('Please select a valid video file', '', {
                     duration: 3000,
-                    panelClass: ['error-snackbar', 'custom-snackbar']
+                    panelClass: ['error-snackbar', 'custom-snackbar'],
+                    horizontalPosition: 'right',
+                    verticalPosition: 'top'
                 });
                 return;
             }
@@ -148,12 +150,15 @@ export class CreateSubLesson implements OnDestroy {
             if (file.size > 100 * 1024 * 1024) {
                 this.snack.open('Video file size must be less than 100MB', '', {
                     duration: 3000,
-                    panelClass: ['error-snackbar', 'custom-snackbar']
+                    panelClass: ['error-snackbar', 'custom-snackbar'],
+                    horizontalPosition: 'right',
+                    verticalPosition: 'top'
                 });
                 return;
             }
 
             this.selectedVideo = file;
+            this.isDeleteVideo = false; // Reset delete flag khi chọn video mới
             
             // Create preview URL
             this.selectedVideoUrl = URL.createObjectURL(file);

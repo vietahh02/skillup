@@ -27,14 +27,16 @@ export class DocumentDialog {
     searchTerm = '';
     isDragOver = false;
     isUploading = false;
+    isDraftCourse = false;
 
     constructor(
         public dialogRef: MatDialogRef<DocumentDialog>,
-        @Inject(MAT_DIALOG_DATA) public data: { courseId: number | string },
+        @Inject(MAT_DIALOG_DATA) public data: { courseId: number | string, isDraftCourse: boolean },
         private documentService: ApiDocumentServices,
         private dialog: MatDialog,
         private snack: MatSnackBar
     ) {
+      this.isDraftCourse = this.data.isDraftCourse;
     }
 
     ngOnInit() {
@@ -116,8 +118,8 @@ export class DocumentDialog {
       this.isUploading = true;
       
       this.documentService.uploadDocument(this.data.courseId, this.selectedFiles).subscribe({
-        next: (document: DocumentModel) => {
-          this.documents.unshift(document);
+        next: (documents: any) => {
+          this.documents.unshift(...documents.documents);
           this.filterDocuments();
           this.selectedFiles = [];
           this.isUploading = false;

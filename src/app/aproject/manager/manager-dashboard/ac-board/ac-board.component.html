@@ -1,0 +1,87 @@
+<div class="row">
+    <div class="col-lg-4 col-md-6 col-xl-4 col-xxl-4">
+        <mat-card class="mb-25 position-relative tagus-card">
+            <mat-card-header>
+                <h5 class="mb-0">Top Courses</h5>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="single-stats-box mb-25 d-flex align-items-center">
+                    <div class="icon">
+                        <i class="flaticon-to-do-list"></i>
+                    </div>
+                    <div class="title">
+                        <h3 class="mb-0">{{ topCoursesEnrollmentCount }}</h3>
+                        <span class="d-block gray-color">Total employees</span>
+                    </div>
+                </div>
+                <div class="kanban-item bg-gray border-radius p-20" *ngFor="let course of topCourses">
+                    <div class="image">
+                        <img [src]="course.imageUrl || 'img/user/user12.jpg'" alt="user">
+                    </div>
+                    <div class="title">
+                        <h5 class="mb-8 fw-semibold">{{ course.courseName }}</h5>
+                        <!-- <span class="muted-color fw-medium">{{ course.courseType }}</span> -->
+                        <div class="d-flex mt-12 align-items-center justify-content-space-between">
+                            <span class="gray-color">{{ course.totalEnrollments }} employees</span>
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+    <div class="col-lg-4 col-md-6 col-xl-4 col-xxl-4">
+        <mat-card class="mb-25 position-relative tagus-card">
+            <mat-card-header>
+                <h5 class="mb-0">Top Learning Paths</h5>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="single-stats-box mb-25 d-flex align-items-center">
+                    <div class="icon">
+                        <i class="flaticon-donut-chart"></i>
+                    </div>
+                    <div class="title">
+                        <h3 class="mb-0">{{ topLearningPathsEnrollmentCount }}</h3>
+                        <span class="d-block gray-color">Total employees</span>
+                    </div>
+                </div>
+                <div class="kanban-item bg-gray border-radius p-20" *ngFor="let learningPath of topLearningPaths">
+                    <div class="title">
+                        <h5 class="mb-8 fw-semibold">{{ learningPath.learningPathName }}</h5>
+                        <!-- <span class="muted-color fw-medium">{{ learningPath.description }}</span> -->
+                        <div class="d-flex mt-12 align-items-center justify-content-space-between">
+                            <span class="gray-color">{{ learningPath.totalEnrollments }} employees</span>
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+    <div class="col-lg-4 col-md-6 col-xl-4 col-xxl-4">
+        <mat-card class="mb-25 position-relative tagus-card">
+            <mat-card-header>
+                <h5 class="mb-0">Top Lecturers</h5>
+            </mat-card-header>
+            <mat-card-content>
+                <div class="single-stats-box mb-25 d-flex align-items-center">
+                    <div class="icon">
+                        <i class="flaticon-filter"></i>
+                    </div>
+                    <div class="title">
+                        <h3 class="mb-0">{{ topLecturersEnrollmentCount }}</h3>
+                        <span class="d-block gray-color">Total courses</span>
+                    </div>
+                </div>
+                <div class="kanban-item bg-gray border-radius p-20" *ngFor="let lecturer of topLecturers">
+                    <div class="image"> <img [src]="lecturer.avatarUrl || 'img/user/user12.jpg'" alt="user"></div>
+                    <div class="title">
+                        <h5 class="mb-8 fw-semibold">{{ lecturer.fullName }}</h5>
+                        <span class="muted-color fw-medium">{{ lecturer.email }}</span>
+                        <div class="d-flex mt-12 align-items-center justify-content-space-between">
+                            <span class="gray-color">{{ lecturer.totalCourses }} courses</span>
+                        </div>
+                    </div>
+                </div>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>

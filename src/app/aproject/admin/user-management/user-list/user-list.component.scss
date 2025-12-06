@@ -7,6 +7,19 @@
     margin: 15px 0;
 }
 
+.search-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.error-message {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
 .role-badge {
   display: inline-block;
   padding: 4px 10px;

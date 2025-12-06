@@ -1,4 +1,4 @@
-import { Component, ViewChild } from "@angular/core";
+import { Component, Input, ViewChild } from "@angular/core";
 import {
     ApexAxisChartSeries,
     ApexChart,
@@ -42,6 +42,7 @@ export type ChartOptions = {
     styleUrls: ['./ac-user-status.component.scss']
 })
 export class AcUserStatusComponent {
+    @Input() data:any;
 
     @ViewChild("chart") chart!: ChartComponent;
     public chartOptions: Partial<ChartOptions>;

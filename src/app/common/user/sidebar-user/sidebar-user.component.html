@@ -52,6 +52,17 @@
                     </mat-expansion-panel-header>
                     </mat-expansion-panel>
 
+                    <mat-expansion-panel [expanded]="isActive('/learning-paths')" hideToggle>
+                    <mat-expansion-panel-header
+                        routerLink="/learning-paths" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="sidemenu-link"
+                    >
+                        <mat-panel-title>
+                            <i class="flaticon-learning"></i>
+                            <span class="title">Learning Paths</span>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    </mat-expansion-panel>
+
                     <mat-expansion-panel [expanded]="isActive('/quiz/1')" hideToggle>
                     <mat-expansion-panel-header
                         routerLink="/quiz/1" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="sidemenu-link"

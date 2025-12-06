@@ -1,8 +1,11 @@
 <mat-card class="mb-25 tagus-card">
     <!-- <mat-card-header> -->
         <div class="search">
-            <h5 class="mb-1">User Management</h5>
-            
+            <div class="search-header">
+                <h5 class="mb-1">User Management</h5>
+                <button mat-flat-button color="primary" (click)="addUser()">Add User</button>
+            </div>
+
             <div >
                 <div class="tagus-search-box">
                     <input type="text" class="input-search border-radius" placeholder="Search here" [(ngModel)]="searchTerm" >

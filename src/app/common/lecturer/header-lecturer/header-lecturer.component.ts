@@ -4,8 +4,8 @@ import { Router, RouterLink } from '@angular/router';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { ToggleService } from '../../context/toggle.service';
-import { AuthService } from '../../context/auth.service';
+import { ToggleService } from '../../../context/toggle.service';
+import { AuthService } from '../../../context/auth.service';
 import { Observable } from 'rxjs';
 import { UserInfo } from '../../../models/user.models';
 

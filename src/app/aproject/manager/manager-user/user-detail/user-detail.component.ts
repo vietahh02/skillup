@@ -58,8 +58,15 @@ export class ManagerUserDetail {
     private route = inject(ActivatedRoute);
     id!: string;
     detail: UserDetail | null = null;
+    
+    active = true;
+    pending = true;
+    completed = true;
 
-    constructor(private api: ApiUserServices) {
+    enrolledCourse: any[] = [];
+    createdCourse: any[] = [];
+
+    constructor(private api: ApiUserServices, private apiUser: ApiUserServices) {
         this.chartOptions = {
             series: [
                 {
@@ -162,13 +169,33 @@ export class ManagerUserDetail {
         this.api.getUserDetail(this.id).subscribe({
             next: (res) => {
                 this.detail = res;
+                if (res.roles?.includes('Employee')) {
+                    this.fetchEnrolledCourse();
+                }
+                if (res.roles?.includes('Lecturer')) {
+                    this.fetchCreatedCourse();
+                }
             }
         })
     }
 
-    active = true;
-    pending = true;
-    completed = true;
+    private fetchEnrolledCourse() {
+        this.apiUser.getCourseEmployee(this.id).subscribe({
+            next: (res) => {
+                this.enrolledCourse = res;
+            }
+        })
+    }
+
+    private fetchCreatedCourse() {
+        this.apiUser.getCourseLecturers(this.id).subscribe({
+            next: (res) => {
+                this.createdCourse = res;
+            }
+        })
+    }
+
+
 
 }
 

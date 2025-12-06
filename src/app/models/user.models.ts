@@ -39,6 +39,7 @@ export interface PaginatedResponse<T> {
 }
 
 export interface UserManager {
+    allCourseProgress?: number;
     userId: number;
     fullName: string;
     email: string;
@@ -51,4 +52,19 @@ export interface UserManager {
     active: boolean;
     createdAt: string; // ISO datetime string
     roles: string[];
+}
+
+export interface DashBoardAdmin {
+    totalUser: number;
+    totalEmployee: number;
+    totalManager: number;
+    totalLecturer: number;
+    totalEmployeeChart: DashBoardAdminChart[];
+    totalManagerChart: DashBoardAdminChart[];
+    totalLecturerChart: DashBoardAdminChart[];
+}
+
+export interface DashBoardAdminChart {
+    month: string;
+    count: number;
 }

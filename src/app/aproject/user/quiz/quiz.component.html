@@ -41,7 +41,7 @@
     <!-- Main Quiz Area -->
     <div class="col-lg-8 col-md-12">
       <!-- Question Card -->
-      <mat-card class="mb-25 tagus-card question-card">
+      <mat-card class="mb-25 tagus-card question-card" *ngIf="currentQuestion">
         <mat-card-header class="question-header">
           <div class="question-number-badge">
             <mat-icon>help_outline</mat-icon>
@@ -52,7 +52,7 @@
             {{getQuestionTypeLabel(currentQuestion.type)}}
           </mat-chip>
         </mat-card-header>
-        
+
         <mat-card-content>
           <h3 class="question-text">{{currentQuestion.question}}</h3>
           

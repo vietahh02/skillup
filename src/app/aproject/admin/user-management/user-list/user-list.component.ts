@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ViewChild, OnInit } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AfterViewInit, Component, inject, ViewChild, OnInit, Inject } from '@angular/core';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -13,6 +13,9 @@ import { Router } from '@angular/router';
 import { UserAdmin, PaginatedResponse } from '../../../../models/user.models';
 import { ApiUserServices } from '../../../../services/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { Level } from '../../../../models/lookup.model';
+import { ApiCourseServices } from '../../../../services/course.service';
 
 @Component({
     selector: 'app-admin-user-list',
@@ -37,7 +40,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     styleUrls: ['./user-list.component.scss'],
 })
 export class AdminUserList implements OnInit, AfterViewInit {
-    constructor(private router: Router, private apiUserService: ApiUserServices, private snack: MatSnackBar) {}
+    constructor(private router: Router, private apiUserService: ApiUserServices, private snack: MatSnackBar, private dialog: MatDialog) {}
 
     displayedColumns: string[] = [
         'id',
@@ -108,6 +111,13 @@ export class AdminUserList implements OnInit, AfterViewInit {
         this.data.filterPredicate = () => true;
     }
 
+    addUser() {
+        this.dialog.open(CreateUserDialog, {
+            width: '500px',
+            data: { loadUsers: () => this.loadUsers() }
+        });
+    }
+
     goDetail(element: UserAdmin) {
         this.router.navigate([`/admin/users/${element.userId}`])
     }
@@ -152,4 +162,79 @@ export class AdminUserList implements OnInit, AfterViewInit {
         this.pageSize = event.pageSize;
         this.loadUsers(this.currentPage, this.pageSize, this.searchTerm);
     }
+}
+
+@Component({
+    selector: 'create-user',
+    templateUrl: './dialog-create-employee.html',
+    imports:[CommonModule, FormsModule, ReactiveFormsModule],
+    styleUrls: ['./user-list.component.scss']
+})
+export class CreateUserDialog {
+
+    fb = inject(FormBuilder);
+    userForm = this.fb.group({
+      fullName: ['', [Validators.required, Validators.maxLength(255)]],
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
+      levelId: [1, [Validators.required]],
+      roleId: [4, [Validators.required]],
+    });
+
+    constructor(
+            public dialogRef: MatDialogRef<CreateUserDialog>,
+        @Inject(MAT_DIALOG_DATA) public data: { loadUsers: () => void },
+        private apiUserServices: ApiUserServices,
+        private apiCourseServices: ApiCourseServices,
+        private snack: MatSnackBar
+    ) {}
+
+    listLevel: Level[] = [];
+
+    listRole: any[] = [
+      { roleId: 1, name: 'Admin' },
+      { roleId: 2, name: 'Manager' },
+      { roleId: 3, name: 'Lecturer' },
+      { roleId: 4, name: 'Employee' },
+    ];
+
+    ngOnInit() {
+      this.apiCourseServices.getLevels().subscribe(
+        (res: any) => {
+            this.listLevel = res;
+        }
+      );
+    }
+
+    onSubmit() {
+      this.userForm.markAllAsTouched();
+      if (!this.userForm.valid) return;
+
+      const payload = {
+        fullName: this.userForm.value.fullName,
+        email: this.userForm.value.email,
+        roleId: this.userForm.value.roleId,
+        levelId: this.userForm.value.levelId,
+        roleIds: [this.userForm.value.roleId],
+    };
+
+      this.apiUserServices.createUser(payload).subscribe(
+        (res: any) => {
+          this.snack.open('User created successfully', '', { duration: 2200, panelClass: ['success-snackbar', 'custom-snackbar'], horizontalPosition: 'right', verticalPosition: 'top' });
+          if (this.data?.loadUsers) {
+            this.data.loadUsers();
+          }
+          this.close();
+        },
+        (error: any) => {
+          console.error('Error creating user:', error);
+          this.snack.open('Failed to create user. Please try again.', '', { duration: 3000, panelClass: ['error-snackbar', 'custom-snackbar'], horizontalPosition: 'right', verticalPosition: 'top' });
+        }
+      );
+    }
+
+
+    close(){
+        this.dialogRef.close(true);
+    }
+
 }

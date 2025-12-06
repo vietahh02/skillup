@@ -20,7 +20,7 @@
             </div>
             <!-- <p class="text-white">{{course.description || ''}}</p> -->
              <div>
-                 <a mat-raised-button routerLink="/course/learn/{{course.courseId}}" class="tagus mt-10" >{{course.isEnrolled ? 'Continue' : 'Enroll Now'}}</a>
+                 <a mat-raised-button class="tagus mt-10" (click)="enrollCourse()">{{course.isEnrolled ? 'Continue' : 'Enroll Now'}}</a>
              </div>
         </div>
         <div class="course-details-desc">
@@ -33,13 +33,13 @@
                     <li class="gray-color fw-semibold">
                         Lecturer
                         <div class="d-flex align-items-center">
-                            <img src="img/user/user2.jpg" class="rounded-circle" width="30" alt="user">
+                            <img [src]="course.lecturerImageUrl || 'img/user/user2.jpg'" class="rounded-circle" width="30" alt="user">
                             <span class="d-block fw-semibold">{{course.createdByName || ''}}</span>
                         </div>
                     </li>
                     <li class="gray-color fw-semibold">
                         Course Duration
-                        <span class="d-block fw-semibold position-relative"><i class="ri-time-line"></i> {{totalDuration || 0}}s</span>
+                        <span class="d-block fw-semibold position-relative"><i class="ri-time-line"></i> {{formatSeconds(totalDuration) || 0}}</span>
                     </li>
                 </ul>
                 <!-- <div class="rating-box text-end">
@@ -66,22 +66,57 @@
                             <ul class="mb-0 mt-0 ps-0 content-list">
                                 <li class="d-flex align-items-center justify-content-space-between" *ngFor="let subLesson of lesson.subLessons">
                                     <span class="d-block gray-color fw-medium position-relative"><i class="ri-play-circle-line"></i> {{subLesson.title}}</span>
-                                    <span class="d-block gray-color fw-medium">{{subLesson.duration}}s</span>
+                                    <span class="badge" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                                                color: white;
+                                                                padding: 4px 12px;
+                                                                border-radius: 6px;
+                                                                font-size: 12px;
+                                                                font-weight: 600;">
+                                        {{formatSeconds(subLesson.duration) || 0}}
+                                    </span>
                                 </li>
-                                
+
                             </ul>
                         </mat-expansion-panel>
                         
-                        <mat-expansion-panel>
+                        <mat-expansion-panel *ngIf="course.quiz">
                             <mat-expansion-panel-header>
                                 <mat-panel-title>
                                     Final Quiz
+                                    <!-- Passed: Green -->
+                                    <span class="ms-10" *ngIf="course.quiz.isCompleted && (course.quiz.userScore ?? 0) >= course.quiz.passScore"
+                                          style="color: #22c55e; font-weight: bold;">
+                                        <i class="ri-check-line"></i> Passed
+                                    </span>
+                                    <!-- Failed: Red -->
+                                    <span class="ms-10" *ngIf="course.quiz.isCompleted && (course.quiz.userScore ?? 0) < course.quiz.passScore"
+                                          style="color: #ef4444; font-weight: bold;">
+                                        <i class="ri-close-line"></i> Failed
+                                    </span>
                                 </mat-panel-title>
                             </mat-expansion-panel-header>
                             <ul class="mb-0 mt-0 ps-0 content-list">
                                 <li class="d-flex align-items-center justify-content-space-between">
-                                    <span class="d-block gray-color fw-medium position-relative"><i class="ri-star-line"></i> Quiz: {{course.name}}</span>
-                                    <span class="d-block gray-color fw-medium">{{course.quizzes.attemptLimit}}s</span>
+                                    <span class="d-block gray-color fw-medium position-relative">
+                                        <!-- Passed: Green check icon -->
+                                        <i class="ri-checkbox-circle-fill" style="color: #22c55e;"
+                                           *ngIf="course.quiz.isCompleted && (course.quiz.userScore ?? 0) >= course.quiz.passScore"></i>
+                                        <!-- Failed: Red X icon -->
+                                        <i class="ri-close-circle-fill" style="color: #ef4444;"
+                                           *ngIf="course.quiz.isCompleted && (course.quiz.userScore ?? 0) < course.quiz.passScore"></i>
+                                        <!-- Not completed: Play icon -->
+                                        <i class="ri-play-circle-line" *ngIf="!course.quiz.isCompleted"></i>
+                                        Quiz: {{course.quiz.title || course.name}}
+                                    </span>
+                                    <span class="badge" *ngIf="course.quiz.userScore !== undefined"
+                                          style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                                 color: white;
+                                                 padding: 4px 12px;
+                                                 border-radius: 6px;
+                                                 font-size: 12px;
+                                                 font-weight: 600;">
+                                        {{course.quiz.userScore}}%
+                                    </span>
                                 </li>
                             </ul>
                         </mat-expansion-panel>
@@ -111,18 +146,18 @@
     <mat-card-content>
         <div class="p-md-25 feedback-section">
             <div class="d-flex justify-content-between align-items-center feedback-header">
-                <h5 class="mb-0">Student Feedback (127 reviews)</h5>
-                <button mat-flat-button class="tagus" (click)="toggleWriteFeedback()">Write Feedback</button>
+                <h5 class="mb-0">Student Feedback ({{totalFeedbacks || 0}} reviews)</h5>
+                <button mat-flat-button class="tagus" *ngIf="course.progressPct && course.progressPct === 100" (click)="toggleWriteFeedback()">Write Feedback</button>
             </div>
 
             <!-- Write Feedback Input -->
             <div class="write-feedback-input" id="write-feedback-input" style="display: none;">
                 <div class="d-flex align-items-start">
-                    <img src="img/user/avatar.png" class="rounded-circle me-15" width="50" alt="user">
+                    <img src="img/user/user1.jpg" class="rounded-circle me-15" width="50" alt="user">
                     <div class="flex-grow-1">
-                        <textarea class="feedback-textarea" placeholder="Share your experience with this course... What did you like? What could be improved?" rows="5"></textarea>
+                        <textarea class="feedback-textarea" id="feedback-content" placeholder="Share your experience with this course... What did you like? What could be improved?" rows="5"></textarea>
                         <div class="feedback-actions">
-                            <button mat-flat-button class="tagus me-10">Post Feedback</button>
+                            <button mat-flat-button class="tagus me-10" (click)="createFeedback()">Post Feedback</button>
                             <button mat-button (click)="toggleWriteFeedback()">Cancel</button>
                         </div>
                     </div>
@@ -132,36 +167,39 @@
             <!-- Feedback List -->
             <div class="feedback-list">
                 <!-- Feedback Item 1 -->
-                <div class="feedback-item">
+                <div class="feedback-item" *ngFor="let feedback of feedbacks">
                     <div class="d-flex align-items-start">
-                        <img src="img/user/user1.jpg" class="rounded-circle me-15" width="50" alt="user">
+                        <img [src]="feedback.userAvatarUrl || 'img/user/user1.jpg'" class="rounded-circle me-15" width="50" alt="user">
                         <div class="flex-grow-1">
                             <div class="feedback-header">
                                 <div class="user-info">
-                                    <h6>Sarah Johnson</h6>
-                                    <span class="timestamp">2 days ago</span>
+                                    <h6>{{feedback.userName || ''}}</h6>
+                                    <span class="timestamp">{{getTimeAgo(feedback.createdAt) || ''}}</span>
                                 </div>
                             </div>
                             <p class="feedback-content">
-                                Excellent course! The instructor explains complex concepts very clearly. The hands-on projects really helped me understand Node.js better. Highly recommended for beginners!
+                                {{feedback.content || ''}}
                             </p>
                             
-                            <!-- Reply button -->
-                            <div class="mb-15">
-                                <button mat-button class="reply-btn" (click)="toggleReply('feedback-1')">
+                            <!-- Reply and Delete buttons -->
+                            <div class="mb-15 d-flex align-items-center">
+                                <button mat-button class="reply-btn me-15" (click)="toggleReply(feedback.feedbackId.toString())">
                                     <i class="ri-reply-line me-5"></i> Reply
+                                </button>
+                                <button mat-button class="delete-feedback-btn" *ngIf="canDelete(feedback.userId)" (click)="deleteFeedback(feedback.feedbackId)">
+                                    <i class="ri-delete-bin-line me-5"></i> Delete
                                 </button>
                             </div>
 
                             <!-- Reply input (hidden by default) -->
-                            <div class="reply-input" id="reply-feedback-1" style="display: none;">
+                            <div class="reply-input" id="reply-{{feedback.feedbackId}}" style="display: none;">
                                 <div class="d-flex align-items-start">
-                                    <img src="img/user/avatar.png" class="rounded-circle me-10" width="35" alt="user">
+                                    <img src="img/user/user1.jpg" class="rounded-circle me-10" width="35" alt="user">
                                     <div class="flex-grow-1">
-                                        <textarea class="reply-textarea" rows="3" placeholder="Write a thoughtful reply..."></textarea>
+                                        <textarea class="reply-textarea" id="reply-content-{{feedback.feedbackId}}" rows="3" placeholder="Write a thoughtful reply..."></textarea>
                                         <div class="reply-actions">
-                                            <button mat-flat-button class="tagus me-10">Post Reply</button>
-                                            <button mat-button (click)="toggleReply('feedback-1')">Cancel</button>
+                                            <button mat-flat-button class="tagus me-10" (click)="createComment(feedback)">Post Reply</button>
+                                            <button mat-button (click)="toggleReply(feedback.feedbackId.toString())">Cancel</button>
                                         </div>
                                     </div>
                                 </div>
@@ -170,210 +208,23 @@
                             <!-- Comments for this feedback -->
                             <div class="comments-section">
                                 <!-- Comment 1 -->
-                                <div class="comment-item d-flex align-items-start">
-                                    <img src="img/user/user2.jpg" class="rounded-circle me-10" width="35" alt="user">
+                                <div class="comment-item d-flex align-items-start" *ngFor="let comment of feedback.comments">
+                                    <img [src]="comment.userAvatarUrl || 'img/user/user1.jpg'" class="rounded-circle me-10" width="35" alt="user">
                                     <div class="flex-grow-1">
                                         <div class="comment-content">
                                             <div class="comment-header d-flex justify-content-between align-items-center">
-                                                <span class="comment-user">Mike Chen</span>
-                                                <span class="comment-time">1 day ago</span>
+                                                <div class="comment-info">
+                                                    <span class="comment-user">{{comment.userName || ''}}</span>
+                                                    <span class="comment-time ms-15">{{getTimeAgo(comment.createdAt) || ''}}</span>
+                                                </div>
+                                                <button mat-icon-button class="delete-comment-btn" *ngIf="canDelete(comment.userId)" (click)="deleteComment(comment.commentId, feedback.feedbackId)" title="Delete comment">
+                                                    <mat-icon class="small-icon">delete</mat-icon>
+                                                </button>
                                             </div>
-                                            <p class="comment-text">I totally agree! This course helped me land my first Node.js job. Thanks for the recommendation!</p>
+                                            <p class="comment-text">{{comment.commentText || ''}}</p>
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- Comment 2 -->
-                                <div class="comment-item d-flex align-items-start">
-                                    <img src="img/user/user3.jpg" class="rounded-circle me-10" width="35" alt="user">
-                                    <div class="flex-grow-1">
-                                        <div class="comment-content">
-                                            <div class="comment-header d-flex justify-content-between align-items-center">
-                                                <span class="comment-user">Emma Wilson</span>
-                                                <span class="comment-time">18 hours ago</span>
-                                            </div>
-                                            <p class="comment-text">Which project was your favorite? I'm still working through the authentication module.</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Comment 3 -->
-                                <div class="comment-item d-flex align-items-start">
-                                    <img src="img/user/user9.jpg" class="rounded-circle me-10" width="35" alt="user">
-                                    <div class="flex-grow-1">
-                                        <div class="comment-content">
-                                            <div class="comment-header d-flex justify-content-between align-items-center">
-                                                <span class="comment-user">John Smith</span>
-                                                <span class="comment-time">12 hours ago</span>
-                                            </div>
-                                            <p class="comment-text">The authentication module was tricky for me too! But once you get it, everything clicks.</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Comment 4 -->
-                                <div class="comment-item d-flex align-items-start">
-                                    <img src="img/user/user10.jpg" class="rounded-circle me-10" width="35" alt="user">
-                                    <div class="flex-grow-1">
-                                        <div class="comment-content">
-                                            <div class="comment-header d-flex justify-content-between align-items-center">
-                                                <span class="comment-user">Maria Garcia</span>
-                                                <span class="comment-time">8 hours ago</span>
-                                            </div>
-                                            <p class="comment-text">I found the Express.js section really helpful. Great practical examples!</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Comment 5 -->
-                                <div class="comment-item d-flex align-items-start">
-                                    <img src="img/user/user11.jpg" class="rounded-circle me-10" width="35" alt="user">
-                                    <div class="flex-grow-1">
-                                        <div class="comment-content">
-                                            <div class="comment-header d-flex justify-content-between align-items-center">
-                                                <span class="comment-user">David Kim</span>
-                                                <span class="comment-time">5 hours ago</span>
-                                            </div>
-                                            <p class="comment-text">Just finished the course yesterday. Already applying what I learned in my current project!</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Load more comments button -->
-                                <div class="text-center mt-15">
-                                    <button mat-button class="load-more-btn" (click)="loadMoreComments('feedback-1')">
-                                        <i class="ri-add-line me-5"></i>Load more comments (3 more)
-                                    </button>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feedback Item 2 -->
-                <div class="feedback-item">
-                    <div class="d-flex align-items-start">
-                        <img src="img/user/user4.jpg" class="rounded-circle me-15" width="50" alt="user">
-                        <div class="flex-grow-1">
-                            <div class="feedback-header">
-                                <div class="user-info">
-                                    <h6>David Rodriguez</h6>
-                                    <span class="timestamp">1 week ago</span>
-                                </div>
-                            </div>
-                            <p class="feedback-content">
-                                Good course overall, but I wish there were more advanced topics covered. The basics are well explained though, perfect for someone starting out with Node.js.
-                            </p>
-                            
-                            <!-- Reply button -->
-                            <div class="mb-15">
-                                <button mat-button class="reply-btn" (click)="toggleReply('feedback-2')">
-                                    <i class="ri-reply-line me-5"></i> Reply
-                                </button>
-                            </div>
-
-                            <!-- Reply input (hidden by default) -->
-                            <div class="reply-input" id="reply-feedback-2" style="display: none;">
-                                <div class="d-flex align-items-start">
-                                    <img src="img/user/avatar.png" class="rounded-circle me-10" width="35" alt="user">
-                                    <div class="flex-grow-1">
-                                        <textarea class="reply-textarea" rows="3" placeholder="Write a thoughtful reply..."></textarea>
-                                        <div class="reply-actions">
-                                            <button mat-flat-button class="tagus me-10">Post Reply</button>
-                                            <button mat-button (click)="toggleReply('feedback-2')">Cancel</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Comments for this feedback -->
-                            <div class="comments-section">
-                                <!-- Comment 1 -->
-                                <div class="comment-item d-flex align-items-start">
-                                    <img src="img/user/user5.jpg" class="rounded-circle me-10" width="35" alt="user">
-                                    <div class="flex-grow-1">
-                                        <div class="comment-content">
-                                            <div class="comment-header d-flex justify-content-between align-items-center">
-                                                <span class="comment-user">Lisa Anderson</span>
-                                                <span class="comment-time">5 days ago</span>
-                                            </div>
-                                            <p class="comment-text">There's an advanced Node.js course coming next month! The instructor mentioned it in the community forum.</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Feedback Item 3 -->
-                <div class="feedback-item">
-                    <div class="d-flex align-items-start">
-                        <img src="img/user/user6.jpg" class="rounded-circle me-15" width="50" alt="user">
-                        <div class="flex-grow-1">
-                            <div class="feedback-header">
-                                <div class="user-info">
-                                    <h6>Jennifer Lee</h6>
-                                    <span class="timestamp">2 weeks ago</span>
-                                </div>
-                            </div>
-                            <p class="feedback-content">
-                                Amazing course! The step-by-step approach made learning Node.js so much easier. The final project was challenging but rewarding. 10/10 would recommend!
-                            </p>
-                            
-                            <!-- Reply button -->
-                            <div class="mb-15">
-                                <button mat-button class="reply-btn" (click)="toggleReply('feedback-3')">
-                                    <i class="ri-reply-line me-5"></i> Reply
-                                </button>
-                            </div>
-
-                            <!-- Reply input (hidden by default) -->
-                            <div class="reply-input" id="reply-feedback-3" style="display: none;">
-                                <div class="d-flex align-items-start">
-                                    <img src="img/user/avatar.png" class="rounded-circle me-10" width="35" alt="user">
-                                    <div class="flex-grow-1">
-                                        <textarea class="reply-textarea" rows="3" placeholder="Write a thoughtful reply..."></textarea>
-                                        <div class="reply-actions">
-                                            <button mat-flat-button class="tagus me-10">Post Reply</button>
-                                            <button mat-button (click)="toggleReply('feedback-3')">Cancel</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Comments for this feedback -->
-                            <div class="comments-section">
-                                <!-- Comment 1 -->
-                                <div class="comment-item d-flex align-items-start">
-                                    <img src="img/user/user7.jpg" class="rounded-circle me-10" width="35" alt="user">
-                                    <div class="flex-grow-1">
-                                        <div class="comment-content">
-                                            <div class="comment-header d-flex justify-content-between align-items-center">
-                                                <span class="comment-user">Alex Thompson</span>
-                                                <span class="comment-time">1 week ago</span>
-                                            </div>
-                                            <p class="comment-text">Completely agree! What was your final project about? I'm curious to see different implementations.</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Comment 2 -->
-                                <div class="comment-item d-flex align-items-start">
-                                    <img src="img/user/user8.jpg" class="rounded-circle me-10" width="35" alt="user">
-                                    <div class="flex-grow-1">
-                                        <div class="comment-content">
-                                            <div class="comment-header d-flex justify-content-between align-items-center">
-                                                <span class="comment-user">Ryan Parker</span>
-                                                <span class="comment-time">5 days ago</span>
-                                            </div>
-                                            <p class="comment-text">I built a REST API for a blog system. Still need to add authentication though 😅</p>
-                                        </div>
-                                    </div>
-                                </div>
-
                             </div>
                         </div>
                     </div>
@@ -381,8 +232,8 @@
             </div>
 
             <!-- Load More Button -->
-            <div class="load-more-reviews">
-                <button mat-flat-button class="gray">Load More Reviews</button>
+            <div class="load-more-reviews" *ngIf="totalFeedbacks > feedbacks.length">
+                <button mat-flat-button class="gray" (click)="loadMoreFeedbacks()">Load More Reviews</button>
             </div>
         </div>
     </mat-card-content>

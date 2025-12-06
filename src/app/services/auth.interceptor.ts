@@ -2,8 +2,8 @@ import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, finalize, switchMap } from 'rxjs/operators';
 import { throwError } from 'rxjs';
-import { TokenService } from '../common/context/token.service';
-import { LoadingService } from '../common/context/loading.service';
+import { TokenService } from '../context/token.service';
+import { LoadingService } from '../context/loading.service';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const tokenService = inject(TokenService);
@@ -57,5 +57,9 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     );
   }
 
-  return next(req);
+  return next(req).pipe(
+    finalize(() => {
+      loadingService.offLoading();
+    })
+  );
 };

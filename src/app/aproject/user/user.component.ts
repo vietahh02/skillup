@@ -4,7 +4,7 @@ import { Event, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { FooterComponent } from '../../common/footer/footer.component';
 import { HeaderUserComponent } from "../../common/user/header-user/header-user.component";
 import { SidebarUserComponent } from "../../common/user/sidebar-user/sidebar-user.component";
-import { ToggleService } from '../../common/context/toggle.service';
+import { ToggleService } from '../../context/toggle.service';
 
 
 @Component({

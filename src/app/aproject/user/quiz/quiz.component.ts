@@ -13,7 +13,14 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { QuizService } from '../../../services/quiz.service';
+import { ApiCourseServices } from '../../../services/course.service';
+import { QuizResponse, QuizAttemptDetail, SubmitAnswerRequest, SubmitQuizRequest } from '../../../models/quiz.models';
+import { firstValueFrom } from 'rxjs';
 
+// Frontend UI interface - maps to backend Question format
 interface Question {
   id: number;
   type: 'single_choice' | 'multiple_choice' | 'true_false' | 'text';
@@ -29,6 +36,7 @@ interface Answer {
   isCorrect: boolean;
 }
 
+// User answer for submission
 interface UserAnswer {
   questionId: number;
   answerIds?: number[];
@@ -52,78 +60,40 @@ interface UserAnswer {
     MatProgressBarModule,
     MatChipsModule,
     MatDividerModule,
-    MatDialogModule
+    MatDialogModule,
+    MatSnackBarModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './quiz.component.html',
   styleUrls: ['./quiz.component.scss']
 })
 export class QuizComponent implements OnInit, OnDestroy {
-  quizId!: string;
-  quizTitle = 'Final Quiz - JavaScript Fundamentals';
-  quizDuration = 30; // minutes
+  quizId!: number;
+  courseId!: number;
+  quizTitle = '';
+  quizDuration = 30; // minutes - will be updated from backend
   currentQuestionIndex = 0;
   userAnswers: UserAnswer[] = [];
-  
+
+  // Backend data
+  quizData: QuizResponse | null = null;
+  attemptId: number | null = null;
+  passScore = 70;
+
+  // Loading states
+  isLoading = true;
+  isSubmitting = false;
+
   // Timer properties
   timeRemaining: number = 0; // in seconds
   timerInterval: any;
   isTimerRunning = false;
   isTimeUp = false;
-  
-  // Sample quiz questions - in production, these would come from API
-  questions: Question[] = [
-    {
-      id: 1,
-      type: 'single_choice',
-      question: 'Which of the following is NOT a feature introduced in ES6?',
-      answers: [
-        { id: 1, text: 'Arrow Functions', isCorrect: false },
-        { id: 2, text: 'Template Literals', isCorrect: false },
-        { id: 3, text: 'Callbacks', isCorrect: true },
-        { id: 4, text: 'Classes', isCorrect: false }
-      ]
-    },
-    {
-      id: 2,
-      type: 'multiple_choice',
-      question: 'Which of the following are valid ways to handle asynchronous operations in JavaScript? (Select all that apply)',
-      answers: [
-        { id: 5, text: 'Callbacks', isCorrect: true },
-        { id: 6, text: 'Promises', isCorrect: true },
-        { id: 7, text: 'Async/Await', isCorrect: true },
-        { id: 8, text: 'Synchronous Functions', isCorrect: false }
-      ]
-    },
-    {
-      id: 3,
-      type: 'true_false',
-      question: 'ES6 modules use the import/export syntax.',
-      answers: [
-        { id: 9, text: 'True', isCorrect: true },
-        { id: 10, text: 'False', isCorrect: false }
-      ]
-    },
-    {
-      id: 4,
-      type: 'text',
-      question: 'Explain what a closure is in JavaScript and provide a simple example.',
-      textAnswer: 'A closure is a function that retains access to its outer scope even after the outer function has returned.',
-      explanation: 'A closure is a function that has access to variables in its outer scope even after the outer function returns.'
-    },
-    {
-      id: 5,
-      type: 'single_choice',
-      question: 'What does the "this" keyword refer to in arrow functions?',
-      answers: [
-        { id: 11, text: 'The function itself', isCorrect: false },
-        { id: 12, text: 'The enclosing scope', isCorrect: true },
-        { id: 13, text: 'The global object', isCorrect: false },
-        { id: 14, text: 'undefined', isCorrect: false }
-      ]
-    }
-  ];
 
-  get currentQuestion(): Question {
+  // Questions loaded from backend
+  questions: Question[] = [];
+
+  get currentQuestion(): Question | undefined {
     return this.questions[this.currentQuestionIndex];
   }
 
@@ -146,19 +116,139 @@ export class QuizComponent implements OnInit, OnDestroy {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private quizService: QuizService,
+    private courseService: ApiCourseServices,
+    private snackBar: MatSnackBar
   ) {}
 
-  ngOnInit() {
-    this.quizId = this.route.snapshot.paramMap.get('id') || '';
-    this.initializeUserAnswers();
-    this.startTimer();
+  async ngOnInit() {
+    this.quizId = Number(this.route.snapshot.paramMap.get('id'));
+
+    // TODO: Add enrollment check here when ready
+    // if (!this.isEnrolled) { redirect to course page }
+
+    await this.loadQuizAndStartAttempt();
   }
 
   ngOnDestroy() {
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
     }
+  }
+
+  /**
+   * Load quiz from backend and start attempt
+   */
+  private async loadQuizAndStartAttempt(): Promise<void> {
+    try {
+      this.isLoading = true;
+
+      // Step 1: Load quiz data
+      console.log(`Loading quiz ${this.quizId}...`);
+      this.quizData = await firstValueFrom(this.quizService.getQuizById(this.quizId));
+
+      console.log('Quiz loaded:', this.quizData);
+
+      // Set quiz metadata
+      this.quizTitle = this.quizData!.title;
+      this.courseId = this.quizData!.courseId;
+      this.passScore = this.quizData!.passScore;
+      // this.quizDuration = this.quizData.duration || 30; // Backend may not have duration yet
+
+      // Step 2: Start quiz attempt
+      console.log('Starting quiz attempt...');
+      const attemptData = await firstValueFrom(this.quizService.startQuizAttempt(this.quizId));
+
+      this.attemptId = attemptData.attemptId;
+      console.log('Attempt started:', this.attemptId);
+
+      // Step 3: Transform backend questions to UI format
+      this.questions = this.transformQuestions(this.quizData!.questions);
+      console.log(`Transformed ${this.questions.length} questions`);
+
+      // Step 4: Initialize user answers
+      this.initializeUserAnswers();
+
+      // Step 5: Start timer
+      this.startTimer();
+
+      this.isLoading = false;
+
+    } catch (error: any) {
+      console.error('Error loading quiz:', error);
+      console.error('Error details:', error.error);
+      this.isLoading = false;
+
+      // Extract detailed error message
+      let errorMessage = 'Failed to load quiz. Please try again.';
+      if (error.error?.message) {
+        errorMessage = error.error.message;
+      } else if (error.error?.title) {
+        errorMessage = error.error.title;
+      } else if (typeof error.error === 'string') {
+        errorMessage = error.error;
+      }
+
+      this.snackBar.open(
+        errorMessage,
+        'Close',
+        { duration: 8000, panelClass: ['error-snackbar'] }
+      );
+
+      // Redirect back after error
+      setTimeout(() => {
+        this.router.navigate(['/']);
+      }, 3000);
+    }
+  }
+
+  /**
+   * Transform backend Question format to UI Question format
+   * Backend: { questionId, questionType: 0, title, answerOptions: [{ optionId, content, isCorrect }] }
+   * UI: { id, type: 'single_choice', question, answers: [{ id, text, isCorrect }] }
+   */
+  private transformQuestions(backendQuestions: any[]): Question[] {
+    return backendQuestions.map((q: any) => {
+      // Convert questionType number to string
+      const type = this.normalizeQuestionType(q.questionType);
+
+      return {
+        id: q.questionId,
+        type: type as any,
+        question: q.title,
+        answers: q.answerOptions?.map((opt: any) => ({
+          id: opt.optionId || opt.questionId, // Use optionId if available
+          text: opt.content,
+          isCorrect: opt.isCorrect
+        })) || [],
+        textAnswer: type === 'text' ? q.answerOptions?.[0]?.content || '' : undefined
+      };
+    });
+  }
+
+  /**
+   * Normalize questionType from backend (number) to FE string enum
+   * Backend: 0=SingleChoice, 1=MultipleChoice, 2=TrueFalse, 3=Text
+   * Frontend: 'single_choice', 'multiple_choice', 'true_false', 'text'
+   */
+  private normalizeQuestionType(questionType: any): string {
+    if (typeof questionType === 'number') {
+      switch (questionType) {
+        case 0: return 'single_choice';
+        case 1: return 'multiple_choice';
+        case 2: return 'true_false';
+        case 3: return 'text';
+        default: return 'single_choice';
+      }
+    }
+
+    // If already string, return as-is
+    if (typeof questionType === 'string') {
+      return questionType;
+    }
+
+    return 'single_choice';
   }
 
   startTimer() {
@@ -170,16 +260,6 @@ export class QuizComponent implements OnInit, OnDestroy {
     this.timerInterval = setInterval(() => {
       if (this.timeRemaining > 0) {
         this.timeRemaining--;
-        
-        // Warning when less than 5 minutes remaining
-        if (this.timeRemaining === 5 * 60) {
-          // You can add a notification here if needed
-        }
-        
-        // Warning when less than 1 minute remaining
-        if (this.timeRemaining === 60) {
-          // You can add a notification here if needed
-        }
       } else {
         // Time is up - auto submit
         this.stopTimer();
@@ -200,7 +280,7 @@ export class QuizComponent implements OnInit, OnDestroy {
     const hours = Math.floor(this.timeRemaining / 3600);
     const minutes = Math.floor((this.timeRemaining % 3600) / 60);
     const seconds = this.timeRemaining % 60;
-    
+
     if (hours > 0) {
       return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     }
@@ -223,7 +303,7 @@ export class QuizComponent implements OnInit, OnDestroy {
   autoSubmit() {
     this.isTimeUp = true;
     this.stopTimer();
-    
+
     // Auto submit without confirmation
     this.submitQuiz(true);
   }
@@ -301,99 +381,137 @@ export class QuizComponent implements OnInit, OnDestroy {
     }
   }
 
-  submitQuiz(autoSubmit = false) {
+  async submitQuiz(autoSubmit = false) {
     // Stop timer if still running
     this.stopTimer();
-    
+
     if (!autoSubmit) {
-      if (!confirm('Are you sure you want to submit the quiz? You will not be able to make changes after submission.')) {
+      // Open confirmation dialog
+      const dialogRef = this.dialog.open(SubmitConfirmDialog, {
+        width: '450px',
+        disableClose: true,
+        data: {
+          answeredCount: this.userAnswers.filter(ua =>
+            (ua.answerIds && ua.answerIds.length > 0) || (ua.textAnswer && ua.textAnswer.trim())
+          ).length,
+          totalCount: this.questions.length
+        }
+      });
+
+      const confirmed = await firstValueFrom(dialogRef.afterClosed());
+      if (!confirmed) {
+        // Restart timer if user cancels
+        this.startTimer();
         return;
       }
     }
-    
-    const score = this.calculateScore();
-    const percentage = (score / this.questions.length) * 100;
-    
-    // Open result dialog
-    this.dialog.open(QuizResultDialog, {
-      width: '600px',
-      maxWidth: '95vw',
-      data: {
-        score,
-        total: this.questions.length,
-        percentage,
-        passScore: 70,
-        autoSubmitted: autoSubmit
-      },
-      disableClose: true
-    }).afterClosed().subscribe(() => {
-      this.router.navigate(['/course/learn', this.quizId]);
-    });
-  }
 
-  private calculateScore(): number {
-    let score = 0;
-    
-    this.questions.forEach(question => {
-      const userAnswer = this.userAnswers.find(a => a.questionId === question.id);
-      
-      if (!userAnswer) return;
-      
-      switch (question.type) {
-        case 'single_choice':
-          if (userAnswer.answerIds && userAnswer.answerIds.length === 1) {
-            const answerIds = userAnswer.answerIds;
-            const selectedAnswer = question.answers?.find(a => a.id === answerIds[0]);
-            if (selectedAnswer?.isCorrect) {
-              score++;
-            }
-          }
-          break;
-          
-        case 'multiple_choice':
-          if (userAnswer.answerIds && userAnswer.answerIds.length > 0) {
-            const correctIds = question.answers?.filter(a => a.isCorrect).map(a => a.id) || [];
-            const selectedIds = userAnswer.answerIds;
+    if (!this.attemptId) {
+      this.snackBar.open('No active attempt found', 'Close', { duration: 3000 });
+      return;
+    }
+
+    try {
+      this.isSubmitting = true;
+
+      // Build submission request
+      const answers: SubmitAnswerRequest[] = this.userAnswers.map(ua => {
+        const answer: SubmitAnswerRequest = {
+          questionId: ua.questionId,
+          selectedOptionId: ua.answerIds && ua.answerIds.length > 0 ? ua.answerIds[0] : undefined,
+          answerText: ua.textAnswer?.trim() || undefined
+        } as SubmitAnswerRequest;
+
+        if (answer.selectedOptionId === undefined) {
+          delete (answer as any).selectedOptionId;
+        }
+        if (!answer.answerText) {
+          delete answer.answerText;
+        }
+
+        return answer;
+      });
+
+      const request: SubmitQuizRequest = {
+        attemptId: this.attemptId,
+        answers: answers
+      };
+
+      console.log('Submitting quiz:', request);
+
+      // Submit to backend
+      const result = await firstValueFrom(this.quizService.submitQuizAttempt(request));
+
+      console.log('Quiz submitted:', result);
+
+      // Backend returns score as percentage (0-100)
+      const percentage = result.score || 0;
+
+      // Calculate number of correct answers from percentage
+      const correctAnswers = Math.round((percentage / 100) * this.questions.length);
+
+      // Open result dialog
+      this.dialog.open(QuizResultDialog, {
+        width: '600px',
+        maxWidth: '95vw',
+        data: {
+          score: correctAnswers,
+          total: this.questions.length,
+          percentage,
+          passScore: this.passScore,
+          autoSubmitted: autoSubmit,
+          attemptId: this.attemptId
+        },
+        disableClose: true
+      }).afterClosed().subscribe(async () => {
+        // Mark course as complete
+        if (this.courseId) {
+          try {
+            await firstValueFrom(this.courseService.completeCourse(this.courseId));
+            console.log('✅ Course marked as complete');
             
-            if (correctIds.length === selectedIds.length &&
-                correctIds.every(id => selectedIds.includes(id)) &&
-                selectedIds.every(id => correctIds.includes(id))) {
-              score++;
+            // Refresh course data to update quiz status
+            try {
+              await firstValueFrom(this.courseService.getCourseById(this.courseId));
+              console.log('✅ Course data refreshed');
+            } catch (refreshError) {
+              console.error('Error refreshing course data:', refreshError);
             }
+          } catch (error) {
+            console.error('Error marking course as complete:', error);
           }
-          break;
-          
-        case 'true_false':
-          if (userAnswer.answerIds && userAnswer.answerIds.length === 1) {
-            const answerIds = userAnswer.answerIds;
-            const selectedAnswer = question.answers?.find(a => a.id === answerIds[0]);
-            if (selectedAnswer?.isCorrect) {
-              score++;
-            }
-          }
-          break;
-          
-        case 'text':
-          // For text questions, we'll check if answer is not empty
-          // In production, this would be evaluated by instructor or using keyword matching
-          if (userAnswer.textAnswer && userAnswer.textAnswer.trim().length > 0) {
-            score++;
-          }
-          break;
-      }
-    });
-    
-    return score;
+        }
+
+        // Navigate back to course learn page
+        if (this.courseId) {
+          this.router.navigate(['/course/learn', this.courseId]);
+        } else {
+          this.router.navigate(['/']);
+        }
+      });
+
+    } catch (error: any) {
+      console.error('Error submitting quiz:', error);
+      this.snackBar.open(
+        error.error?.message || 'Failed to submit quiz. Please try again.',
+        'Close',
+        { duration: 5000 }
+      );
+      // Restart timer if submission failed
+      this.startTimer();
+    } finally {
+      this.isSubmitting = false;
+    }
   }
 
   getQuestionStatus(questionIndex: number): 'answered' | 'current' | 'unanswered' {
     if (questionIndex === this.currentQuestionIndex) {
       return 'current';
     }
-    
+
     const question = this.questions[questionIndex];
     const userAnswer = this.userAnswers.find(a => a.questionId === question.id);
-    
+
     if (question.type === 'text') {
       return userAnswer?.textAnswer && userAnswer.textAnswer.trim().length > 0 ? 'answered' : 'unanswered';
     } else {
@@ -435,44 +553,45 @@ export class QuizComponent implements OnInit, OnDestroy {
 // Result Dialog Component
 @Component({
   selector: 'quiz-result-dialog',
+  standalone: true,
   template: `
     <div class="quiz-result-dialog">
       <h2 mat-dialog-title class="dialog-title">
         <mat-icon [class]="resultIconClass">{{resultIcon}}</mat-icon>
         Quiz Results
       </h2>
-      
+
       <mat-dialog-content class="dialog-content">
         <div *ngIf="data.autoSubmitted" class="auto-submit-notice">
           <mat-icon>schedule</mat-icon>
           <span>Quiz was automatically submitted when time ran out.</span>
         </div>
         <div class="score-container">
-          <div class="score-circle" [class.passed]="data.percentage >= data.passScore" 
+          <div class="score-circle" [class.passed]="data.percentage >= data.passScore"
                [class.failed]="data.percentage < data.passScore">
-            <div class="score-value">{{data.percentage}}%</div>
+            <div class="score-value">{{data.percentage.toFixed(0)}}%</div>
             <div class="score-label">Score</div>
           </div>
-          
+
           <div class="score-details">
             <div class="detail-item">
               <mat-icon>check_circle</mat-icon>
               <span class="label">Correct Answers:</span>
               <span class="value">{{data.score}} / {{data.total}}</span>
             </div>
-            
+
             <div class="detail-item">
               <mat-icon>assignment</mat-icon>
               <span class="label">Total Questions:</span>
               <span class="value">{{data.total}}</span>
             </div>
-            
+
             <div class="detail-item">
               <mat-icon>emoji_events</mat-icon>
               <span class="label">Passing Score:</span>
               <span class="value">{{data.passScore}}%</span>
             </div>
-            
+
             <mat-chip [color]="data.percentage >= data.passScore ? 'primary' : 'warn'" selected class="status-chip">
               <mat-icon matChipAvatar>
                 {{data.percentage >= data.passScore ? 'check_circle' : 'cancel'}}
@@ -482,7 +601,7 @@ export class QuizComponent implements OnInit, OnDestroy {
           </div>
         </div>
       </mat-dialog-content>
-      
+
       <mat-dialog-actions class="dialog-actions">
         <button mat-raised-button color="primary" (click)="close()">
           <mat-icon>check</mat-icon>
@@ -502,23 +621,23 @@ export class QuizComponent implements OnInit, OnDestroy {
         padding: 20px 24px;
         border-bottom: 1px solid #e2e8f0;
         margin: 0;
-        
+
         mat-icon {
           font-size: 32px;
-          
+
           &.success {
             color: #38a169;
           }
-          
+
           &.failure {
             color: #e53e3e;
           }
         }
       }
-      
+
       .dialog-content {
         padding: 30px 24px;
-        
+
         .auto-submit-notice {
           display: flex;
           align-items: center;
@@ -532,18 +651,18 @@ export class QuizComponent implements OnInit, OnDestroy {
           color: #e53e3e;
           font-weight: 600;
           font-size: 14px;
-          
+
           mat-icon {
             font-size: 20px;
           }
         }
-        
+
         .score-container {
           display: flex;
           flex-direction: column;
           align-items: center;
           gap: 30px;
-          
+
           .score-circle {
             width: 200px;
             height: 200px;
@@ -555,18 +674,18 @@ export class QuizComponent implements OnInit, OnDestroy {
             background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
             color: white;
             box-shadow: 0 8px 24px rgba(229, 62, 62, 0.3);
-            
+
             &.passed {
               background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
               box-shadow: 0 8px 24px rgba(56, 161, 105, 0.3);
             }
-            
+
             .score-value {
               font-size: 48px;
               font-weight: 700;
               line-height: 1;
             }
-            
+
             .score-label {
               font-size: 14px;
               font-weight: 500;
@@ -574,13 +693,13 @@ export class QuizComponent implements OnInit, OnDestroy {
               margin-top: 8px;
             }
           }
-          
+
           .score-details {
             width: 100%;
             display: flex;
             flex-direction: column;
             gap: 16px;
-            
+
             .detail-item {
               display: flex;
               align-items: center;
@@ -588,24 +707,24 @@ export class QuizComponent implements OnInit, OnDestroy {
               padding: 12px;
               background: #f7fafc;
               border-radius: 8px;
-              
+
               mat-icon {
                 color: #4299e1;
               }
-              
+
               .label {
                 flex: 1;
                 font-weight: 500;
                 color: #4a5568;
               }
-              
+
               .value {
                 font-weight: 600;
                 color: #2d3748;
                 font-size: 16px;
               }
             }
-            
+
             .status-chip {
               align-self: center;
               font-size: 14px;
@@ -615,12 +734,12 @@ export class QuizComponent implements OnInit, OnDestroy {
           }
         }
       }
-      
+
       .dialog-actions {
         padding: 16px 24px;
         border-top: 1px solid #e2e8f0;
         justify-content: center;
-        
+
         button {
           mat-icon {
             margin-right: 8px;
@@ -632,10 +751,17 @@ export class QuizComponent implements OnInit, OnDestroy {
   imports: [CommonModule, MatButtonModule, MatIconModule, MatDialogModule, MatChipsModule]
 })
 export class QuizResultDialog {
-    constructor(
-        public dialogRef: MatDialogRef<QuizResultDialog>,
-        @Inject(MAT_DIALOG_DATA) public data: { score: number; total: number; percentage: number; passScore: number; autoSubmitted?: boolean }
-    ) {}
+  constructor(
+    public dialogRef: MatDialogRef<QuizResultDialog>,
+    @Inject(MAT_DIALOG_DATA) public data: {
+      score: number;
+      total: number;
+      percentage: number;
+      passScore: number;
+      autoSubmitted?: boolean;
+      attemptId: number;
+    }
+  ) {}
 
   get resultIcon(): string {
     return this.data.percentage >= this.data.passScore ? 'celebration' : 'error';
@@ -650,3 +776,127 @@ export class QuizResultDialog {
   }
 }
 
+// Submit Confirmation Dialog Component
+@Component({
+  selector: 'submit-confirm-dialog',
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatIconModule
+  ],
+  template: `
+    <div class="submit-confirm-dialog">
+      <h2 mat-dialog-title>
+        <mat-icon>warning</mat-icon>
+        Submit Quiz?
+      </h2>
+
+      <mat-dialog-content>
+        <p class="message">Are you sure you want to submit your quiz?</p>
+        <p class="warning">You will not be able to make changes after submission.</p>
+
+        <div class="progress-info">
+          <mat-icon>assignment</mat-icon>
+          <span>You have answered <strong>{{data.answeredCount}}</strong> out of <strong>{{data.totalCount}}</strong> questions.</span>
+        </div>
+      </mat-dialog-content>
+
+      <mat-dialog-actions align="end">
+        <button mat-button (click)="cancel()">
+          <mat-icon>close</mat-icon>
+          Cancel
+        </button>
+        <button mat-raised-button color="primary" (click)="confirm()">
+          <mat-icon>send</mat-icon>
+          Submit Quiz
+        </button>
+      </mat-dialog-actions>
+    </div>
+  `,
+  styles: [`
+    .submit-confirm-dialog {
+      h2 {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 0;
+        color: #f59e0b;
+
+        mat-icon {
+          font-size: 28px;
+          width: 28px;
+          height: 28px;
+        }
+      }
+
+      mat-dialog-content {
+        padding: 24px 0;
+        min-width: 350px;
+
+        .message {
+          font-size: 16px;
+          margin: 0 0 8px 0;
+          color: #1e293b;
+        }
+
+        .warning {
+          font-size: 14px;
+          color: #ef4444;
+          margin: 0 0 20px 0;
+          font-weight: 500;
+        }
+
+        .progress-info {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 12px;
+          background: #f1f5f9;
+          border-radius: 8px;
+          font-size: 14px;
+          color: #475569;
+
+          mat-icon {
+            color: #3b82f6;
+            font-size: 20px;
+            width: 20px;
+            height: 20px;
+          }
+
+          strong {
+            color: #1e293b;
+          }
+        }
+      }
+
+      mat-dialog-actions {
+        padding: 16px 0 0 0;
+
+        button {
+          mat-icon {
+            margin-right: 6px;
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+          }
+        }
+      }
+    }
+  `]
+})
+export class SubmitConfirmDialog {
+  constructor(
+    public dialogRef: MatDialogRef<SubmitConfirmDialog>,
+    @Inject(MAT_DIALOG_DATA) public data: { answeredCount: number, totalCount: number }
+  ) {}
+
+  cancel() {
+    this.dialogRef.close(false);
+  }
+
+  confirm() {
+    this.dialogRef.close(true);
+  }
+}

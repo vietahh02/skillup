@@ -1,4 +1,4 @@
-import { Component, ViewChild } from "@angular/core";
+import { Component, Input, ViewChild } from "@angular/core";
 import { MatButtonModule } from "@angular/material/button";
 import { MatCardModule } from "@angular/material/card";
 import { MatMenuModule } from "@angular/material/menu";
@@ -37,7 +37,8 @@ export type ChartOptions = {
     styleUrls: ['./ac-user-overview.component.scss']
 })
 export class AcUserOverviewComponent {
-
+    @Input() data:any;
+    
     @ViewChild("chart") chart!: ChartComponent;
     public chartOptions: Partial<ChartOptions>;
 

@@ -1,10 +1,10 @@
 import { Component, signal } from '@angular/core';
-import { ToggleService } from './common/context/toggle.service';
 import { CommonModule, ViewportScroller } from '@angular/common';
 import { RouterOutlet, Router, Event, NavigationEnd } from '@angular/router';
 import { MatProgressBar } from "@angular/material/progress-bar";
-import { LoadingService } from './common/context/loading.service';
 import { ChatBoxComponent } from './shared/chat-box/chat-box.component';
+import { ToggleService } from './context/toggle.service';
+import { LoadingService } from './context/loading.service';
 
 @Component({
     selector: 'app-root',
@@ -25,7 +25,7 @@ export class App {
         public router: Router,
         private toggleService: ToggleService,
         private loadingService: LoadingService,
-        private viewportScroller: ViewportScroller,
+        private viewportScroller: ViewportScroller
     ) {
         this.router.events.subscribe((event: Event) => {
             if (event instanceof NavigationEnd) {
@@ -41,7 +41,10 @@ export class App {
             this.isToggled = isToggled;
         });
         this.loadingService.isLoading$.subscribe(loading => {
-            this.loading = loading;
+            // Defer the change to the next change detection cycle to avoid ExpressionChangedAfterItHasBeenCheckedError
+            setTimeout(() => {
+                this.loading = loading;
+            }, 0);
         });
     }
 

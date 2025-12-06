@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, Inject, inject, ViewChild } from '@angular/core';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatCardModule } from '@angular/material/card';
@@ -9,20 +9,23 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatIcon, MatIconModule } from "@angular/material/icon";
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { UserManager } from '../../../../models/user.models';
 import { ApiUserServices } from '../../../../services/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Level } from '../../../../models/lookup.model';
+import { ApiCourseServices } from '../../../../services/course.service';
 
 @Component({
-    selector: 'app-manager-user-list',
+    selector: 'app-manager-employee',
     imports: [FormsModule, MatCardModule, MatButtonModule, MatMenuModule, MatTableModule, MatPaginatorModule, MatProgressBarModule, MatCheckboxModule, CommonModule, MatIcon, MatIconModule],
-    templateUrl: './user-list.component.html',
-    styleUrls: ['./user-list.component.scss']
+    templateUrl: './manager-employee.component.html',
+    styleUrls: ['./manager-employee.component.scss']
 })
-export class ManagerUserList {
-  constructor(private router: Router,public dialog: MatDialog, private apiUserServices: ApiUserServices, private snack: MatSnackBar) {}
+export class ManagerEmployee {
+  constructor(private router: Router,public dialog: MatDialog, private apiUserServices: ApiUserServices,
+     private snack: MatSnackBar, private apiCourseServices: ApiCourseServices) {}
 
   displayedColumns: string[] = ['user','progress', 'email', 'level','courses', 'role', 'status', 'action'];
   dataSource = new MatTableDataSource<UserManager>([]);
@@ -35,24 +38,18 @@ export class ManagerUserList {
   isDownloading = false;
   isImporting = false;
 
-  levelOptions: string[] = [
-    "Assistant Manager",
-    "Director",
-    "Junior Developer",
-    "Mid-level Developer",
-    "Product Manager",
-    "Senior Lecturer"
-    ];
+  levelOptions: Level[] = [];
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   ngOnInit() {
       this.loadUsers();
+      this.loadLevels();
   }
 
   loadUsers(page: number = 1, pageSize: number = 10, searchTerm?: string) {
     this.isLoading = true;
-    this.apiUserServices.getUserManagerList(page, pageSize, searchTerm).subscribe(
+    this.apiUserServices.getEmployeeManagerList(page, pageSize, searchTerm).subscribe(
       (res: any) => {
         console.log(res);
         this.dataSource = res.items;
@@ -74,9 +71,17 @@ export class ManagerUserList {
     );
   }
 
-  changeLevel(element: UserManager, level: string) {
+  loadLevels() {
+    this.apiCourseServices.getLevels().subscribe(
+      (res: any) => {
+        this.levelOptions = res;
+      }
+    );
+  }
 
-    this.apiUserServices.updateUserLevel(element.userId, level).subscribe(
+  changeLevel(element: UserManager, level: Level) {
+
+    this.apiUserServices.updateUserLevel(element.userId, level.levelId.toString()).subscribe(
         (res: any) => {
             this.snack.open('User level updated successfully', '', { duration: 2200, panelClass: ['success-snackbar', 'custom-snackbar'], horizontalPosition: 'right', verticalPosition: 'top' });
             this.loadUsers(this.currentPage, this.pageSize, this.searchTerm);
@@ -96,11 +101,14 @@ export class ManagerUserList {
       this.router.navigate([`/manager/users/${element.userId}`])
   }
 
-  openCreateUserDialog(enterAnimationDuration: string, exitAnimationDuration: string): void {
-      this.dialog.open(CreateUserDialog, {
+  openCreateEmployeeDialog(enterAnimationDuration: string, exitAnimationDuration: string): void {
+      this.dialog.open(CreateEmployeeDialog, {
           width: '600px',
           enterAnimationDuration,
-          exitAnimationDuration
+          exitAnimationDuration,
+          data: {
+            loadUsers: () => this.loadUsers(this.currentPage, this.pageSize, this.searchTerm)
+          }
       });
   }
 
@@ -127,8 +135,23 @@ export class ManagerUserList {
 
   onPaginatorChange(event: PageEvent) {
       this.currentPage = event.pageIndex + 1;
-      this.pageSize = event.pageSize;
+      if (event.pageSize !== this.pageSize) {
+        this.onPageSizeChange(event.pageSize);
+      } else {
+        this.onPageChange(event.pageIndex + 1);
+      }
       this.loadUsers(this.currentPage, this.pageSize, this.searchTerm);
+  }
+
+  onPageSizeChange(s: number) {
+    this.pageSize = s;
+    this.currentPage = 1;
+    this.loadUsers(this.currentPage, this.pageSize, this.searchTerm);
+  }
+
+  onPageChange(p: number) {
+    this.currentPage = p;
+    this.loadUsers(this.currentPage, this.pageSize, this.searchTerm);
   }
 
   downloadTemplate() {
@@ -295,17 +318,58 @@ export class ManagerUserList {
 }
 
 @Component({
-    selector: 'create-user',
-    templateUrl: './dialog-create-user.html',
-    imports:[CommonModule],
+    selector: 'create-employee',
+    templateUrl: './dialog-create-employee.html',
+    imports:[CommonModule, FormsModule, ReactiveFormsModule],
+    styleUrls: ['./manager-employee.component.scss']
 })
-export class CreateUserDialog {
+export class CreateEmployeeDialog {
+
+    fb = inject(FormBuilder);
+    employeeForm = this.fb.group({
+      fullName: ['', [Validators.required, Validators.maxLength(255)]],
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
+      levelId: [null as number | null, [Validators.required]],
+    });
 
     constructor(
-        public dialogRef: MatDialogRef<CreateUserDialog>
+        public dialogRef: MatDialogRef<CreateEmployeeDialog>,
+        @Inject(MAT_DIALOG_DATA) public data: { loadUsers: () => void },
+        private apiUserServices: ApiUserServices,
+        private apiCourseServices: ApiCourseServices,
+        private snack: MatSnackBar
     ) {}
 
-    listRole: string[] = ['Intern', 'Fresher', 'Junior', 'Middle', 'Senior']
+    listLevel: Level[] = [];
+
+    ngOnInit() {
+      this.apiCourseServices.getLevels().subscribe(
+        (res: any) => {
+            this.listLevel = res;
+        }
+      );
+      
+    }
+
+    onSubmit() {
+      this.employeeForm.markAllAsTouched();
+      if (!this.employeeForm.valid) return;
+
+      this.apiUserServices.createEmployee(this.employeeForm.value).subscribe(
+        (res: any) => {
+          this.snack.open('Employee created successfully', '', { duration: 2200, panelClass: ['success-snackbar', 'custom-snackbar'], horizontalPosition: 'right', verticalPosition: 'top' });
+          if (this.data?.loadUsers) {
+            this.data.loadUsers();
+          }
+          this.close();
+        },
+        (error: any) => {
+          console.error('Error creating employee:', error);
+          this.snack.open('Failed to create employee. Please try again.', '', { duration: 3000, panelClass: ['error-snackbar', 'custom-snackbar'], horizontalPosition: 'right', verticalPosition: 'top' });
+        }
+      );
+    }
+
 
     close(){
         this.dialogRef.close(true);

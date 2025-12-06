@@ -8,10 +8,10 @@
         <nav>
             <ul class="ps-0 mt-0">
                 <li>
-                    <a routerLink="/profile" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Profile</a>
+                    <a [routerLink]="getProfileRoute()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Profile</a>
                 </li>
                 <li>
-                    <a routerLink="/security" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Security</a>
+                    <a [routerLink]="getSecurityRoute()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Security</a>
                 </li>
             </ul>
         </nav>
@@ -45,6 +45,7 @@
                             <i class="ri-user-3-line"></i>
                             <input matInput formControlName="fullName">
                             <mat-error *ngIf="profileForm.get('fullName')?.hasError('required')">Full Name is required</mat-error>
+                            <mat-error *ngIf="profileForm.get('fullName')?.hasError('maxlength')">Full Name must be less than 255 characters</mat-error>
                         </mat-form-field>
                     </div>
                 </div>
@@ -56,6 +57,7 @@
                             <input matInput formControlName="email">
                             <mat-error *ngIf="profileForm.get('email')?.hasError('required')">Email is required</mat-error>
                             <mat-error *ngIf="profileForm.get('email')?.hasError('email')">Invalid email format</mat-error>
+                            <mat-error *ngIf="profileForm.get('email')?.hasError('maxlength')">Email must be less than 255 characters</mat-error>
                         </mat-form-field>
                     </div>
                 </div>
@@ -77,6 +79,7 @@
                             <i class="ri-home-7-line"></i>
                             <input matInput formControlName="location">
                             <mat-error *ngIf="profileForm.get('location')?.hasError('required')">Address is required</mat-error>
+                            <mat-error *ngIf="profileForm.get('location')?.hasError('maxlength')">Address must be less than 255 characters</mat-error>
                         </mat-form-field>
                     </div>
                 </div>

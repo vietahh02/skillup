@@ -624,3 +624,80 @@
     }
   }
 }
+
+// Floating Action Button (FAB) for Add Question
+.fab-add-question {
+  position: fixed;
+  bottom: 120px;  // Raised higher to avoid chatbox
+  right: 32px;
+  z-index: 1000;
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+  box-shadow: 0 4px 20px rgba(66, 153, 225, 0.4), 0 8px 40px rgba(66, 153, 225, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  mat-icon {
+    font-size: 32px;
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+  }
+
+  &:hover {
+    background: linear-gradient(135deg, #3182ce 0%, #2c5282 100%);
+    transform: scale(1.1) translateY(-4px);
+    box-shadow: 0 6px 30px rgba(66, 153, 225, 0.5), 0 12px 60px rgba(66, 153, 225, 0.3);
+  }
+
+  &:active {
+    transform: scale(1.05) translateY(-2px);
+  }
+
+  // Smooth animation on page load
+  animation: fabSlideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fabSlideIn {
+  from {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// Responsive FAB positioning
+@media (max-width: 768px) {
+  .fab-add-question {
+    bottom: 100px;  // Also raised on tablet
+    right: 24px;
+    width: 56px;
+    height: 56px;
+
+    mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+      line-height: 28px;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .fab-add-question {
+    bottom: 90px;  // Raised on mobile
+    right: 20px;
+    width: 52px;
+    height: 52px;
+
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+      line-height: 24px;
+    }
+  }
+}

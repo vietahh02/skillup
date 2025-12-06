@@ -6,6 +6,13 @@
   margin-bottom: 20px;
 
   .info-item {
+
+    .course-image {
+      width: 200px;
+      height: 100px;
+      object-fit: cover;
+    }
+    
     .info-label {
       color: #718096;
       font-size: 12px;
@@ -22,6 +29,10 @@
       margin: 0;
     }
   }
+}
+
+::ng-deep .mat-mdc-dialog-surface {
+  overflow-x: hidden;
 }
 
 .course-description {

@@ -6,6 +6,7 @@ export interface Course {
     courseType: CourseType;
     imageUrl: string | null;
     duration: number | null;
+    rejectionReason: string | null;
     level: string;
     createdBy: number;
     createdByName: string;
@@ -47,14 +48,17 @@ export interface CourseDetail {
     duration: number;
     createdBy: number;
     createdByName: string;
+    progressPct?: number;
+    lecturerImageUrl?: string;
+    completedLessons?: number;
+    totalLessons?: number;
     createdAt: string;
+    deadline: string;
     isEnrolled: boolean;
     lessons: Lesson[];
-    quizzes: Quiz;
+    quiz: Quiz;
     documents: DocumentItem[];
 }
-
-
 
 export interface CourseCreateEdit {
     name: string;
@@ -75,6 +79,10 @@ export interface Lesson {
     publicId: string;
     orderIndex: number;
     totalDuration: number;
+    totalSubLessons: number;
+    completedSubLessons: number;
+    progressPct: number;
+    progressStatus: string;
     subLessons: SubLesson[];
 }
 
@@ -91,6 +99,8 @@ export interface SubLesson {
     createdBy: number;
     createdAt: string;
     updatedAt: string;
+    isCompleted: boolean;
+    completedAt: string;
 }
 
 export interface SubLessonCreateEdit {
@@ -167,13 +177,15 @@ export interface DocumentItem {
     createdAt: string;
     updatedAt: string;
     questions: Question[];
+    isCompleted?: boolean;
+    userScore?: number;
   }
   
   export interface Question {
     questionId: number;
     quizId: number;
     title: string;
-    questionType: string;
+    questionType: string | number;
     points: number;
     orderIndex: number;
     answerOptions: AnswerOption[];
@@ -185,3 +197,17 @@ export interface DocumentItem {
     content: string;
     isCorrect: boolean;
   }
+
+export interface CourseEnrollment {
+    courseId: number;
+    name: string;
+    description: string;
+    courseTypeId: number;
+    targetLevelId: number;
+    image: string;
+    createdByName: string;
+    startDay: string;
+    endDate: string;
+    progressPct: number;
+    isEnrolled: boolean;
+}

@@ -222,3 +222,7 @@ tr.example-element-row:not(.example-expanded-row):active {
 .form-group {
   position: relative;
 }
+
+::ng-deep .mat-mdc-dialog-surface {
+  overflow-x: hidden;
+}

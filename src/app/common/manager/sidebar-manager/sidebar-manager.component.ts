@@ -3,7 +3,7 @@ import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { NgClass } from '@angular/common';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { MatExpansionModule } from '@angular/material/expansion';
-import { ToggleService } from '../../context/toggle.service';
+import { ToggleService } from '../../../context/toggle.service';
 
 @Component({
     selector: 'app-sidebar-manager',

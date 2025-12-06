@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, timer, Observable, throwError } from 'rxjs';
-import { ApiAuthServices } from '../../services/auth.service';
+import { ApiAuthServices } from '../services/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { tap, catchError, share } from 'rxjs/operators';
 
@@ -27,6 +27,21 @@ export class TokenService {
       return true;
     }
   }
+
+  getRole(): string | null {
+    const token = this.getToken();
+    if (!token) return null;
+  
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // Lấy role từ claim đúng
+      return payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || null;
+    } catch (e) {
+      console.error('Invalid token', e);
+      return null;
+    }
+  }
+  
 
   /**
    * Refresh token và trả về Observable để có thể đợi kết quả

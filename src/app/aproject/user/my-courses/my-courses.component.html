@@ -19,8 +19,8 @@
                     <th mat-header-cell *matHeaderCellDef class="col-course">Course</th>
                     <td mat-cell *matCellDef="let element" class="col-course">
                         <div class="d-flex align-items-center course-info">
-                            <img [src]="element.course.image" class="border-radius" alt="course">
-                            <a (click)="detailCourse(element)">{{element.course.title}}</a>
+                            <img [src]="element.image || 'assets/images/course-default.png'" class="border-radius" alt="course">
+                            <a (click)="detailCourse(element)">{{element.name}}</a>
                         </div>
                     </td>
                 </ng-container>
@@ -29,17 +29,23 @@
                 <ng-container matColumnDef="instructor">
                     <th mat-header-cell *matHeaderCellDef>Lecturer</th>
                     <td mat-cell *matCellDef="let element">
-                        {{element.instructor}}
+                        {{element.createdByName}}
                     </td>
                 </ng-container>
 
-                <!-- Role Column -->
+                <!-- Result Column -->
                 <ng-container matColumnDef="status">
                     <th mat-header-cell *matHeaderCellDef>Result</th>
                     <td mat-cell *matCellDef="let element">
-                        @if (element.status.percentage) {<span class="badge ">{{element.status.percentage}}</span>}
-                        @if (element.status.passed) {<span class="badge text-soft-success">{{element.status.passed}}</span>}
-                        @if (element.status.failed) {<span class="badge text-soft-danger">{{element.status.failed}}</span>}
+                        <!-- Show course completion percentage -->
+                        <span class="badge" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                                   color: white;
+                                                   padding: 4px 12px;
+                                                   border-radius: 6px;
+                                                   font-size: 12px;
+                                                   font-weight: 600;">
+                            {{element.progressPct || 0}}%
+                        </span>
                     </td>
                 </ng-container>
 
@@ -47,7 +53,7 @@
                 <ng-container matColumnDef="startTime">
                     <th mat-header-cell *matHeaderCellDef>Start Time</th>
                     <td mat-cell *matCellDef="let element">
-                        <span class="d-block gray-color">{{element.startTime.date}}</span>
+                        <span class="d-block gray-color">{{getDate(element.startDay)}}</span>
                     </td>
                 </ng-container>
 
@@ -55,18 +61,16 @@
                 <ng-container matColumnDef="endTime">
                     <th mat-header-cell *matHeaderCellDef>End Time</th>
                     <td mat-cell *matCellDef="let element">
-                        <span class="d-block gray-color">{{element.endTime.date}}</span>
+                        <span class="d-block gray-color">{{getDate(element.endDate)}}</span>
                     </td>
                 </ng-container>
 
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
             </table>
-            <mat-paginator
-                [pageSizeOptions]="[10, 20]"
-                showFirstLastButtons
-            >
-            </mat-paginator>
+            <mat-paginator [pageSizeOptions]="[5, 10, 20, 50]" showFirstLastButtons [pageSize]="pageSize"
+                [pageIndex]="currentPage - 1" (page)="onPaginatorChange($event)" [disabled]="false"
+                [length]="totalItems"></mat-paginator>
         </div>
     </mat-card-content>
 </mat-card>

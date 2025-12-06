@@ -27,7 +27,7 @@ export class ApiUserServices {
     return this.http.get<any>(`${API_URLS.GET_USER_BY_ID}/${id}`);
   } 
 
-  getUserManagerList(page: number = 1, pageSize: number = 10, searchTerm?: string): Observable<PaginatedResponse<UserAdmin>> {
+  getEmployeeManagerList(page: number = 1, pageSize: number = 10, searchTerm?: string): Observable<PaginatedResponse<any>> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('pageSize', pageSize.toString());
@@ -36,7 +36,19 @@ export class ApiUserServices {
       params = params.set('search', searchTerm.trim());
     }
 
-    return this.http.get<PaginatedResponse<UserAdmin>>(API_URLS.GET_USERS_MANAGER_LIST, { params });
+    return this.http.get<PaginatedResponse<any>>(`${API_URLS.GET_USERS_MANAGER_LIST}/employees`, { params });
+  }
+  
+  getLecturerManagerList(page: number = 1, pageSize: number = 10, searchTerm?: string): Observable<PaginatedResponse<any>> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('pageSize', pageSize.toString());
+    
+    if (searchTerm && searchTerm.trim()) {
+      params = params.set('search', searchTerm.trim());
+    }
+
+    return this.http.get<PaginatedResponse<any>>(`${API_URLS.GET_USERS_MANAGER_LIST}/lecturers`, { params });
   }
 
   updateUserRole(id: string | number, role: number): Observable<any> {
@@ -54,7 +66,7 @@ export class ApiUserServices {
   }
   
   updateUserLevel(id: string | number, level: string): Observable<any> {
-    return this.http.patch<any>(`${API_URLS.UPDATE_USER_ROLE_STATUS}/${id}/level`, { level });
+    return this.http.patch<any>(`${API_URLS.UPDATE_USER_ROLE_STATUS}/${id}/level`, { levelId : level });
   }
 
   importExcel(file: File): Observable<any> {
@@ -71,4 +83,27 @@ export class ApiUserServices {
       responseType: 'blob' 
     });
   }
+
+  createEmployee(payload: any): Observable<any> {
+    payload.roleIds = [4];
+    return this.http.post<any>(API_URLS.CREATE_USER, payload);
+  }
+
+  createLecturer(payload: any): Observable<any> {
+    payload.roleIds = [3];
+    return this.http.post<any>(API_URLS.CREATE_USER, payload);
+  }  
+
+  createUser(payload: any): Observable<any> {
+    return this.http.post<any>(API_URLS.CREATE_USER, payload);
+  }
+
+  getCourseLecturers(lecturerId: number | string): Observable<any> {
+    return this.http.get<any>(`${API_URLS.GET_COURSE_LECTURER}/${lecturerId}/approved`);
+  }
+
+  getCourseEmployee(employeeId: number | string): Observable<any> {
+    return this.http.get<any>(`${API_URLS.GET_COURSE_EMPLOYEE}/${employeeId}/Enrolled`)
+  }
+  
 }

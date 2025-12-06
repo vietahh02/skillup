@@ -112,7 +112,7 @@
                     <mat-tab label="Course List Enrolled" *ngIf="detail?.roles?.includes('Employee') ?? false">
                         <mat-card-content>
                             <div class="myTasksTable tagus-mat-table mat-elevation-z8">
-                                <table mat-table [dataSource]="dataSource">
+                                <table mat-table [dataSource]="enrolledCourse">
 
                                     <!-- Name Column -->
                                     <ng-container matColumnDef="name">
@@ -120,7 +120,7 @@
                                         <td mat-cell *matCellDef="let element" class="text-start">
                                             <div class="d-flex align-items-center name-info">
                                                 <!-- <mat-checkbox></mat-checkbox> -->
-                                                {{element.name}}
+                                                {{element.courseName}}
                                             </div>
                                         </td>
                                     </ng-container>
@@ -128,21 +128,21 @@
                                     <!-- Start Date Column -->
                                     <ng-container matColumnDef="startDate">
                                         <th mat-header-cell *matHeaderCellDef>Start Date</th>
-                                        <td mat-cell *matCellDef="let element">{{element.startDate}}</td>
+                                        <td mat-cell *matCellDef="let element">{{element.startDate.split("T")[0]}}</td>
                                     </ng-container>
 
                                     <!-- Deadline Column -->
                                     <ng-container matColumnDef="deadline">
                                         <th mat-header-cell *matHeaderCellDef>Deadline</th>
-                                        <td mat-cell *matCellDef="let element">{{element.deadline}}</td>
+                                        <td mat-cell *matCellDef="let element">{{element.deadline.split("T")[0]}}</td>
                                     </ng-container>
 
                                     <!-- Budget Column -->
                                     <ng-container matColumnDef="progress">
                                         <th mat-header-cell *matHeaderCellDef>Progressing</th>
                                         <td mat-cell *matCellDef="let element" class="text-start">
-                                            <span class="d-block gray-color mb-5 fw-normal">{{element.progress}}%</span>
-                                            <mat-progress-bar mode="determinate" value="{{element.progress}}"></mat-progress-bar>
+                                            <span class="d-block gray-color mb-5 fw-normal">{{element.progressPct}}%</span>
+                                            <mat-progress-bar mode="determinate" value="{{element.progressPct}}"></mat-progress-bar>
                                         </td>
                                     </ng-container>
 
@@ -155,7 +155,7 @@
                     <mat-tab label="Course List Created" *ngIf="detail?.roles?.includes('Lecturer') ?? false">
                         <mat-card-content>
                             <div class="myTasksTable tagus-mat-table mat-elevation-z8">
-                                <table mat-table [dataSource]="dataSource">
+                                <table mat-table [dataSource]="createdCourse">
 
                                     <!-- Name Column -->
                                     <ng-container matColumnDef="name">
@@ -163,7 +163,7 @@
                                         <td mat-cell *matCellDef="let element" class="text-start">
                                             <div class="d-flex align-items-center name-info">
                                                 <!-- <mat-checkbox></mat-checkbox> -->
-                                                {{element.name}}
+                                                {{element.courseName}}
                                             </div>
                                         </td>
                                     </ng-container>
@@ -171,7 +171,7 @@
                                     <!-- Start Date Column -->
                                     <ng-container matColumnDef="createdAt">
                                         <th mat-header-cell *matHeaderCellDef>Created At</th>
-                                        <td mat-cell *matCellDef="let element">{{element.startDate}}</td>
+                                        <td mat-cell *matCellDef="let element">{{element.createdAt.split("T")[0]}}</td>
                                     </ng-container>
 
                                     <tr mat-header-row *matHeaderRowDef="displayedColumnsCreated"></tr>

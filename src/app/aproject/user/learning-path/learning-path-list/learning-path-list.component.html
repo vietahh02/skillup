@@ -1,0 +1,168 @@
+<div class="learning-path-container">
+  <!-- Hero Section -->
+  <mat-card class="tagus-card hero-card">
+    <mat-card-content>
+      <div class="hero-content">
+        <div class="hero-badge">
+          <mat-icon>route</mat-icon>
+          <span>Choose Your Path</span>
+        </div>
+
+        <h1 class="hero-title">Learning Paths</h1>
+        <p class="hero-description">
+          Discover structured learning paths designed to guide your professional development.
+          Pick a path that matches your career goals and start learning today.
+        </p>
+
+        <div class="hero-stats">
+          <div class="stat-box">
+            <div class="stat-value">{{learningPaths.length}}</div>
+            <div class="stat-label">Available Paths</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">{{enrolledPaths.length}}</div>
+            <div class="stat-label">Your Active Paths</div>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+
+  <div *ngIf="!isLoading">
+    <!-- Search Section -->
+    <div class="filter-section">
+      <mat-card class="tagus-card">
+        <mat-card-content>
+          <div class="filter-header">
+            <h3>Explore Learning Paths</h3>
+            <div class="search-container">
+              <div class="search-box">
+                <mat-icon class="search-icon">search</mat-icon>
+                <input type="text" placeholder="Search learning paths..." [(ngModel)]="searchTerm" (input)="search()">
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- My Active Learning Paths -->
+    <div class="active-paths-section" *ngIf="enrolledPaths.length > 0">
+      <h2 class="section-title">
+        Your Active Learning Paths
+      </h2>
+
+      <div class="paths-grid active-grid">
+        <mat-card
+          class="tagus-card path-card active-path"
+          *ngFor="let path of enrolledPaths"
+          (click)="viewDetail(path)">
+          <mat-card-content>
+            <div class="path-header">
+              <mat-icon class="path-icon">route</mat-icon>
+              <span class="enrolled-badge">Enrolled</span>
+            </div>
+
+            <h3 class="path-title">{{path.name}}</h3>
+            <p class="path-description">{{path.description}}</p>
+
+            <div class="progress-section">
+              <div class="progress-info">
+                <span class="progress-label">Progress</span>
+                <span class="progress-value">{{getProgress(path.learningPathId)}}%</span>
+              </div>
+              <mat-progress-bar mode="determinate" [value]="getProgress(path.learningPathId)"></mat-progress-bar>
+            </div>
+
+            <div class="path-stats">
+              <div class="stat-item">
+                <mat-icon>person</mat-icon>
+                <span>{{path.createdByName}}</span>
+              </div>
+              <div class="stat-item">
+                <mat-icon>event</mat-icon>
+                <span>{{path.createdAt | date:'MMM d, y'}}</span>
+              </div>
+            </div>
+
+            <div class="path-actions">
+              <button mat-flat-button color="primary" (click)="continuePath(path, $event)" class="action-btn">
+                <mat-icon>play_arrow</mat-icon>
+                Continue Learning
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- All Available Learning Paths -->
+    <div class="available-paths-section">
+      <h2 class="section-title">
+        <span *ngIf="enrolledPaths.length > 0">More Learning Paths</span>
+        <span *ngIf="enrolledPaths.length === 0">All Learning Paths</span>
+      </h2>
+
+      <!-- Empty State -->
+      <div *ngIf="filteredPaths.length === 0" class="empty-state">
+        <mat-icon>school</mat-icon>
+        <h3>No Learning Paths Found</h3>
+        <p>Try adjusting your search to find what you're looking for.</p>
+      </div>
+
+      <!-- Paths Grid -->
+      <div class="paths-grid" *ngIf="filteredPaths.length > 0">
+        <mat-card
+          class="tagus-card path-card"
+          *ngFor="let path of filteredPaths"
+          (click)="viewDetail(path)">
+          <mat-card-content>
+            <div class="path-header">
+              <mat-icon class="path-icon">route</mat-icon>
+            </div>
+
+            <h3 class="path-title">{{path.name}}</h3>
+            <p class="path-description">{{path.description}}</p>
+
+            <div class="path-stats">
+              <div class="stat-item">
+                <mat-icon>person</mat-icon>
+                <span>{{path.createdByName}}</span>
+              </div>
+              <div class="stat-item">
+                <mat-icon>event</mat-icon>
+                <span>{{path.createdAt | date:'MMM d, y'}}</span>
+              </div>
+            </div>
+
+            <div class="path-actions">
+              <button
+                *ngIf="!isEnrolled(path.learningPathId)"
+                mat-flat-button
+                color="primary"
+                (click)="enrollPath(path, $event)"
+                class="action-btn">
+                <mat-icon>add</mat-icon>
+                Enroll Now
+              </button>
+              <button
+                *ngIf="isEnrolled(path.learningPathId)"
+                mat-stroked-button
+                color="primary"
+                (click)="continuePath(path, $event)"
+                class="action-btn enrolled-btn">
+                <mat-icon>check_circle</mat-icon>
+                Enrolled
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</div>

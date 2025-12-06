@@ -1,11 +1,21 @@
 <div class="quiz-creator-container">
   <mat-card class="quiz-header-card">
     <mat-card-header>
-      <mat-card-title class="mb-15">Final Quiz Creator</mat-card-title>
-      <mat-card-subtitle>Create engaging quizzes with multiple question types</mat-card-subtitle>
+      <mat-card-title class="mb-15">
+        {{ isEditMode ? 'Edit Final Quiz' : 'Final Quiz Creator' }}
+      </mat-card-title>
+      <mat-card-subtitle>
+        {{ isEditMode ? 'Update your quiz with new questions or modify existing ones' : 'Create engaging quizzes with multiple question types' }}
+      </mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
-      <form [formGroup]="quizForm" (ngSubmit)="onSubmit()">
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-container" style="text-align: center; padding: 40px;">
+        <mat-spinner diameter="50" style="margin: 0 auto;"></mat-spinner>
+        <p style="margin-top: 20px; color: #666;">Loading quiz data...</p>
+      </div>
+
+      <form *ngIf="!isLoading" [formGroup]="quizForm" (ngSubmit)="onSubmit()">
         <!-- Quiz Info -->
         <div class="quiz-info-section">
           <mat-form-field appearance="outline" class="full-width">
@@ -16,28 +26,28 @@
             </mat-error>
           </mat-form-field>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Description</mat-label>
-            <textarea matInput formControlName="description" rows="3" 
-                      placeholder="Describe what this quiz covers and its objectives..."></textarea>
-          </mat-form-field>
-
           <div class="row">
             <mat-form-field appearance="outline" class="col-md-6">
-              <mat-label>Duration (minutes)</mat-label>
-              <input matInput formControlName="duration" type="number" placeholder="e.g. 30">
-              <mat-hint>How long students have to complete the quiz</mat-hint>
-              <mat-error *ngIf="quizForm.get('duration')?.hasError('required')">
-                Duration is required
+              <mat-label>Pass Score (%)</mat-label>
+              <input matInput formControlName="passScore" type="number" min="0" max="100" placeholder="e.g. 70">
+              <mat-hint>Minimum score needed to pass (0-100)</mat-hint>
+              <mat-error *ngIf="quizForm.get('passScore')?.hasError('required')">
+                Pass score is required
+              </mat-error>
+              <mat-error *ngIf="quizForm.get('passScore')?.hasError('min') || quizForm.get('passScore')?.hasError('max')">
+                Pass score must be between 0 and 100
               </mat-error>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="col-md-6">
-              <mat-label>Pass Score (%)</mat-label>
-              <input matInput formControlName="passScore" type="number" min="0" max="100" placeholder="e.g. 70">
-              <mat-hint>Minimum score needed to pass</mat-hint>
-              <mat-error *ngIf="quizForm.get('passScore')?.hasError('required')">
-                Pass score is required
+              <mat-label>Attempt Limit</mat-label>
+              <input matInput formControlName="attemptLimit" type="number" min="1" placeholder="e.g. 3">
+              <mat-hint>How many times students can attempt this quiz</mat-hint>
+              <mat-error *ngIf="quizForm.get('attemptLimit')?.hasError('required')">
+                Attempt limit is required
+              </mat-error>
+              <mat-error *ngIf="quizForm.get('attemptLimit')?.hasError('min')">
+                Must be at least 1 attempt
               </mat-error>
             </mat-form-field>
           </div>
@@ -49,9 +59,14 @@
         <div class="questions-section">
           <div class="section-header">
             <h3>Question</h3>
-            <button mat-raised-button color="primary" type="button" (click)="addQuestion()">
-              <mat-icon>add</mat-icon>
-              Add new question
+            <button
+              mat-raised-button
+              color="accent"
+              type="button"
+              (click)="openAIGenDialog()"
+              class="ai-gen-btn">
+              <mat-icon>auto_awesome</mat-icon>
+              AI Generate Quiz
             </button>
           </div>
 
@@ -73,13 +88,7 @@
                   <mat-label>Question Type</mat-label>
                   <mat-select formControlName="type" (selectionChange)="onQuestionTypeChange(qi)">
                     <mat-option *ngFor="let type of questionTypes" [value]="type.value">
-                      <span [ngSwitch]="type.value">
-                        <span *ngSwitchCase="'single_choice'">{{ type.label }}</span>
-                        <span *ngSwitchCase="'multiple_choice'">{{ type.label }}</span>
-                        <span *ngSwitchCase="'true_false'">{{ type.label }}</span>
-                        <span *ngSwitchCase="'text'">{{ type.label }}</span>
-                        <span *ngSwitchDefault>{{ type.label }}</span>
-                      </span>
+                      {{ type.label }}
                     </mat-option>
                   </mat-select>
                 </mat-form-field>
@@ -179,13 +188,31 @@
 
         <!-- Submit Button -->
         <div class="form-actions">
-          <button mat-raised-button color="primary" type="submit" 
-                  [disabled]="questions.length === 0">
-            <mat-icon>save</mat-icon>
-            Save Quiz
+          <button mat-raised-button color="primary" type="submit"
+                  [disabled]="questions.length === 0 || isSubmitting">
+            <mat-spinner *ngIf="isSubmitting" diameter="20" style="display: inline-block; margin-right: 8px;"></mat-spinner>
+            <mat-icon *ngIf="!isSubmitting">save</mat-icon>
+            <ng-container *ngIf="isSubmitting">
+              {{ isEditMode ? 'Updating Quiz...' : 'Creating Quiz...' }}
+            </ng-container>
+            <ng-container *ngIf="!isSubmitting">
+              {{ isEditMode ? 'Update Quiz' : 'Save Quiz' }}
+            </ng-container>
           </button>
         </div>
       </form>
+
+      <!-- Floating Action Button for Add Question -->
+      <button *ngIf="!isLoading"
+              mat-fab
+              color="primary"
+              class="fab-add-question"
+              type="button"
+              (click)="addQuestion()"
+              matTooltip="Add new question"
+              matTooltipPosition="left">
+        <mat-icon>add</mat-icon>
+      </button>
     </mat-card-content>
   </mat-card>
 </div>

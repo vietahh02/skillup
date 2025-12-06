@@ -68,10 +68,16 @@ export class ManagerCourseList implements AfterViewInit {
         this.courseService.getCourseListManager(this.currentPage, this.pageSize, this.searchTerm).subscribe({
             next: (response: any) => {
                 console.log(response);
-                this.data.data = response.items || [];
-                this.totalItems = response.total || 0;
-                this.currentPage = response.page || 1;
-                this.pageSize = response.pageSize || 10;
+                this.data.data = response.items;
+                this.totalItems = response.total;
+                this.currentPage = response.page;
+                this.pageSize = response.pageSize;
+
+                if (this.paginator) {
+                    this.paginator.length = this.totalItems;
+                    this.paginator.pageSize = this.pageSize;
+                    this.paginator.pageIndex = this.currentPage - 1;
+                }
             },
             error: (error: any) => {
                 this.snack.open(error.error || 'Failed to load courses', '', {
@@ -92,9 +98,9 @@ export class ManagerCourseList implements AfterViewInit {
 
     search() {
         this.currentPage = 1;
-        if (this.paginator) {
-        this.paginator.pageIndex = 0;
-        }
+        // if (this.paginator) {
+        // this.paginator.pageIndex = 0;
+        // }
         this.loadCourses();
     }
 
@@ -104,8 +110,22 @@ export class ManagerCourseList implements AfterViewInit {
 
     onPaginatorChange(event: PageEvent) {
         this.currentPage = event.pageIndex + 1;
-        this.pageSize = event.pageSize;
+        if (event.pageSize !== this.pageSize) {
+            this.onPageSizeChange(event.pageSize);
+        } else {
+            this.onPageChange(event.pageIndex + 1);
+        }
+    }
+
+    onPageSizeChange(s: number) {
+        this.pageSize = s;
+        this.currentPage = 1;
         this.loadCourses();
-      }
+    }
+
+    onPageChange(p: number) {
+        this.currentPage = p;
+        this.loadCourses();
+    }
 
 }

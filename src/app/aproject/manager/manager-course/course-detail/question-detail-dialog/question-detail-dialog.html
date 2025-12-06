@@ -8,33 +8,33 @@
       <div class="question-info">
       
         <div class="question-content">
-          <h3 class="question-text">{{data.question.question}}</h3>
+          <h3 class="question-text">{{data.question.title}}</h3>
         </div>
       </div>
 
       <!-- Single Choice & Multiple Choice Questions -->
-      <div *ngIf="data.question.type === 'single_choice' || data.question.type === 'multiple_choice'" class="answers-section">
+      <div *ngIf="data.question.questionType === 0 || data.question.questionType === 1" class="answers-section">
         <h4 class="answers-title">
-          <mat-icon>{{data.question.type === 'single_choice' ? 'radio_button_checked' : 'check_box'}}</mat-icon>
+          <mat-icon>{{data.question.questionType === 0 ? 'radio_button_checked' : 'check_box'}}</mat-icon>
           Answer Options
         </h4>
         
         <div class="answers-list">
-          <div *ngFor="let answer of data.question.answers; let i = index" 
+          <div *ngFor="let answer of data.question.answerOptions; let i = index" 
                class="answer-option"
                [class.correct-answer]="answer.isCorrect">
             <div class="answer-indicator">
-              <mat-icon *ngIf="data.question.type === 'single_choice'" 
+              <mat-icon *ngIf="data.question.questionType === 0" 
                         [class.correct]="answer.isCorrect">
                 {{answer.isCorrect ? 'radio_button_checked' : 'radio_button_unchecked'}}
               </mat-icon>
-              <mat-icon *ngIf="data.question.type === 'multiple_choice'" 
+              <mat-icon *ngIf="data.question.questionType === 1" 
                         [class.correct]="answer.isCorrect">
                 {{answer.isCorrect ? 'check_box' : 'check_box_outline_blank'}}
               </mat-icon>
             </div>
             <div class="answer-content">
-              <span class="answer-text">{{answer.text}}</span>
+              <span class="answer-text">{{answer.content}}</span>
               <mat-chip *ngIf="answer.isCorrect" color="primary" selected class="correct-chip">
                 <mat-icon matChipAvatar>check</mat-icon>
                 Correct
@@ -45,20 +45,20 @@
       </div>
 
       <!-- True/False Questions -->
-      <div *ngIf="data.question.type === 'true_false'" class="answers-section">
+      <div *ngIf="data.question.questionType === 2" class="answers-section">
         <h4 class="answers-title">
           <mat-icon>help_outline</mat-icon>
           True or False
         </h4>
         
         <div class="true-false-options">
-          <div *ngFor="let answer of data.question.answers" 
+          <div *ngFor="let answer of data.question.answerOptions" 
                class="true-false-option"
                [class.correct-answer]="answer.isCorrect">
             <mat-icon [class.correct]="answer.isCorrect">
               {{answer.isCorrect ? 'check_circle' : 'cancel'}}
             </mat-icon>
-            <span class="option-text">{{answer.text}}</span>
+            <span class="option-text">{{answer.content}}</span>
             <mat-chip *ngIf="answer.isCorrect" color="primary" selected class="correct-chip">
               Correct Answer
             </mat-chip>
@@ -67,7 +67,7 @@
       </div>
 
       <!-- Text Questions -->
-      <div *ngIf="data.question.type === 'text'" class="text-answer-section">
+      <div *ngIf="data.question.questionType === 3" class="text-answer-section">
         <h4 class="answers-title">
           <mat-icon>text_fields</mat-icon>
           Expected Answer
@@ -75,21 +75,11 @@
         
         <div class="text-answer-content">
           <div class="answer-box">
-            <p class="text-answer">{{data.question.textAnswer}}</p>
+            <p class="text-answer">{{data.question.answerOptions[0].content}}</p>
           </div>
         </div>
       </div>
 
-      <!-- Explanation -->
-      <div *ngIf="data.question.explanation" class="explanation-section">
-        <h4 class="explanation-title">
-          <mat-icon>lightbulb</mat-icon>
-          Explanation
-        </h4>
-        <div class="explanation-content">
-          <p class="explanation-text">{{data.question.explanation}}</p>
-        </div>
-      </div>
     </mat-dialog-content>
 
     <mat-dialog-actions class="dialog-actions">

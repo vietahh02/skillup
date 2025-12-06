@@ -9,8 +9,8 @@ import { MatCardModule } from '@angular/material/card';
 import { MatBadgeModule } from '@angular/material/badge';
 import { ChatMessage, ConversationModel } from '../../models/ai.models';
 import { ApiAiServices } from '../../services/ai.service';
-import { AuthService } from '../../common/context/auth.service';
 import { UserInfo } from '../../models/user.models';
+import { AuthService } from '../../context/auth.service';
 
 @Component({
   selector: 'app-chat-box',
