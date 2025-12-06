@@ -11,7 +11,7 @@ import { ApiAuthServices } from '../../services/auth.service';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { MatSelectModule } from '@angular/material/select';
 import { CommonModule } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -20,23 +20,31 @@ import { AuthService } from '../../context/auth.service';
 import { TokenService } from '../../context/token.service';
 @Component({
     selector: 'app-profile',
-    imports: [RouterLink, MatCardModule, MatButtonModule, MatMenuModule, RouterLinkActive, MatFormFieldModule, MatInputModule,MatIconModule,
+    imports: [CommonModule, RouterLink, MatCardModule, MatButtonModule, MatMenuModule, RouterLinkActive, MatFormFieldModule, MatInputModule,MatIconModule,
         MatDatepickerModule,
-        MatNativeDateModule,ReactiveFormsModule,MatSelectModule,CommonModule],
+        MatNativeDateModule,ReactiveFormsModule,MatSelectModule],
     templateUrl: './profile.component.html',
     styleUrls: ['./profile.component.scss']
 })
 export class ProfileComponent implements OnDestroy {
     private fb = inject(FormBuilder);
     profileForm = this.fb.group({
-        fullName: ['', [Validators.required]],
+        fullName: ['', [Validators.required, Validators.maxLength(255)]],
         email: [{value: '', disabled: true}, [Validators.required, Validators.email, Validators.maxLength(255)]],
-        phone: ['', [Validators.required, Validators.pattern(/^[\+]?[0-9]{10}$/)]],
-        location: ['', [Validators.required, Validators.maxLength(255)]],
-        dateOfBirth: [null as Date | null, [Validators.required]],
+        phone: ['', [Validators.required, Validators.pattern(/^[\+]?[0-9]{10}$/), Validators.maxLength(10)]],
+        location: ['', [Validators.maxLength(255)]],
+        dateOfBirth: [null as Date | null, [Validators.required, this.minAgeValidator(18)]],
         gender: ['', [Validators.required]],
-        level: ['', [Validators.required]],
     });
+
+    minAgeValidator(minAge: number): ValidatorFn {
+        return (control: AbstractControl): ValidationErrors | null => {
+            const dateOfBirth = control.value;
+            if (!dateOfBirth) return null;
+            const age = new Date().getFullYear() - new Date(dateOfBirth).getFullYear();
+            return age < minAge ? { minAge: true } : null;
+        };
+    }
 
     constructor(
         private apiAuthService: ApiAuthServices,
@@ -98,7 +106,6 @@ export class ProfileComponent implements OnDestroy {
                 location: userProfile.location,
                 dateOfBirth: userProfile.dateOfBirth ? new Date(userProfile.dateOfBirth) : null,
                 gender: userProfile.gender || '',
-                level: userProfile.level || '',
             });
             this.previewUrl = null;
             this.selectedFile = null;
@@ -108,7 +115,7 @@ export class ProfileComponent implements OnDestroy {
     onSubmit() {
         this.profileForm.markAllAsTouched();
         console.log(this.selectedFile);
-        if (this.profileForm.valid) return;
+        if (!this.profileForm.valid) return;
 
         // return;
         this.apiAuthService.updateUserInfo({
@@ -119,7 +126,7 @@ export class ProfileComponent implements OnDestroy {
             gender: this.profileForm.value.gender,
             avatar: this.selectedFile,
         }).subscribe((response : any) => {
-            this.authService.updateUserInfo(this.profileForm.value);
+            this.authService.loadUserInfo();
             this.userProfile = response;
             this.clearPreview();
             this.snack.open("Update profile successfully", '', { duration: 2200, panelClass: ['success-snackbar', 'custom-snackbar'], horizontalPosition: 'right', verticalPosition: 'top' });

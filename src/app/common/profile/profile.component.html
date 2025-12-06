@@ -15,7 +15,7 @@
                 </li>
             </ul>
         </nav>
-        <form [formGroup]="profileForm">
+        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
             <h5 class="fw-semibold mb-8 mt-5">Your Photo</h5>
             <p>This will be displayed on your profile.</p>
             <div class="d-flex align-items-center mb-20">
@@ -95,6 +95,7 @@
                                 Date Of Birth is required
                             </mat-error>
                             <mat-error *ngIf="profileForm.get('dateOfBirth')?.hasError('matDatepickerParse')">Invalid date of birth</mat-error>
+                            <mat-error *ngIf="profileForm.get('dateOfBirth')?.hasError('minAge')">You must be at least 18 years old</mat-error>
                         </mat-form-field>
                     </div>
                 </div>
@@ -114,7 +115,7 @@
                 </div>
             </div>
             <div class="d-flex justify-content-end">
-                <button mat-raised-button (click)="onSubmit()" class="tagus fw-semibold">Update</button>
+                <button mat-raised-button type="submit" class="tagus fw-semibold">Update</button>
             </div>
         </form>
     </mat-card-content>
