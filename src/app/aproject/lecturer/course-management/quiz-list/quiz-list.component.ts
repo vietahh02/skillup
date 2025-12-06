@@ -7,7 +7,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatTooltipModule, MatTooltip } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
@@ -289,7 +289,7 @@ export class DeleteQuizDialog {
 @Component({
   selector: 'view-quiz-dialog',
   standalone: true,
-  imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, MatDividerModule, MatChipsModule],
+  imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, MatDividerModule, MatChipsModule, MatTooltip],
   template: `
     <div class="view-quiz-dialog">
       <h2 mat-dialog-title class="dialog-title">
@@ -310,7 +310,7 @@ export class DeleteQuizDialog {
               <mat-icon>school</mat-icon>
               <div class="info-content">
                 <span class="label">Course</span>
-                <span class="value">{{ data.courseName }}</span>
+                <span class="value" [matTooltip]="maxLengthText(data.courseName) ? data.courseName : ''">{{formatText(data.courseName)}}</span>
               </div>
             </div>
 
@@ -681,6 +681,15 @@ export class ViewQuizDialog {
     }
     // Already a string
     return type;
+  }
+
+  
+  maxLengthText(text: string) : boolean {
+    return text.length > 10;
+  }
+
+  formatText(text: string) : string {
+      return this.maxLengthText(text) ? text.substring(0, 10) + '...' : text;
   }
 
   /**
