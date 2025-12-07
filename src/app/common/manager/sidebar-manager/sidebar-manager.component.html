@@ -81,6 +81,14 @@
                     </mat-expansion-panel-header>
                     </mat-expansion-panel>
 
+                    <mat-expansion-panel [expanded]="isActive('/manager/report-user')" hideToggle>
+                    <mat-expansion-panel-header routerLink="/manager/report-user" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="sidemenu-link">
+                        <mat-panel-title>
+                            <i class="flaticon-monitor"></i>
+                            <span class="title">Reports</span>
+                        </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    </mat-expansion-panel>
                 </mat-accordion>
             </div>
         </div>
