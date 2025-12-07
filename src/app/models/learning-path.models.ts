@@ -5,10 +5,12 @@ export interface LearningPath {
   learningPathId: number;
   name: string;
   description: string;
-  category?: string;                    // NEW: Category (Backend, Frontend, Full-Stack, etc.)
-  totalEnrolledUsers?: number;          // NEW: Number of users enrolled
-  averageProgress?: number;             // NEW: Average progress % of all users
-  status?: 'Active' | 'Inactive' | 'Draft';  // NEW: Learning path status
+  level?: string;                       // Level name (Beginner, Intermediate, Advanced) - from backend
+  levelId?: number;                     // Level ID - foreign key
+  duration?: number;                    // Duration in hours
+  totalEnrolledUsers?: number;          // Number of users enrolled
+  averageProgress?: number;             // Average progress % of all users
+  status?: 'Active' | 'Inactive' | 'Draft';  // Learning path status
   createdBy: number;
   createdByName: string;
   createdAt: string;
@@ -40,6 +42,14 @@ export interface LearningPathsResponse {
 export interface CreateLearningPathRequest {
   name: string;
   description: string;
+  levelId?: number;    // Level ID (foreign key)
+  // duration is auto-calculated by backend from sum of course durations
+}
+
+// Level lookup model
+export interface Level {
+  levelId: number;
+  name: string;
 }
 
 // Create Learning Path Item Request

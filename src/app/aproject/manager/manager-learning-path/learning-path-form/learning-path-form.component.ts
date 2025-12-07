@@ -19,7 +19,9 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
 import { LearningPathService } from '../../../../services/learning-path.service';
 import { ApiCourseServices } from '../../../../services/course.service';
+import { ApiLookupServices } from '../../../../services/lookup.service';
 import { LearningPathItem, CreateLearningPathItemRequest } from '../../../../models/learning-path.models';
+import { Level } from '../../../../models/lookup.model';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -68,21 +70,30 @@ export class LearningPathFormComponent implements OnInit {
   courseNotes: { [courseId: number]: string } = {};
   courseMandatory: { [courseId: number]: boolean } = {};
 
+  // Level options
+  levels: Level[] = [];
+
   constructor(
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
     private learningPathService: LearningPathService,
     private courseService: ApiCourseServices,
+    private lookupService: ApiLookupServices,
     private snackBar: MatSnackBar
   ) {
     this.pathForm = this.fb.group({
       name: ['', [Validators.required, Validators.maxLength(200)]],
-      description: ['', [Validators.required, Validators.maxLength(1000)]]
+      description: ['', [Validators.required, Validators.maxLength(1000)]],
+      levelId: ['', Validators.required]
+      // duration is auto-calculated by backend from sum of course durations
     });
   }
 
   ngOnInit(): void {
+    // Load levels first
+    this.loadLevels();
+
     // Check if edit mode
     this.route.params.subscribe(params => {
       if (params['id']) {
@@ -96,6 +107,15 @@ export class LearningPathFormComponent implements OnInit {
     this.loadAvailableCourses();
   }
 
+  async loadLevels(): Promise<void> {
+    try {
+      this.levels = await firstValueFrom(this.lookupService.getLevels());
+    } catch (error) {
+      console.error('Error loading levels:', error);
+      this.snackBar.open('Failed to load levels', 'Close', { duration: 3000 });
+    }
+  }
+
   async loadLearningPath(): Promise<void> {
     if (!this.pathId) return;
 
@@ -107,7 +127,8 @@ export class LearningPathFormComponent implements OnInit {
 
       this.pathForm.patchValue({
         name: path.name,
-        description: path.description
+        description: path.description,
+        levelId: path.levelId || ''
       });
     } catch (error) {
       console.error('Error loading learning path:', error);

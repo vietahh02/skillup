@@ -38,9 +38,9 @@ export class CreateSubLesson implements OnDestroy {
         private courseService: ApiCourseServices
     ) {
         this.subLessonForm = this.fb.group({
-            name: ['', Validators.required],
+            name: ['', [Validators.required, Validators.maxLength(255)]],
             videoFile: [null as File | null, Validators.required],
-            description: [''],
+            description: ['', [Validators.required, Validators.maxLength(1000)]],
         });
     }
 

@@ -54,7 +54,7 @@ export class ManagerLearningPathComponent implements OnInit {
   completedEnrollments = 0;
 
   // Learning Paths table data
-  displayedColumns: string[] = ['roadmap', 'category', 'users', 'avgProgress', 'status', 'created', 'actions'];
+  displayedColumns: string[] = ['roadmap', 'level', 'duration', 'users', 'avgProgress', 'status', 'created', 'actions'];
   dataSource: LearningPath[] = [];
   total = 0;
   currentPage = 1;
@@ -242,6 +242,19 @@ formatText(text: string) : string {
         return 'text-soft-warning';
       default:
         return 'text-soft-success';
+    }
+  }
+
+  getLevelBadgeClass(level?: string): string {
+    switch (level?.toLowerCase()) {
+      case 'beginner':
+        return 'text-soft-success';
+      case 'intermediate':
+        return 'text-soft-warning';
+      case 'advanced':
+        return 'text-soft-danger';
+      default:
+        return 'text-soft-info';
     }
   }
 

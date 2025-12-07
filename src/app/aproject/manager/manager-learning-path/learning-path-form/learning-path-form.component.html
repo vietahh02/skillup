@@ -55,6 +55,26 @@
                 </mat-error>
               </mat-form-field>
             </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Level</mat-label>
+                <mat-select formControlName="levelId" placeholder="Select difficulty level">
+                  <mat-option *ngFor="let level of levels" [value]="level.levelId">
+                    {{level.name}}
+                  </mat-option>
+                </mat-select>
+                <mat-error *ngIf="pathForm.get('levelId')?.hasError('required')">
+                  Level is required
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <!-- Duration Info -->
+            <div class="info-message-tab" *ngIf="isEditMode && pathItems.length > 0">
+              <mat-icon>schedule</mat-icon>
+              <p>Total duration is automatically calculated from the courses in this learning path.</p>
+            </div>
           </form>
 
           <!-- Info message for new paths -->

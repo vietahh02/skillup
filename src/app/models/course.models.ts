@@ -210,4 +210,5 @@ export interface CourseEnrollment {
     endDate: string;
     progressPct: number;
     isEnrolled: boolean;
+    status: string;
 }

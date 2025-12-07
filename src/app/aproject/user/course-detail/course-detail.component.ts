@@ -19,10 +19,11 @@ import { ApiFeedbackServices } from '../../../services/feedback.service';
 import { ConfirmDialogComponent } from '../../../common/confirm-dialog/confirm-dialog.component';
 import { UserInfo } from '../../../models/user.models';
 import { AuthService } from '../../../context/auth.service';
+import { MatTooltip } from "@angular/material/tooltip";
 
 @Component({
     selector: 'app-course-detail',
-    imports: [CommonModule,RouterLink, MatCardModule, MatButtonModule, MatMenuModule, MatCheckboxModule, MatExpansionModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule],
+    imports: [CommonModule, RouterLink, MatCardModule, MatButtonModule, MatMenuModule, MatCheckboxModule, MatExpansionModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule],
     templateUrl: './course-detail.component.html',
     styleUrls: ['./course-detail.component.scss'],
 })
@@ -62,6 +63,14 @@ export class CourseDetailComponent {
             this.totalDuration = this.course.lessons.reduce((acc, lesson) => acc + lesson.totalDuration, 0);
             this.loadFeedbacks();
         });
+    }
+
+    maxLengthText(text: string) : boolean {
+        return text.length > 20;
+    }
+
+    formatText(text: string) : string {
+        return this.maxLengthText(text) ? text.substring(0, 20) + '...' : text;
     }
 
     checkLesson(courseDetail: CourseDetail | null): void {

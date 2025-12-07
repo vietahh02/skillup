@@ -48,6 +48,14 @@ export class LecturerCourseDetail {
     this.getCourseDetail();
   }
 
+  maxLengthText(text: string) : boolean {
+    return text.length > 20;
+  }
+
+  formatText(text: string) : string {
+      return this.maxLengthText(text) ? text.substring(0, 20) + '...' : text;
+  }
+
   getCourseDetail() {
 
     this.courseService.getCourseById(Number(this.id)).subscribe((courseDetail: CourseDetail) => {
@@ -439,8 +447,8 @@ export class CreateCourse {
 
   fb = inject(FormBuilder);
   lessonForm = this.fb.group({
-    name: ['', [Validators.required]],
-    description: ['', []],
+    name: ['', [Validators.required, Validators.maxLength(255)]],
+    description: ['', [Validators.required, Validators.maxLength(1000)]],
   });
   isEdit = false;
   

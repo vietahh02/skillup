@@ -64,7 +64,9 @@
           (click)="viewDetail(path)">
           <mat-card-content>
             <div class="path-header">
-              <mat-icon class="path-icon">route</mat-icon>
+              <div class="path-meta">
+                <span class="level-badge" [ngClass]="getLevelClass(path.level)">{{path.level || 'N/A'}}</span>
+              </div>
               <span class="enrolled-badge">Enrolled</span>
             </div>
 
@@ -83,6 +85,10 @@
               <div class="stat-item">
                 <mat-icon>person</mat-icon>
                 <span>{{path.createdByName}}</span>
+              </div>
+              <div class="stat-item">
+                <mat-icon>schedule</mat-icon>
+                <span>{{path.duration ? path.duration + 'h' : 'N/A'}}</span>
               </div>
               <div class="stat-item">
                 <mat-icon>event</mat-icon>
@@ -123,7 +129,9 @@
           (click)="viewDetail(path)">
           <mat-card-content>
             <div class="path-header">
-              <mat-icon class="path-icon">route</mat-icon>
+              <div class="path-meta">
+                <span class="level-badge" [ngClass]="getLevelClass(path.level)">{{path.level || 'N/A'}}</span>
+              </div>
             </div>
 
             <h3 class="path-title">{{path.name}}</h3>
@@ -133,6 +141,10 @@
               <div class="stat-item">
                 <mat-icon>person</mat-icon>
                 <span>{{path.createdByName}}</span>
+              </div>
+              <div class="stat-item">
+                <mat-icon>schedule</mat-icon>
+                <span>{{path.duration ? path.duration + 'h' : 'N/A'}}</span>
               </div>
               <div class="stat-item">
                 <mat-icon>event</mat-icon>

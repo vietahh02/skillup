@@ -131,8 +131,8 @@ export class LecturerCourseList {
         type: 'confirm',
         title: 'Reason Reject',
         message: `Reason: ${item.rejectionReason}`,
-        confirmText: 'Yes',
-        cancelText: 'No'
+        confirmText: 'Close',
+        isDisabledConfirm: false
       });
     }
 

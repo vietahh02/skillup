@@ -8,10 +8,11 @@ import { ToggleService } from '../../../context/toggle.service';
 import { AuthService } from '../../../context/auth.service';
 import { Observable } from 'rxjs';
 import { UserInfo } from '../../../models/user.models';
+import { MatTooltip } from "@angular/material/tooltip";
 
 @Component({
     selector: 'app-header-manager',
-    imports: [RouterLink, NgClass, MatMenuModule, MatIconModule, MatButtonModule, DatePipe, CommonModule],
+    imports: [RouterLink, NgClass, MatMenuModule, MatIconModule, MatButtonModule, DatePipe, CommonModule, MatTooltip],
     templateUrl: './header-manager.component.html',
     styleUrls: ['./header-manager.component.scss']
 })
@@ -31,6 +32,14 @@ export class HeaderManagerComponent {
         });
         this.currentDate = new Date();
         this.currentUser$ = this.authService.currentUser$;
+    }
+    
+    maxLengthText(text: string) : boolean {
+        return text.length > 20;
+    }
+
+    formatText(text: string) : string {
+        return this.maxLengthText(text) ? text.substring(0, 20) + '...' : text;
     }
 
     toggle() {

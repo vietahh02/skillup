@@ -233,6 +233,15 @@
       align-items: flex-start;
       margin-bottom: 16px;
 
+      .enrolled-badge {
+        font-size: 12px;
+        font-weight: 600;
+        color: #10b981;
+        background: #d4f4dd;
+        padding: 6px 12px;
+        border-radius: 20px;
+      }
+
       .path-thumbnail {
         width: 48px;
         height: 48px;
@@ -279,19 +288,24 @@
           padding: 2px 6px;
           border-radius: 4px;
 
-          &.beginner {
+          &.level-beginner {
             background: #d4f4dd;
             color: #10b981;
           }
 
-          &.intermediate {
+          &.level-intermediate {
             background: #fff3cd;
             color: #856404;
           }
 
-          &.advanced {
+          &.level-advanced {
             background: #f8d7da;
             color: #721c24;
+          }
+
+          &.level-default {
+            background: #e5e7eb;
+            color: #6b7280;
           }
         }
       }
@@ -417,6 +431,33 @@
 
         mat-icon {
           font-size: 16px;
+          margin-right: 4px;
+        }
+      }
+
+      .enrolled-btn {
+        cursor: default;
+
+        &:hover {
+          background: transparent;
+          border-color: currentColor;
+        }
+      }
+    }
+
+    .path-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+
+      .action-btn {
+        flex: 1;
+        font-size: 13px;
+        padding: 10px 16px;
+        border-radius: 8px;
+
+        mat-icon {
+          font-size: 18px;
           margin-right: 4px;
         }
       }
@@ -567,6 +608,27 @@
 
     .continue-btn {
       padding: 10px;
+    }
+  }
+}
+
+// Snackbar Styles
+::ng-deep {
+  .success-snackbar {
+    background-color: #10b981 !important;
+    color: white !important;
+
+    .mat-mdc-button {
+      color: white !important;
+    }
+  }
+
+  .error-snackbar {
+    background-color: #ef4444 !important;
+    color: white !important;
+
+    .mat-mdc-button {
+      color: white !important;
     }
   }
 }

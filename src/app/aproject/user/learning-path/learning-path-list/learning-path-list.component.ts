@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { LearningPathService } from '../../../../services/learning-path.service';
@@ -22,6 +23,7 @@ import { firstValueFrom } from 'rxjs';
     MatIconModule,
     MatProgressBarModule,
     MatProgressSpinnerModule,
+    MatSnackBarModule,
     FormsModule
   ],
   templateUrl: './learning-path-list.component.html',
@@ -38,7 +40,8 @@ export class LearningPathListComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private learningPathService: LearningPathService
+    private learningPathService: LearningPathService,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -139,14 +142,79 @@ export class LearningPathListComponent implements OnInit {
       // Update local state
       this.enrolledPathIds.push(path.learningPathId);
       this.pathProgress[path.learningPathId] = enrollment.progressPct || 0;
-    } catch (error) {
+
+      // Show success notification
+      this.snackBar.open(`Successfully enrolled in "${path.name}"`, 'Close', {
+        duration: 4000,
+        horizontalPosition: 'end',
+        verticalPosition: 'top',
+        panelClass: ['success-snackbar']
+      });
+    } catch (error: any) {
       console.error('Error enrolling in learning path:', error);
-      alert('Failed to enroll in learning path. Please try again.');
+
+      // Handle different error types from backend
+      const errorData = error?.error;
+      const httpStatus = error?.status;
+      let errorMessage = '';
+
+      if (errorData?.errors) {
+        // FluentValidation errors
+        const firstError = Object.values(errorData.errors)[0] as string[] | undefined;
+        errorMessage = firstError?.[0] || 'Validation error occurred';
+      } else if (errorData?.error === 'InsufficientLevel') {
+        // Level validation error - show detailed message
+        errorMessage = `Cannot enroll: Your current level (${errorData.userLevel}) is lower than the required level (${errorData.requiredLevel}) for this learning path.`;
+      } else if (errorData?.error === 'InvalidOperation') {
+        // Business logic error
+        errorMessage = errorData.message || 'Invalid operation';
+      } else if (httpStatus === 410) {
+        // HTTP 410 Gone - Resource no longer available
+        errorMessage = 'This learning path is no longer available';
+      } else if (httpStatus === 404) {
+        // HTTP 404 Not Found
+        errorMessage = 'Learning path not found';
+      } else if (httpStatus === 409) {
+        // HTTP 409 Conflict - Already enrolled
+        errorMessage = 'You are already enrolled in this learning path';
+      } else if (httpStatus === 401 || httpStatus === 403) {
+        // Unauthorized or Forbidden
+        errorMessage = 'You do not have permission to enroll in this learning path';
+      } else if (errorData?.message) {
+        // Use backend message if available
+        errorMessage = errorData.message;
+      } else {
+        // Generic error
+        errorMessage = 'Failed to enroll in learning path. Please try again.';
+      }
+
+      // Show error notification
+      this.snackBar.open(errorMessage, 'Close', {
+        duration: 5000,
+        horizontalPosition: 'end',
+        verticalPosition: 'top',
+        panelClass: ['error-snackbar']
+      });
     }
   }
 
   continuePath(path: LearningPath, event: Event): void {
     event.stopPropagation();
     this.router.navigate(['/learning-path', path.learningPathId]);
+  }
+
+  getLevelClass(level?: string): string {
+    if (!level) return 'level-default';
+
+    switch (level.toLowerCase()) {
+      case 'beginner':
+        return 'level-beginner';
+      case 'intermediate':
+        return 'level-intermediate';
+      case 'advanced':
+        return 'level-advanced';
+      default:
+        return 'level-default';
+    }
   }
 }

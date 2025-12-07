@@ -16,7 +16,7 @@
         <div class="course-details-header mb-25 border-radius">
             <div class="d-md-flex mb-25 align-items-top">
                 <img [src]="course.imageUrl || 'img/lms/lms1.jpg'" class="border-radius" width="200" alt="lms">
-                <h3 class="mb-0 ms-20 text-white">{{course.name || ''}}</h3>
+                <h3 class="mb-0 ms-20 text-white" [title]="maxLengthText(course.name) ? course.name : ''">{{formatText(course.name) || ''}}</h3>
             </div>
             <!-- <p class="text-white">{{course.description || ''}}</p> -->
              <div>
