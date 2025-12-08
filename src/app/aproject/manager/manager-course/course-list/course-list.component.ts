@@ -58,10 +58,12 @@ export class ManagerCourseList implements AfterViewInit {
     constructor(private router: Router, private courseService: ApiCourseServices, private snack: MatSnackBar) {}
 
     ngAfterViewInit() {
-        this.data.paginator = this.paginator;
-
-        this.data.filterPredicate = (data, filter) =>
-            data.name.toLowerCase().includes(filter) || data.email.toLowerCase().includes(filter);
+        // Don't assign paginator to dataSource since we're using server-side pagination
+        // Sync paginator with current page
+        if (this.paginator) {
+            this.paginator.pageIndex = this.currentPage - 1;
+            this.paginator.pageSize = this.pageSize;
+        }
 
         this.loadCourses();
     }
@@ -78,12 +80,12 @@ export class ManagerCourseList implements AfterViewInit {
     loadCourses() {
         this.courseService.getCourseListManager(this.currentPage, this.pageSize, this.searchTerm).subscribe({
             next: (response: any) => {
-                console.log(response);
-                this.data.data = response.items;
-                this.totalItems = response.total;
-                this.currentPage = response.page;
-                this.pageSize = response.pageSize;
+                this.data.data = response.items || [];
+                this.totalItems = response.total || 0;
+                this.currentPage = response.page || this.currentPage;
+                this.pageSize = response.pageSize || this.pageSize;
 
+                // Sync paginator after data is loaded
                 if (this.paginator) {
                     this.paginator.length = this.totalItems;
                     this.paginator.pageSize = this.pageSize;
@@ -91,7 +93,8 @@ export class ManagerCourseList implements AfterViewInit {
                 }
             },
             error: (error: any) => {
-                this.snack.open(error.error || 'Failed to load courses', '', {
+                console.error('Error loading courses:', error);
+                this.snack.open(error.error?.message || error.error || 'Failed to load courses', '', {
                     duration: 3000,
                     panelClass: ['error-snackbar', 'custom-snackbar'],
                     horizontalPosition: 'right',
@@ -108,11 +111,10 @@ export class ManagerCourseList implements AfterViewInit {
     }
 
     search() {
-        console.log('Search called with term:', this.searchTerm);
         this.currentPage = 1;
-        // if (this.paginator) {
-        // this.paginator.pageIndex = 0;
-        // }
+        if (this.paginator) {
+            this.paginator.pageIndex = 0;
+        }
         this.loadCourses();
     }
 
@@ -122,21 +124,7 @@ export class ManagerCourseList implements AfterViewInit {
 
     onPaginatorChange(event: PageEvent) {
         this.currentPage = event.pageIndex + 1;
-        if (event.pageSize !== this.pageSize) {
-            this.onPageSizeChange(event.pageSize);
-        } else {
-            this.onPageChange(event.pageIndex + 1);
-        }
-    }
-
-    onPageSizeChange(s: number) {
-        this.pageSize = s;
-        this.currentPage = 1;
-        this.loadCourses();
-    }
-
-    onPageChange(p: number) {
-        this.currentPage = p;
+        this.pageSize = event.pageSize;
         this.loadCourses();
     }
 

@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ReportService } from '../../../services/report.service';
 import { UserReport } from '../../../models/report.models';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
     selector: 'app-manager-report-user',
@@ -24,7 +25,8 @@ import { UserReport } from '../../../models/report.models';
         MatPaginatorModule,
         MatProgressBarModule,
         MatIconModule,
-        MatTooltipModule
+        MatTooltipModule,
+        MatSnackBarModule
     ],
     templateUrl: './manager-report-user.component.html',
     styleUrls: ['./manager-report-user.component.scss']
@@ -32,6 +34,7 @@ import { UserReport } from '../../../models/report.models';
 export class ManagerReportUserComponent implements AfterViewInit {
     @ViewChild(MatPaginator) paginator!: MatPaginator;
     private reportService = inject(ReportService);
+    private snack = inject(MatSnackBar);
 
     displayedColumns: string[] = ['user', 'level', 'courses', 'progress', 'completionRate', 'learningTime', 'quizScore', 'lastActive', 'status'];
     dataSource = new MatTableDataSource<UserReport>([]);
@@ -133,13 +136,46 @@ export class ManagerReportUserComponent implements AfterViewInit {
         return this.maxLengthText(text) ? text.substring(0, 20) + '...' : text;
     }
 
-    exportToPDF() {
-        // In real implementation, this would export to PDF
-        console.log('Exporting to PDF...');
-    }
-
     exportToExcel() {
-        // In real implementation, this would export to Excel
-        console.log('Exporting to Excel...');
+        this.isLoading = true;
+        this.reportService.exportUserReportExcel(this.searchTerm).subscribe({
+            next: (blob: Blob) => {
+                // Create download link
+                const url = window.URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                
+                // Generate filename with current date
+                const date = new Date();
+                const dateStr = date.toISOString().split('T')[0];
+                link.download = `user-report-${dateStr}.xlsx`;
+                
+                // Trigger download
+                document.body.appendChild(link);
+                link.click();
+                
+                // Cleanup
+                document.body.removeChild(link);
+                window.URL.revokeObjectURL(url);
+                
+                this.isLoading = false;
+                this.snack.open('Export thành công', '', {
+                    duration: 3000,
+                    panelClass: ['success-snackbar', 'custom-snackbar'],
+                    horizontalPosition: 'right',
+                    verticalPosition: 'top'
+                });
+            },
+            error: (error) => {
+                console.error('Error exporting user report:', error);
+                this.isLoading = false;
+                this.snack.open('Không thể xuất file Excel', '', {
+                    duration: 3000,
+                    panelClass: ['error-snackbar', 'custom-snackbar'],
+                    horizontalPosition: 'right',
+                    verticalPosition: 'top'
+                });
+            }
+        });
     }
 }

@@ -3,20 +3,10 @@
     <mat-card-header>
         <h5 class="mb-0">User Report Details</h5>
         <div class="box-button">
-            <button mat-stroked-button color="primary" [matMenuTriggerFor]="exportMenu">
+            <button mat-stroked-button color="primary" (click)="exportToExcel()">
                 <mat-icon>download</mat-icon>
                 Export Report
             </button>
-            <mat-menu #exportMenu="matMenu">
-                <button mat-menu-item (click)="exportToPDF()">
-                    <mat-icon>picture_as_pdf</mat-icon>
-                    <span>Export to PDF</span>
-                </button>
-                <button mat-menu-item (click)="exportToExcel()">
-                    <mat-icon>table_chart</mat-icon>
-                    <span>Export to Excel</span>
-                </button>
-            </mat-menu>
         </div>
     </mat-card-header>
     <div class="tagus-search-box mb-15">
