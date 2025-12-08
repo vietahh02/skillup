@@ -8,6 +8,8 @@ export interface Course {
     duration: number | null;
     rejectionReason: string | null;
     level: string;
+    targetLevel?: string;
+    targetLevelId?: number;
     createdBy: number;
     createdByName: string;
     createdAt: string;

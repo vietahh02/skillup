@@ -163,4 +163,8 @@ export const API_URLS = {
   GET_AI_KEY: BASE_POINTS.SETTINGS + "/ai-key", // GET /api/settings/ai-key
   UPDATE_AI_KEY: BASE_POINTS.SETTINGS + "/ai-key", // PUT /api/settings/ai-key
   DASHBOARD_ADMIN: BASE_POINTS.DASHBOARD + "/admin",
+
+  //API Report
+  GET_USER_REPORT: BASE_POINTS.USER + "/employees/detail-statistics", // GET /api/Users/employees/detail-statistics
+  EXPORT_USER_REPORT_EXCEL: BASE_POINTS.USER + "/employees/detail-statistics/export-excel", // GET /api/Users/employees/detail-statistics/export-excel
 }

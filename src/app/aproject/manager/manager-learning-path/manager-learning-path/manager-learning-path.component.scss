@@ -94,6 +94,7 @@
     max-width: 100%;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
@@ -166,7 +167,54 @@
   }
 }
 
+// Level Badge Styles
+.badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 12px;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &.level-intern {
+    background: #e0f2fe !important;
+    color: #0369a1 !important;
+  }
+
+  &.level-fresher {
+    background: #dcfce7 !important;
+    color: #15803d !important;
+  }
+
+  &.level-junior {
+    background: #d4f4dd !important;
+    color: #10b981 !important;
+  }
+
+  &.level-middle {
+    background: #fef3c7 !important;
+    color: #d97706 !important;
+  }
+
+  &.level-senior {
+    background: #fed7aa !important;
+    color: #c2410c !important;
+  }
+
+  &.level-leader {
+    background: #fecaca !important;
+    color: #b91c1c !important;
+  }
+
+  &.level-default {
+    background: #e5e7eb !important;
+    color: #6b7280 !important;
+  }
+}
+
 // Responsive
+
 @media (max-width: 768px) {
   .stats-card {
     margin-bottom: 15px;

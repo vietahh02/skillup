@@ -108,6 +108,7 @@ export class ManagerCourseList implements AfterViewInit {
     }
 
     search() {
+        console.log('Search called with term:', this.searchTerm);
         this.currentPage = 1;
         // if (this.paginator) {
         // this.paginator.pageIndex = 0;

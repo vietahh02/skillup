@@ -185,6 +185,7 @@
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
+        gap: 12px;
         margin-bottom: 12px;
 
         .course-title {
@@ -194,6 +195,51 @@
           color: #2c3e50;
           flex: 1;
           line-height: 1.4;
+        }
+
+        .course-level-badge {
+          font-size: 11px;
+          font-weight: 600;
+          padding: 4px 10px;
+          border-radius: 12px;
+          white-space: nowrap;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+
+          &.level-intern {
+            background: #e0f2fe;
+            color: #0369a1;
+          }
+
+          &.level-fresher {
+            background: #dcfce7;
+            color: #15803d;
+          }
+
+          &.level-junior {
+            background: #d4f4dd;
+            color: #10b981;
+          }
+
+          &.level-middle {
+            background: #fef3c7;
+            color: #d97706;
+          }
+
+          &.level-senior {
+            background: #fed7aa;
+            color: #c2410c;
+          }
+
+          &.level-leader {
+            background: #fecaca;
+            color: #b91c1c;
+          }
+
+          &.level-default {
+            background: #e5e7eb;
+            color: #6b7280;
+          }
         }
       }
 

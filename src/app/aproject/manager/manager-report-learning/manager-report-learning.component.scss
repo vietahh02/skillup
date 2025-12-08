@@ -1,0 +1,134 @@
+.user-info {
+    img {
+        width: 45px;
+        height: 45px;
+        object-fit: cover;
+    }
+}
+
+.box-button {
+    display: flex;
+    gap: 10px;
+    button {
+        transform: scale(0.9);
+    }
+}
+
+.tagus-mat-table {
+    width: 100%;
+}
+
+.chart {
+    margin-top: 20px;
+}
+
+.single-stats-box {
+    .icon {
+        i {
+            font-size: 40px;
+            color: var(--heraBlueColor);
+            opacity: 0.3;
+        }
+    }
+    .title {
+        h3 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--heraBlueColor);
+            margin-bottom: 5px;
+        }
+    }
+}
+
+.loading-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.loading-text {
+    padding: 10px 20px;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    font-weight: 500;
+}
+
+table.loading {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.role-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 500;
+    text-transform: capitalize;
+    font-size: 13px;
+    text-align: center;
+    min-width: 80px;
+}
+
+.employee {
+    background-color: #dbeafe;
+    color: #1e3a8a;
+}
+
+.lecturer {
+    background-color: #fef9c3;
+    color: #854d0e;
+}
+
+.admin {
+    background-color: #fca5a5;
+    color: #7f1d1d;
+}
+
+.manager {
+    background-color: #bbf7d0;
+    color: #14532d;
+}
+
+.text-success {
+    color: #10b981 !important;
+}
+
+.text-warning {
+    color: #f59e0b !important;
+}
+
+.text-danger {
+    color: #ef4444 !important;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.text-soft-success {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.text-soft-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.border-bottom {
+    border-bottom: 1px solid #EDEFF5;
+    padding-bottom: 15px;
+    margin-bottom: 15px;
+}

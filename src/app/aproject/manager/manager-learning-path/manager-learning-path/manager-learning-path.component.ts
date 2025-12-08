@@ -246,15 +246,24 @@ formatText(text: string) : string {
   }
 
   getLevelBadgeClass(level?: string): string {
-    switch (level?.toLowerCase()) {
-      case 'beginner':
-        return 'text-soft-success';
+    if (!level) return 'level-default';
+
+    switch (level.toLowerCase()) {
+      case 'intern':
+        return 'level-intern';
+      case 'fresher':
+        return 'level-fresher';
+      case 'junior':
+        return 'level-junior';
+      case 'middle':
       case 'intermediate':
-        return 'text-soft-warning';
-      case 'advanced':
-        return 'text-soft-danger';
+        return 'level-middle';
+      case 'senior':
+        return 'level-senior';
+      case 'leader':
+        return 'level-leader';
       default:
-        return 'text-soft-info';
+        return 'level-default';
     }
   }
 

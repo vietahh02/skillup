@@ -59,7 +59,7 @@
             <div class="form-row">
               <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Level</mat-label>
-                <mat-select formControlName="levelId" placeholder="Select difficulty level">
+                <mat-select formControlName="levelId" placeholder="Select difficulty level" (selectionChange)="onLevelChange()">
                   <mat-option *ngFor="let level of levels" [value]="level.levelId">
                     {{level.name}}
                   </mat-option>
@@ -67,6 +67,7 @@
                 <mat-error *ngIf="pathForm.get('levelId')?.hasError('required')">
                   Level is required
                 </mat-error>
+                <mat-hint *ngIf="isEditMode">Changing level will filter available courses</mat-hint>
               </mat-form-field>
             </div>
 
@@ -112,6 +113,9 @@
                 <div class="course-info">
                   <div class="course-header">
                     <h4 class="course-title">{{getCourseDisplayName(course)}}</h4>
+                    <span class="course-level-badge" [ngClass]="getLevelBadgeClass(course.targetLevel || course.level)">
+                      {{course.targetLevel || course.level || 'N/A'}}
+                    </span>
                   </div>
                   <p class="course-description">{{course.description || 'No description available'}}</p>
 

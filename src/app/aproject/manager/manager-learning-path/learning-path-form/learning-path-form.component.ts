@@ -101,10 +101,11 @@ export class LearningPathFormComponent implements OnInit {
         this.pathId = +params['id'];
         this.loadLearningPath();
         this.loadPathItems();
+      } else {
+        // Only load available courses in create mode (no level filter)
+        this.loadAvailableCourses();
       }
     });
-
-    this.loadAvailableCourses();
   }
 
   async loadLevels(): Promise<void> {
@@ -130,6 +131,9 @@ export class LearningPathFormComponent implements OnInit {
         description: path.description,
         levelId: path.levelId || ''
       });
+
+      // Load available courses after form is populated with levelId
+      await this.loadAvailableCourses();
     } catch (error) {
       console.error('Error loading learning path:', error);
       this.snackBar.open('Failed to load learning path', 'Close', { duration: 3000 });
@@ -155,10 +159,18 @@ export class LearningPathFormComponent implements OnInit {
 
   async loadAvailableCourses(): Promise<void> {
     try {
+      // Get selected level from form
+      const selectedLevelId = this.pathForm.get('levelId')?.value;
+      const maxLevelId = selectedLevelId ? Number(selectedLevelId) : undefined;
+
       const response = await firstValueFrom(
-        this.courseService.getCourseListManager(1, 1000) // Load all courses from all lecturers
+        this.courseService.getCourseListManager(1, 1000, undefined, maxLevelId, 'Approved') // Only load Approved courses
       );
-      this.availableCourses = response.items || [];
+
+      // Filter only Approved courses (in case backend doesn't support status parameter yet)
+      this.availableCourses = (response.items || []).filter(course =>
+        course.status === 'Approved'
+      );
 
       // Initialize defaults
       this.availableCourses.forEach(course => {
@@ -350,5 +362,32 @@ export class LearningPathFormComponent implements OnInit {
 
   getCourseDisplayName(course: any): string {
     return course.courseName || course.name || course.title || 'Unnamed Course';
+  }
+
+  onLevelChange(): void {
+    // Reload courses when level changes
+    this.loadAvailableCourses();
+  }
+
+  getLevelBadgeClass(level?: string): string {
+    if (!level) return 'level-default';
+
+    switch (level.toLowerCase()) {
+      case 'intern':
+        return 'level-intern';
+      case 'fresher':
+        return 'level-fresher';
+      case 'junior':
+        return 'level-junior';
+      case 'middle':
+      case 'intermediate':
+        return 'level-middle';
+      case 'senior':
+        return 'level-senior';
+      case 'leader':
+        return 'level-leader';
+      default:
+        return 'level-default';
+    }
   }
 }
