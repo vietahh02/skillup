@@ -1,7 +1,9 @@
 .user-info {
     img {
-        width: 45px;
-        height: 45px;
+        width: 45px !important;
+        min-width: 45px !important;
+        height: 45px !important;
+        min-height: 45px !important;
         object-fit: cover;
     }
 }

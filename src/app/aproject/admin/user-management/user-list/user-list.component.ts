@@ -184,8 +184,8 @@ export class CreateUserDialog {
 
     fb = inject(FormBuilder);
     userForm = this.fb.group({
-      fullName: ['', [Validators.required, Validators.maxLength(255)]],
-      email: ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
+      fullName: ['', [Validators.required, Validators.maxLength(200)]],
+      email: ['', [Validators.required, Validators.email, Validators.maxLength(200)]],
       levelId: [1, [Validators.required]],
       roleId: [4, [Validators.required]],
     });

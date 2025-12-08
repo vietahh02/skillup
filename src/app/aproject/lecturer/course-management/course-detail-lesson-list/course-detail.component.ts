@@ -447,7 +447,7 @@ export class CreateCourse {
 
   fb = inject(FormBuilder);
   lessonForm = this.fb.group({
-    name: ['', [Validators.required, Validators.maxLength(255)]],
+    name: ['', [Validators.required, Validators.maxLength(200)]],
     description: ['', [Validators.required, Validators.maxLength(1000)]],
   });
   isEdit = false;

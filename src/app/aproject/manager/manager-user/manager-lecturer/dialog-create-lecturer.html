@@ -19,7 +19,7 @@
                         Name is required
                     </div>
                     <div *ngIf="lecturerForm.get('fullName')?.hasError('maxlength') && lecturerForm.get('fullName')?.touched" class="error-message">
-                        Name must be less than 255 characters
+                        Name must be less than 200 characters
                     </div>
                 </div>
             </div>
@@ -40,7 +40,7 @@
                         Invalid email address
                     </div>
                     <div *ngIf="lecturerForm.get('email')?.hasError('maxlength') && lecturerForm.get('email')?.touched" class="error-message">
-                        Email must be less than 255 characters
+                        Email must be less than 200 characters
                     </div>
                 </div>
             </div>

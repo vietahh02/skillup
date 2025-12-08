@@ -23,12 +23,12 @@
                         class="input-control" 
                         placeholder="Name Sub Lesson"
                         formControlName="name"
-                        [class.error]="isFieldInvalid('name')">
-                    <div *ngIf="isFieldInvalid('name')" class="error-message">
+                        >
+                    <div *ngIf="subLessonForm.get('name')?.hasError('required') && subLessonForm.get('name')?.touched" class="error-message">
                         Name Sub Lesson is required
                     </div>
                     <div *ngIf="subLessonForm.get('name')?.hasError('maxlength') && subLessonForm.get('name')?.touched" class="error-message">
-                        Name Sub Lesson must be less than 255 characters
+                        Name Sub Lesson must be less than 200 characters
                     </div>
                 </div>
             </div>
@@ -45,7 +45,6 @@
                             class="input-control file-input" 
                             accept="video/*"
                             (change)="onVideoSelected($event)"
-                            [class.error]="isFieldInvalid('videoFile')"
                             #fileInput
                         >
                         <div class="video-preview-wrapper" *ngIf="!selectedVideo">
@@ -76,7 +75,7 @@
                             </div>
                         </div>
                     </div>
-                    <div *ngIf="isFieldInvalid('videoFile')" class="error-message">
+                    <div *ngIf="subLessonForm.get('videoFile')?.hasError('required') && subLessonForm.get('videoFile')?.touched" class="error-message">
                         Video file is required
                     </div>
                 </div>

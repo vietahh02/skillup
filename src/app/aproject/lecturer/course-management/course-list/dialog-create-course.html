@@ -27,6 +27,9 @@
                     <div *ngIf="courseForm.get('duration')?.hasError('min') && courseForm.get('duration')?.touched" class="error-message">
                         Duration must be greater than 0
                     </div>
+                    <div *ngIf="courseForm.get('duration')?.hasError('max') && courseForm.get('duration')?.touched" class="error-message">
+                        Duration must be less than 1000
+                    </div>
                 </div>
             </div>
             <div class="col-md-6">
