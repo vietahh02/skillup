@@ -17,5 +17,6 @@ export interface CourseInfo {
     quizScore: number;
     lastActivity: string;
     status: string;
+    avgProgress: number;
   }
   

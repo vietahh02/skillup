@@ -120,13 +120,13 @@ export class ManagerReportUserComponent implements AfterViewInit {
         } else if (s > 0 && h > 0 && m === 0) {
           result += `${s}s`;
         }
-      
+        
         if (result === '') {
           return '0s';
         }
-      
+        
         return result;
-      }
+    }
     
     maxLengthText(text: string): boolean {
         return text.length > 20;
