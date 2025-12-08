@@ -70,11 +70,11 @@ export class LecturerCourseList {
     
     maxLengthText(text: string) : boolean {
       return text.length > 20;
-  }
+    }
 
-  formatText(text: string) : string {
-      return this.maxLengthText(text) ? text.substring(0, 20) + '...' : text;
-  }
+    formatText(text: string) : string {
+        return this.maxLengthText(text) ? text.substring(0, 20) + '...' : text;
+    }
 
     loadCourses(page: number = 1, pageSize: number = 10, searchTerm?: string) {
       this.courseService.getCourseListCreator(page, pageSize, searchTerm).subscribe({

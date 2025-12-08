@@ -25,6 +25,7 @@ import { ActivatedRoute, RouterLink } from "@angular/router";
 import { ApiUserServices } from '../../../../services/user.service';
 import { UserDetail } from '../../../../models/user.models';
 import { CommonModule } from '@angular/common';
+import { MatTooltip } from "@angular/material/tooltip";
 
 export type ChartOptions = {
     series: ApexAxisChartSeries;
@@ -43,7 +44,7 @@ export type ChartOptions = {
 
 @Component({
     selector: 'app-manager-user-detail',
-    imports: [CommonModule, MatCardModule, MatButtonModule, MatMenuModule, ChartComponent, MatCheckboxModule, MatTableModule, MatProgressBar, MatPaginatorModule, RouterLink, MatTabsModule],
+    imports: [CommonModule, MatCardModule, MatButtonModule, MatMenuModule, ChartComponent, MatCheckboxModule, MatTableModule, MatProgressBar, MatPaginatorModule, RouterLink, MatTabsModule, MatTooltip],
     templateUrl: './user-detail.component.html',
     styleUrls: ['./user-detail.component.scss']
 })
@@ -65,6 +66,14 @@ export class ManagerUserDetail {
 
     enrolledCourse: any[] = [];
     createdCourse: any[] = [];
+
+    maxLengthText(text: string) : boolean {
+        return text.length > 20;
+    }
+  
+    formatText(text: string) : string {
+        return this.maxLengthText(text) ? text.substring(0, 20) + '...' : text;
+    }
 
     constructor(private api: ApiUserServices, private apiUser: ApiUserServices) {
         this.chartOptions = {

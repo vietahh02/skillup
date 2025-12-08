@@ -19,7 +19,7 @@
             </mat-card-header>
             <mat-card-content>
                 <img [src]="detail?.avatarUrl || 'img/user/user12.jpg'" class="rounded-circle mb-15 avatar-user" width="150" alt="user">
-                <span class="d-block gray-color fw-medium">&#64;{{ detail?.fullName }}</span>
+                <span class="d-block gray-color fw-medium" [matTooltip]="maxLengthText(detail?.fullName || '') ? detail?.fullName || '' : ''">&#64;{{ formatText(detail?.fullName || '') }}</span>
                 <ul class="list ps-0 mb-0">
                     <li class="gray-color fw-medium">
                         <a href="tel:+9003526765" class="gray-color d-inline-block position-relative">
@@ -47,7 +47,7 @@
                 <ul class="list ps-0 mb-0">
                     <li>
                         <span class="fw-semibold d-inline-block">Full Name:</span>
-                        <span class="gray-color">{{ detail?.fullName }}</span>
+                        <span class="gray-color" [matTooltip]="maxLengthText(detail?.fullName || '') ? detail?.fullName || '' : ''">{{ formatText(detail?.fullName || '') }}</span>
                     </li>
                     <li>
                         <span class="fw-semibold d-inline-block">Mobile:</span>
@@ -55,11 +55,11 @@
                     </li>
                     <li>
                         <span class="fw-semibold d-inline-block">Email:</span>
-                        <span class="gray-color">{{ detail?.email }}</span>
+                        <span class="gray-color" [matTooltip]="maxLengthText(detail?.email || '') ? detail?.email || '' : ''">{{ formatText(detail?.email || '') }}</span>
                     </li>
                     <li>
                         <span class="fw-semibold d-inline-block">Location:</span>
-                        <span class="gray-color">{{ detail?.location }}</span>
+                        <span class="gray-color" [matTooltip]="maxLengthText(detail?.location || '') ? detail?.location || '' : ''">{{ formatText(detail?.location || '') }}</span>
                     </li>
                     <li>
                         <span class="fw-semibold d-inline-block">Designation:</span>
@@ -120,7 +120,7 @@
                                         <td mat-cell *matCellDef="let element" class="text-start">
                                             <div class="d-flex align-items-center name-info">
                                                 <!-- <mat-checkbox></mat-checkbox> -->
-                                                {{element.courseName}}
+                                                <span [matTooltip]="maxLengthText(element.courseName) ? element.courseName : ''">{{ formatText(element.courseName) }}</span>
                                             </div>
                                         </td>
                                     </ng-container>
