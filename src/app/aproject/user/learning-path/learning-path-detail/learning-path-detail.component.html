@@ -1,0 +1,249 @@
+<div class="learning-path-container">
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+
+  <div *ngIf="!isLoading && learningPath">
+    <!-- Hero Section -->
+    <mat-card class="tagus-card hero-card">
+      <mat-card-content>
+        <div class="hero-content">
+          <div class="hero-badge">
+            <mat-icon>route</mat-icon>
+            <span>Your Learning Journey</span>
+          </div>
+
+          <h1 class="hero-title" [matTooltip]="maxLengthText(learningPath.name) ? learningPath.name : ''">{{formatText(learningPath.name)}}</h1>
+          <p class="hero-description" [matTooltip]="maxLengthText(learningPath.description) ? learningPath.description : ''">
+            {{formatText(learningPath.description)}}
+          </p>
+
+          <div class="hero-stats">
+            <div class="stat-box">
+              <div class="stat-value">{{overallProgress}}%</div>
+              <div class="stat-label">Overall Progress</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-value">{{completedCourses}}/{{totalCourses}}</div>
+              <div class="stat-label">Courses Completed</div>
+            </div>
+            <div class="stat-box" *ngIf="currentCourse">
+              <div class="stat-value">{{currentCourse.progress}}%</div>
+              <div class="stat-label">Current Course</div>
+            </div>
+          </div>
+
+          <div class="progress-bar-container">
+            <mat-progress-bar mode="determinate" [value]="overallProgress"></mat-progress-bar>
+          </div>
+
+          <div class="hero-actions" *ngIf="!isEnrolled">
+            <button mat-raised-button color="primary" (click)="enrollNow()" class="enroll-btn">
+              <mat-icon>add_circle</mat-icon>
+              Enroll Now
+            </button>
+          </div>
+
+          <div class="hero-actions" *ngIf="isEnrolled">
+            <div class="enrolled-chip">
+              <mat-icon>check_circle</mat-icon>
+              Enrolled
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <div class="content-layout">
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Courses List -->
+        <mat-card class="tagus-card">
+          <h3>Learning Path Courses</h3>
+
+          <mat-card-content>
+            <div class="courses-list">
+              <div
+                class="course-item"
+                *ngFor="let course of courses; let i = index"
+                [ngClass]="{
+                  'completed': course.status === 'completed',
+                  'in-progress': course.status === 'in-progress',
+                  'upcoming': course.status === 'upcoming',
+                  'locked': !isCourseUnlocked(course)
+                }"
+                (click)="viewCourse(course)"
+                [style.cursor]="isCourseUnlocked(course) ? 'pointer' : 'not-allowed'"
+                [style.opacity]="isCourseUnlocked(course) ? '1' : '0.5'">
+                <div class="course-number">
+                  {{i + 1}}
+                  <mat-icon *ngIf="!isCourseUnlocked(course)" style="font-size: 16px; margin-left: 4px;">lock</mat-icon>
+                </div>
+
+                <div class="course-main">
+                  <div class="course-header">
+                    <div class="course-info">
+                      <h3 class="course-title">
+                        {{course.courseName}}
+                        <mat-icon *ngIf="!isCourseUnlocked(course)" style="font-size: 18px; vertical-align: middle; margin-left: 8px; color: #999;">lock</mat-icon>
+                      </h3>
+                      <p class="course-description" *ngIf="course.description">
+                        {{course.description}}
+                      </p>
+                      <p class="course-description" *ngIf="!isCourseUnlocked(course)" style="color: #f44336; font-size: 12px; margin-top: 4px;">
+                        <mat-icon style="font-size: 14px; vertical-align: middle;">info</mat-icon>
+                        Complete previous mandatory course to unlock
+                      </p>
+                    </div>
+
+                    <div class="course-status-badge">
+                      <mat-icon>{{getStatusIcon(course.status)}}</mat-icon>
+                    </div>
+                  </div>
+
+                  <div class="course-meta">
+                    <div *ngIf="course.isMandatory" class="mandatory-chip">
+                      <span>Mandatory</span>
+                    </div>
+                    <div *ngIf="!course.isMandatory" class="optional-chip">
+                      <mat-icon>check_circle_outline</mat-icon>
+                      <span>Optional</span>
+                    </div>
+                  </div>
+
+                  <div class="course-progress" *ngIf="isEnrolled">
+                    <div class="progress-info">
+                      <span class="progress-label">Progress</span>
+                      <span class="progress-value">{{course.progress}}%</span>
+                    </div>
+                    <mat-progress-bar mode="determinate" [value]="course.progress"></mat-progress-bar>
+                  </div>
+
+                  <div class="course-actions" *ngIf="isCourseUnlocked(course) && course.status !== 'upcoming'">
+                    <button
+                      mat-flat-button
+                      [color]="course.status === 'in-progress' ? 'primary' : 'accent'"
+                      (click)="viewCourse(course)">
+                      <mat-icon>{{course.status === 'completed' ? 'replay' : 'play_arrow'}}</mat-icon>
+                      {{course.status === 'completed' ? 'Review Course' : 'Continue Learning'}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="sidebar-content">
+        <!-- Learning Path Info -->
+        <mat-card class="tagus-card">
+          <h3>Path Information</h3>
+
+          <mat-card-content>
+            <div class="info-item">
+              <mat-icon>person</mat-icon>
+              <div class="info-content">
+                <div class="info-label">Created By</div>
+                <div class="info-value">{{learningPath.createdByName}}</div>
+              </div>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <div class="info-item">
+              <mat-icon>event</mat-icon>
+              <div class="info-content">
+                <div class="info-label">Created Date</div>
+                <div class="info-value">{{learningPath.createdAt | date:'MMM d, y'}}</div>
+              </div>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <div class="info-item">
+              <mat-icon>school</mat-icon>
+              <div class="info-content">
+                <div class="info-label">Total Courses</div>
+                <div class="info-value">{{totalCourses}} courses</div>
+              </div>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <div class="info-item" *ngIf="progressSummary">
+              <mat-icon>star</mat-icon>
+              <div class="info-content">
+                <div class="info-label">Mandatory Courses</div>
+                <div class="info-value">
+                  {{progressSummary.completedMandatory}}/{{progressSummary.mandatoryCourses}}
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Progress Status -->
+        <mat-card class="tagus-card" *ngIf="isEnrolled && progressSummary">
+          <h3>Progress Status</h3>
+
+          <mat-card-content>
+            <div class="status-item">
+              <div class="status-icon completed">
+                <mat-icon>check_circle</mat-icon>
+              </div>
+              <div class="status-content">
+                <div class="status-label">Completed Courses</div>
+                <div class="status-value">{{progressSummary.completedCourses}}</div>
+              </div>
+            </div>
+
+            <div class="status-item">
+              <div class="status-icon in-progress">
+                <mat-icon>pending</mat-icon>
+              </div>
+              <div class="status-content">
+                <div class="status-label">In Progress</div>
+                <div class="status-value">
+                  {{progressSummary.totalCourses - progressSummary.completedCourses}}
+                </div>
+              </div>
+            </div>
+
+            <div class="status-item">
+              <div class="status-icon upcoming">
+                <mat-icon>schedule</mat-icon>
+              </div>
+              <div class="status-content">
+                <div class="status-label">Status</div>
+                <div class="status-value">{{progressSummary.status}}</div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Actions -->
+        <mat-card class="tagus-card actions-card">
+          <mat-card-content>
+            <button mat-stroked-button class="action-button" (click)="goBack()">
+              <mat-icon>arrow_back</mat-icon>
+              Back to Learning Paths
+            </button>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && !learningPath" class="empty-state">
+    <mat-icon>error_outline</mat-icon>
+    <h3>Learning Path Not Found</h3>
+    <p>The learning path you're looking for doesn't exist or has been removed.</p>
+    <button mat-raised-button color="primary" (click)="goBack()">
+      Back to Learning Paths
+    </button>
+  </div>
+</div>

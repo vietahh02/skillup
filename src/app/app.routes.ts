@@ -1,197 +1,159 @@
-import {Routes} from '@angular/router';
-import {NotFoundComponent} from './common/not-found/not-found.component';
-import {SystemConfigComponent} from './features/system-config/system-config.component';
-import {SystemUserManagementComponent} from './features/system-user/user-management/user-management.component';
-import {SystemRoleManagementComponent} from './features/system-role/role-management/role-management.component';
-
-import {ProductListComponent} from './features/product-management/product-list/product-list.component';
-import {PartnerListComponent} from './features/partner-management/partner-list/partner-list.component';
-import {
-    PartnerCreateUpdateComponent
-} from './features/partner-management/partner-create-update/partner-create-update.component';
-import {
-    DocumentManagementComponent
-} from './features/document-management/document-management/document-management.component';
-import {DashboardComponent} from './features/dashboard/dashboard.component';
-import {DashboardV2Component} from './features/dashboard/dashboard-v2.component';
-import {DashboardHubComponent} from './features/dashboard/dashboard-hub.component';
-import {LoginComponent} from './common/login/login.component';
-import {PartnerDetailComponent} from './features/partner-management/partner-detail/partner-detail.component';
-import {authGuard} from './guards/auth.guard';
-import {ApiAuthServices} from './services/auth.service';
-import {inject} from '@angular/core';
-import {ProductDetailComponent} from './features/product-management/product-detail/product-detail.component';
-import {
-    PurchaseOrderListComponent
-} from './features/purchase-order-management/purchase-order-list/purchase-order-list.component';
-import {StockManagementComponent} from './features/stock-management/stock-management/stock-management.component';
-import {
-    NotificationListComponent
-} from './features/notification-management/notification-list/notification-list.component';
-import {TransactionListComponent} from './features/transaction-management/transaction-list/transaction-list.component';
-import {BalanceListComponent} from './features/transaction-management/balance-list/balance-list.component';
-import {
-    ReconciliationListComponent
-} from './features/transaction-management/reconciliation-list/reconciliation-list.component';
-import {permissionGuard} from './guards/permision.guard';
-import {pageGuard} from './guards/page.guard';
-import {PAGES, PERMISSIONS} from './utils/shared/constants/auth.constants';
-import {adminHubGuard} from './guards/admin-hub.guard';
-import {adminGuard} from './guards/admin.guard';
-import { CreateUpdateHelpComponent } from './features/helps/create-update-help/create-update-help.component';
-import { PreviewHelpComponent } from './features/helps/preview-help/preview-help.component';
-import { HelpPartnerComponent } from './features/helps/help-partner/help-partner.component';
+import { Routes } from '@angular/router';
+import { User } from './aproject/user/user.component';
+import { Home } from './aproject/user/home/home.component';
+import { MyCoursesComponent } from './aproject/user/my-courses/my-courses.component';
+import { CourseDetailComponent } from './aproject/user/course-detail/course-detail.component';
+import { Admin } from './aproject/admin/admin.component';
+import { AdminDashboard } from './aproject/admin/admin-dashboard/admin-dashboard.component';
+import { AdminUserManagement } from './aproject/admin/user-management/user-management.component';
+import { AdminUserList } from './aproject/admin/user-management/user-list/user-list.component';
+import { AdminUserDetail } from './aproject/admin/user-management/user-detail/user-detail.component';
+import { AdminCourseManagement } from './aproject/admin/course-management/course-management.component';
+import { AdminCourseList } from './aproject/admin/course-management/course-list/course-list.component';
+import { Manager } from './aproject/manager/manager.component';
+import { ManagerDashboard } from './aproject/manager/manager-dashboard/manager-dashboard.component';
+import { ManagerUserManagement } from './aproject/manager/manager-user/manager-user.component';
+import { ManagerEmployee } from './aproject/manager/manager-user/manager-employee/manager-employee.component';
+import { ManagerLecturer } from './aproject/manager/manager-user/manager-lecturer/manager-lecturer.component';
+import { ManagerUserDetail } from './aproject/manager/manager-user/user-detail/user-detail.component';
+import { ManagerCourseManagement } from './aproject/manager/manager-course/manager-course.component';
+import { ManagerCourseList } from './aproject/manager/manager-course/course-list/course-list.component';
+import { ManagerCourseDetail } from './aproject/manager/manager-course/course-detail/course-detail.component';
+import { Lecturer } from './aproject/lecturer/lecturer.component';
+import { LecturerCourseList } from './aproject/lecturer/course-management/course-list/course-list.component';
+import { LecturerCourseManagement } from './aproject/lecturer/course-management/course-management.component';
+import { LecturerCourseDetail } from './aproject/lecturer/course-management/course-detail-lesson-list/course-detail.component';
+import { NotFoundComponent } from './common/not-found/not-found.component';
 import { ProfileComponent } from './common/profile/profile.component';
-import {HelpManagementComponent} from './features/helps/help-management/help-management.component';
+import { SecurityComponent } from './common/security/security.component';
+import { CourseLearnComponent } from './aproject/user/course-learn/course-learn.component';
+import { LoginComponent } from './common/authentication/login/login.component';
+import { ForgotPasswordComponent } from './common/authentication/forgot-password/forgot-password.component';
+import { QuizCreatorComponent } from './aproject/lecturer/course-management/quiz-creator/quiz-creator.component';
+import { QuizListComponent } from './aproject/lecturer/course-management/quiz-list/quiz-list.component';
+import { QuizComponent } from './aproject/user/quiz/quiz.component';
+import { ChatComponent } from './aproject/user/chat/chat.component';
+import { ManagerChatComponent } from './aproject/manager/manager-chat/manager-chat.component';
+import { RoadmapFormComponent } from './aproject/manager/manager-roadmap/roadmap-form/roadmap-form.component';
+import { RoadmapDetailComponent } from './aproject/manager/manager-roadmap/roadmap-detail/roadmap-detail.component';
+import { ManagerRoadmapComponent } from './aproject/manager/manager-roadmap/manager-roadmap/manager-roadmap.component';
+import { ManagerLearningPathComponent } from './aproject/manager/manager-learning-path/manager-learning-path/manager-learning-path.component';
+import { LearningPathFormComponent } from './aproject/manager/manager-learning-path/learning-path-form/learning-path-form.component';
+import { LearningPathDetailComponent as ManagerLearningPathDetailComponent } from './aproject/manager/manager-learning-path/learning-path-detail/learning-path-detail.component';
+import { RoadMap } from './aproject/user/roadmap/roadmap-detail/roadmap.component';
+import { RoadmapListComponent } from './aproject/user/roadmap/roadmap-list/roadmap-list.component';
+import { LearningPathListComponent as UserLearningPathListComponent } from './aproject/user/learning-path/learning-path-list/learning-path-list.component';
+import { LearningPathDetail as UserLearningPathDetailComponent } from './aproject/user/learning-path/learning-path-detail/learning-path-detail.component';
+import { SettingsComponent } from './aproject/admin/settings/settings';
+import { authGuard } from './guards/auth.guard';
+import { roleGuard } from './guards/role.guard';
+import { ManagerReportUserComponent } from './aproject/manager/manager-report-user/manager-report-user.component';
+import { ManagerCourseTypeComponent } from './aproject/manager/manager-setting/manager-course-type/manager-course-type.component';
+import { ManagerUserLevelComponent } from './aproject/manager/manager-setting/manager-user-level/manager-user-level.component';
 
 export const routes: Routes = [
-  { path: '', component: DashboardComponent, canActivate: [authGuard] },
-    //{ path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
+    //project
+    {path: 'authentication/login', component: LoginComponent},
+    {path: 'authentication/forgot-password', component: ForgotPasswordComponent},
+    {path: 'login', redirectTo: 'authentication/login', pathMatch: 'full'},
     {
-        path: 'dashboard',
-        canActivate: [authGuard],
-        loadComponent: () => {
-            const authService = inject(ApiAuthServices);
-            const roles = authService.getUserRoles();
-            if (roles.includes('hub_admin') || roles.includes('hub_user')) {
-                return DashboardHubComponent;
-            }
-            return DashboardV2Component;
-        }
+        path: '', component: User,
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['Employee'] },
+        children: [
+            {path: '', component: Home},
+            {path: 'profile', component: ProfileComponent},
+            {path: 'my-courses', component: MyCoursesComponent},
+            {path: 'security', component: SecurityComponent},
+            {path: 'course-detail/:id', component: CourseDetailComponent},
+            {path: 'course/learn/:id', component: CourseLearnComponent},
+            {path: 'quiz/:id', component: QuizComponent},
+            {path: 'roadmap', component: RoadmapListComponent},
+            {path: 'roadmap/:id', component: RoadMap},
+            {path: 'learning-paths', component: UserLearningPathListComponent},
+            {path: 'learning-path/:id', component: UserLearningPathDetailComponent},
+            {path: 'chat', component: ChatComponent},
+        ]
     },
-  { path: 'login', component: LoginComponent },
+    {
+        path:'admin', 
+        component: Admin,
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['Admin'] },
+        children: [
+            {path: '', component: AdminDashboard},
+            {path: 'profile', component: ProfileComponent},
+            {path: 'security', component: SecurityComponent},
+            {path: 'users', component: AdminUserManagement, 
+                children:[
+                    {path: '', component: AdminUserList},
+                    {path: ':id', component: AdminUserDetail}
+                ]
+            },
+            {path: 'courses', component: AdminCourseManagement,
+                children: [
+                    {path: '', component: AdminCourseList}
+                ]
+            },
+            {path: 'settings', component: SettingsComponent}
+        ]
+    },
+    {
+        path: 'manager',
+        component: Manager,
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['Manager'] },
+        children: [
+            {path: '', component: ManagerDashboard},
+            {path: 'profile', component: ProfileComponent},
+            {path: 'security', component: SecurityComponent},
+            {path: 'chat', component: ManagerChatComponent},
+            {path: 'users', component: ManagerUserManagement,
+                children: [
+                    {path: 'employee', component: ManagerEmployee},
+                    {path: 'lecturer', component: ManagerLecturer},
+                    {path: ':id', component: ManagerUserDetail},
+                ]
+            },
+            {path: 'courses', component: ManagerCourseManagement,
+                children: [
+                    {path: '', component: ManagerCourseList},
+                    {path: ':id', component: ManagerCourseDetail}
+                ]
+            },
+            {path: 'roadmaps', component: ManagerRoadmapComponent},
+            {path: 'roadmaps/create', component: RoadmapFormComponent},
+            {path: 'roadmaps/edit/:id', component: RoadmapFormComponent},
+            {path: 'roadmaps/detail/:id', component: RoadmapDetailComponent},
+            {path: 'learning-paths', component: ManagerLearningPathComponent},
+            {path: 'learning-paths/create', component: LearningPathFormComponent},
+            {path: 'learning-paths/edit/:id', component: LearningPathFormComponent},
+            {path: 'learning-paths/detail/:id', component: ManagerLearningPathDetailComponent},
+            {path: 'report-user', component: ManagerReportUserComponent},
+            {path: 'course-type', component: ManagerCourseTypeComponent},
+            {path: 'user-level', component: ManagerUserLevelComponent},
+        ]
+    },
+    {
+        path: 'lecturer',
+        component: Lecturer,
+        canActivate: [authGuard, roleGuard],
+        data: { roles: ['Lecturer'] },
+        children: [
+            {path: '', component: LecturerCourseList},
+            {path: 'profile', component: ProfileComponent},
+            {path: 'security', component: SecurityComponent},
+            {path: 'courses', component: LecturerCourseManagement,
+                children: [
+                    {path: '', component:LecturerCourseList},
+                    {path: ':id', component:LecturerCourseDetail},
+                    {path: ':id/quiz', component:QuizCreatorComponent},
+                ]
+            },
+            {path: 'quizzes', component: QuizListComponent},
+        ]
+    },
+    //endProject
 
-  // System User Management
-  {
-    path: 'system/user',
-    loadComponent: () => SystemUserManagementComponent,
-    canActivate: [authGuard, adminGuard],
-    data: { page: PAGES.USER }
-  },
-  // System Role Management
-  {
-    path: 'system/role',
-    loadComponent: () => SystemRoleManagementComponent,
-    canActivate: [authGuard, adminGuard],
-    data: { page: PAGES.ROLE }
-  },
-  // Partner Management
-  {
-    path: 'system/partner-management',
-    loadComponent: () => PartnerListComponent,
-    canActivate: [authGuard, pageGuard, adminHubGuard],
-    data: { page: PAGES.PARTNER_LIST }
-  },
-  {
-    path: 'system/partner-management/create',
-    loadComponent: () => PartnerCreateUpdateComponent,
-    canActivate: [authGuard, permissionGuard, adminHubGuard],
-    data: { permission: PERMISSIONS.PARTNER_CREATE }
-  },
-  {
-    path: 'system/partner-management/edit/:id',
-    loadComponent: () => PartnerCreateUpdateComponent,
-    canActivate: [authGuard, permissionGuard, adminHubGuard],
-    data: { permission: PERMISSIONS.PARTNER_UPDATE }
-  },
-  {
-    path: 'system/partner-management/:id',
-    loadComponent: () => PartnerDetailComponent,
-    canActivate: [authGuard, pageGuard, adminHubGuard],
-    data: { page: PAGES.PARTNER_DETAIL }
-  },
-  // Document Management
-  {
-    path: 'system/document-management',
-    loadComponent: () => DocumentManagementComponent,
-    canActivate: [authGuard, pageGuard],
-    data: { page: PAGES.CONFIG }
-  },
-  // Config Management
-  {
-    path: 'system/config',
-    loadComponent: () => SystemConfigComponent,
-    canActivate: [authGuard, adminGuard],
-    data: { page: PAGES.CONFIG }
-  },
-  // Product Management
-  {
-    path: 'system/product-management',
-    loadComponent: () => ProductListComponent,
-    canActivate: [authGuard, pageGuard],
-    data: { page: PAGES.PRODUCT_LIST }
-  },
-  {
-    path: 'system/product-management/:id',
-    loadComponent: () => ProductDetailComponent,
-    canActivate: [authGuard, pageGuard],
-    data: { page: PAGES.PRODUCT_DETAIL }
-  },
-  // Purchase Order Management
-  {
-    path: 'system/purchase-order-management',
-    loadComponent: () => PurchaseOrderListComponent,
-    canActivate: [authGuard, pageGuard],
-    data: { page: PAGES.PURCHASE_ORDER }
-  },
-  // Stock Management
-  {
-    path: 'system/stock-management',
-    loadComponent: () => StockManagementComponent,
-    canActivate: [authGuard]
-  },
-  // Notification Management
-  {
-    path: 'system/notification',
-    loadComponent: () => NotificationListComponent,
-    canActivate: [authGuard]
-  },
-    // Transaction Management
-    {
-        path: 'system/transaction-management',
-        loadComponent: () => TransactionListComponent,
-        canActivate: [authGuard]
-    },
-    {
-        path: 'system/balance-management',
-        loadComponent: () => BalanceListComponent,
-        canActivate: [authGuard]
-    },
-    {
-        path: 'system/reconciliation-management',
-        loadComponent: () => ReconciliationListComponent,
-        canActivate: [authGuard]
-    },
-    // Help Management
-    {
-        path: 'system/help-management',
-        loadComponent: () => HelpManagementComponent,
-        canActivate: [authGuard, adminHubGuard]
-    },
-    {
-        path: 'system/help-management/create',
-        loadComponent: () => CreateUpdateHelpComponent,
-        canActivate: [authGuard, adminHubGuard]
-    },
-    {
-        path: 'system/help-management/edit/:code',
-        loadComponent: () => CreateUpdateHelpComponent,
-        canActivate: [authGuard, adminHubGuard]
-    },
-    {
-        path: 'system/help-management/:code',
-        loadComponent: () => PreviewHelpComponent,
-        canActivate: [authGuard, adminHubGuard]
-    },
-    {
-      path: 'system/help-partner',
-      loadComponent: () => HelpPartnerComponent,
-      canActivate: [authGuard]
-    },
-    {
-      path: 'profile',
-      loadComponent: () => ProfileComponent,
-      canActivate: [authGuard]
-    },
-  { path: '**', component: NotFoundComponent },
+    {path: '**', component: NotFoundComponent} // This line will remain down from the whole pages component list
 ];

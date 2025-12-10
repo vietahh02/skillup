@@ -1,0 +1,77 @@
+<div class="breadcrumb-card mb-25 d-md-flex align-items-center justify-content-space-between">
+    <h5 class="mb-0">User Profile</h5>
+    <ol class="breadcrumb mb-0 ps-0">
+        <li class="breadcrumb-item">
+            <a routerLink="/admin/users">
+                <i class="ri-home-8-line"></i>
+                User List
+            </a>
+        </li>
+        <li class="breadcrumb-item fw-semibold">User Profile</li>
+    </ol>
+</div>
+
+<div class="row">
+    <div class="col-xxl-3">
+        <mat-card class="mb-25 text-center tagus-card">
+            <mat-card-header class="border-bottom">
+                <h5 class="mb-0">Alvarado Turner</h5>
+            </mat-card-header>
+            <mat-card-content>
+                <img src="img/user/user12.jpg" class="rounded-circle mb-15" width="150" alt="user">
+                <span class="d-block gray-color fw-medium">&#64;{{ detail?.fullName }}</span>
+                <ul class="list ps-0 mb-0">
+                    <li class="gray-color fw-medium">
+                        <a href="tel:+9003526765" class="gray-color d-inline-block position-relative">
+                            <i class="flaticon-phone-call"></i>
+                            {{ detail?.phone }}
+                        </a>
+                    </li>
+                    <li class="gray-color fw-medium">
+                        <a href="mailto:alvaradoturner&#64;tagus.com" class="gray-color d-inline-block position-relative">
+                            <i class="flaticon-envelope"></i>
+                            {{ detail?. email }}
+                        </a>
+                    </li>
+                </ul>
+            </mat-card-content>
+        </mat-card>
+    </div>
+    <div class="col-xxl-9">
+        <mat-card class="mb-25 personal-info-card tagus-card">
+            <mat-card-header class="border-bottom">
+                <h5 class="mb-0">Personal Information</h5>
+            </mat-card-header>
+            <mat-card-content>
+                <h3 class="d-block fw-semibold mb-5">About Me</h3>
+                <!-- <p>Hi I'm Andrew Burns, has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a industry.</p> -->
+                <ul class="list ps-0 mb-0">
+                    <li>
+                        <span class="fw-semibold d-inline-block">Full Name: &nbsp;</span>
+                        <span class="gray-color">{{ detail?.fullName }}</span>
+                    </li>
+                    <li>
+                        <span class="fw-semibold d-inline-block">Mobile: &nbsp;</span>
+                        <span class="gray-color">{{ detail?.phone }}</span>
+                    </li>
+                    <li>
+                        <span class="fw-semibold d-inline-block">Email: &nbsp;</span>
+                        <span class="gray-color">{{ detail?.email }}</span>
+                    </li>
+                    <li>
+                        <span class="fw-semibold d-inline-block">Location: &nbsp;</span>
+                        <span class="gray-color">{{ detail.location }}</span>
+                    </li>
+                    <li>
+                        <span class="fw-semibold d-inline-block">Designation: &nbsp;</span>
+                        <span class="gray-color">{{ "Backend Developer" }}</span>
+                    </li>
+                    <li>
+                        <span class="fw-semibold d-inline-block">Experience: &nbsp;</span>
+                        <span class="gray-color">{{ detail?.level }}</span>
+                    </li>
+                </ul>
+            </mat-card-content>
+        </mat-card>
+    </div>
+</div>

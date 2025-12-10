@@ -1,48 +1,143 @@
+.loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10000000;
+}
+
 .main-content {
-    margin-top: 15px;
     overflow: hidden;
     min-height: 100vh;
     transition: var(--transition);
     padding: {
-        top: 105px;
-        left: 285px;
+        top: 114px;
+        left: 325px;
         right: 25px;
-    }
+    };
     &.active {
-        padding-left: 45px; // Giảm từ 85px xuống 25px để tối ưu khoảng trống
+        padding-left: 85px; // Giảm từ 85px xuống 25px để tối ưu khoảng trống
     }
     &.right-sidebar {
         padding: {
             left: 25px;
             right: 285px;
-        }
+        };
         &.active {
-            padding-right: 25px; // Giảm từ 85px xuống 25px
+            padding-right: 85px; // Giảm từ 85px xuống 25px
         }
     }
     &.hide-sidebar {
         padding: {
             left: 25px;
             right: 25px;
-        }
+        };
     }
 }
 
-//custom icons
-::ng-deep .mat-mdc-slide-toggle {
-  transform: scale(0.7); 
+
+// Utility classes for BTS Management
+.d-flex {
+    display: flex !important;
 }
 
-::ng-deep .view-btn.mat-mdc-icon-button {
-  transform: scale(0.95);
+.align-items-center {
+    align-items: center !important;
 }
 
-//custom color message
-::ng-deep .mat-mdc-snack-bar-container .mat-mdc-button.mat-mdc-snack-bar-action:not(:disabled) {
-  --mat-button-text-state-layer-color: transparent !important;
-  --mat-button-text-ripple-color: transparent !important;
-  background-color: transparent !important;
-  box-shadow: none !important;
+.justify-content-between {
+    justify-content: space-between !important;
+}
+
+.justify-content-center {
+    justify-content: center !important;
+}
+
+.mb-0 { margin-bottom: 0 !important; }
+.mb-1 { margin-bottom: 0.25rem !important; }
+.mb-2 { margin-bottom: 0.5rem !important; }
+.mb-3 { margin-bottom: 1rem !important; }
+.mb-4 { margin-bottom: 1.5rem !important; }
+
+.mt-0 { margin-top: 0 !important; }
+.mt-1 { margin-top: 0.25rem !important; }
+.mt-2 { margin-top: 0.5rem !important; }
+.mt-3 { margin-top: 1rem !important; }
+.mt-4 { margin-top: 1.5rem !important; }
+
+.p-0 { padding: 0 !important; }
+.p-1 { padding: 0.25rem !important; }
+.p-2 { padding: 0.5rem !important; }
+.p-3 { padding: 1rem !important; }
+.p-4 { padding: 1.5rem !important; }
+
+.text-muted {
+    color: #6c757d !important;
+}
+
+.bg-white {
+    background-color: #ffffff !important;
+}
+
+.box-shadow {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+// Row and column system
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+}
+
+.col-12 {
+    flex: 0 0 100%;
+    max-width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+.col-lg-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+@media (max-width: 1600px) {
+    .main-content {
+        padding-left: 285px;
+    }
+}
+
+@media (max-width: 1200px) {
+    .main-content {
+        padding-left: 25px;
+    }
+}
+
+
+@media (max-width: 991.98px) {
+    .col-lg-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+// Responsive utilities
+@media (max-width: 768px) {
+    .row {
+        margin-right: -10px;
+        margin-left: -10px;
+    }
+    
+    .col-12,
+    .col-lg-6 {
+        padding-right: 10px;
+        padding-left: 10px;
+    }
 }
 
 ::ng-deep .custom-snackbar {
@@ -93,176 +188,4 @@
 ::ng-deep .mat-mdc-form-field-error-wrapper {
     margin: 0 !important;
     padding: 0 !important;
-}
-
-// Utility classes for IT Management
-.d-flex {
-    display: flex !important;
-}
-
-.align-items-center {
-    align-items: center !important;
-}
-
-.justify-content-between {
-    justify-content: space-between !important;
-}
-
-.justify-content-center {
-    justify-content: center !important;
-}
-
-.mb-0 {
-    margin-bottom: 0 !important;
-}
-.mb-1 {
-    margin-bottom: 0.25rem !important;
-}
-.mb-2 {
-    margin-bottom: 0.5rem !important;
-}
-.mb-3 {
-    margin-bottom: 1rem !important;
-}
-.mb-4 {
-    margin-bottom: 1.5rem !important;
-}
-
-.mt-0 {
-    margin-top: 0 !important;
-}
-.mt-1 {
-    margin-top: 0.25rem !important;
-}
-.mt-2 {
-    margin-top: 0.5rem !important;
-}
-.mt-3 {
-    margin-top: 1rem !important;
-}
-.mt-4 {
-    margin-top: 1.5rem !important;
-}
-
-.p-0 {
-    padding: 0 !important;
-}
-.p-1 {
-    padding: 0.25rem !important;
-}
-.p-2 {
-    padding: 0.5rem !important;
-}
-.p-3 {
-    padding: 1rem !important;
-}
-.p-4 {
-    padding: 1.5rem !important;
-}
-
-.text-muted {
-    color: #6c757d !important;
-}
-
-.bg-white {
-    background-color: #ffffff !important;
-}
-
-.box-shadow {
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
-}
-
-// Row and column system
-.row {
-    display: flex;
-    flex-wrap: wrap;
-    margin-right: -15px;
-    margin-left: -15px;
-}
-
-.col-12 {
-    flex: 0 0 100%;
-    max-width: 100%;
-    padding-right: 15px;
-    padding-left: 15px;
-}
-
-.col-lg-6 {
-    flex: 0 0 50%;
-    max-width: 50%;
-    padding-right: 15px;
-    padding-left: 15px;
-}
-
-@media (max-width: 1600px) {
-    .main-content {
-        padding-left: 245px;
-        &.active {
-            padding-left: 45px;
-        }
-    }
-}
-
-@media (max-width: 1400px) {
-    .main-content {
-        padding-left: 225px;
-        &.active {
-            padding-left: 45px;
-        }
-    }
-}
-
-@media (max-width: 1200px) {
-    .main-content {
-        padding-left: 0;
-        &.active {
-            padding-left: 245px;
-        }
-    }
-}
-
-
-@media (max-width: 991.98px) {
-    .col-lg-6 {
-        flex: 0 0 100%;
-        max-width: 100%;
-    }
-}
-
-// Responsive utilities
-@media (max-width: 768px) {
-    .main-content {
-        padding-right: 15px;
-    }
-    .row {
-        margin-right: -10px;
-        margin-left: -10px;
-    }
-
-    .col-12,
-    .col-lg-6 {
-        padding-right: 10px;
-        padding-left: 10px;
-    }
-}
-
-::ng-deep .mat-expansion-panel-header  {
-    border-radius: 15px !important;
-}
-
-::ng-deep .sidebar-menu-link  {
-    border-radius: 15px !important;
-}
-
-::ng-deep .header-area {
-    margin-top: 10px;
-}
-
-::ng-deep .border-radius-size-main {
-    border-radius: 25px !important;
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1) !important;
-}
-
-::ng-deep .border-radius-size {
-    border-radius: 20px !important;
 }

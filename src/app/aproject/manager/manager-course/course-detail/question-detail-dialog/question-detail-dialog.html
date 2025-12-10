@@ -1,0 +1,91 @@
+<div class="question-detail-dialog">
+    <h2 mat-dialog-title class="dialog-title">
+      <mat-icon>{{getQuestionTypeIcon()}}</mat-icon>
+      {{getQuestionTypeLabel()}} Question
+    </h2>
+    
+    <mat-dialog-content class="dialog-content">
+      <div class="question-info">
+      
+        <div class="question-content">
+          <h3 class="question-text">{{data.question.title}}</h3>
+        </div>
+      </div>
+
+      <!-- Single Choice & Multiple Choice Questions -->
+      <div *ngIf="data.question.questionType === 0 || data.question.questionType === 1" class="answers-section">
+        <h4 class="answers-title">
+          <mat-icon>{{data.question.questionType === 0 ? 'radio_button_checked' : 'check_box'}}</mat-icon>
+          Answer Options
+        </h4>
+        
+        <div class="answers-list">
+          <div *ngFor="let answer of data.question.answerOptions; let i = index" 
+               class="answer-option"
+               [class.correct-answer]="answer.isCorrect">
+            <div class="answer-indicator">
+              <mat-icon *ngIf="data.question.questionType === 0" 
+                        [class.correct]="answer.isCorrect">
+                {{answer.isCorrect ? 'radio_button_checked' : 'radio_button_unchecked'}}
+              </mat-icon>
+              <mat-icon *ngIf="data.question.questionType === 1" 
+                        [class.correct]="answer.isCorrect">
+                {{answer.isCorrect ? 'check_box' : 'check_box_outline_blank'}}
+              </mat-icon>
+            </div>
+            <div class="answer-content">
+              <span class="answer-text">{{answer.content}}</span>
+              <mat-chip *ngIf="answer.isCorrect" color="primary" selected class="correct-chip">
+                <mat-icon matChipAvatar>check</mat-icon>
+                Correct
+              </mat-chip>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- True/False Questions -->
+      <div *ngIf="data.question.questionType === 2" class="answers-section">
+        <h4 class="answers-title">
+          <mat-icon>help_outline</mat-icon>
+          True or False
+        </h4>
+        
+        <div class="true-false-options">
+          <div *ngFor="let answer of data.question.answerOptions" 
+               class="true-false-option"
+               [class.correct-answer]="answer.isCorrect">
+            <mat-icon [class.correct]="answer.isCorrect">
+              {{answer.isCorrect ? 'check_circle' : 'cancel'}}
+            </mat-icon>
+            <span class="option-text">{{answer.content}}</span>
+            <mat-chip *ngIf="answer.isCorrect" color="primary" selected class="correct-chip">
+              Correct Answer
+            </mat-chip>
+          </div>
+        </div>
+      </div>
+
+      <!-- Text Questions -->
+      <div *ngIf="data.question.questionType === 3" class="text-answer-section">
+        <h4 class="answers-title">
+          <mat-icon>text_fields</mat-icon>
+          Expected Answer
+        </h4>
+        
+        <div class="text-answer-content">
+          <div class="answer-box">
+            <p class="text-answer">{{data.question.answerOptions[0].content}}</p>
+          </div>
+        </div>
+      </div>
+
+    </mat-dialog-content>
+
+    <mat-dialog-actions class="dialog-actions">
+      <button mat-button (click)="close()">
+        <mat-icon>close</mat-icon>
+        Close
+      </button>
+    </mat-dialog-actions>
+  </div>

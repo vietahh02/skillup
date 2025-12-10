@@ -1,0 +1,244 @@
+<div class="learning-path-container">
+  <!-- Hero Section -->
+  <mat-card class="tagus-card hero-card">
+    <mat-card-content>
+      <div class="hero-content">
+        <div class="hero-badge">
+          <mat-icon>route</mat-icon>
+          <span>Choose Your Path</span>
+        </div>
+
+        <h1 class="hero-title">Learning Paths</h1>
+        <p class="hero-description">
+          Discover structured learning paths designed to guide your professional development.
+          Pick a path that matches your career goals and start learning today.
+        </p>
+
+        <div class="hero-stats">
+          <div class="stat-box">
+            <div class="stat-value">{{learningPaths.length}}</div>
+            <div class="stat-label">Available Paths</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">{{assignedPaths.length}}</div>
+            <div class="stat-label">Assigned Paths</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">{{selfEnrolledPaths.length}}</div>
+            <div class="stat-label">Self-Enrolled Paths</div>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+  </div>
+
+  <div *ngIf="!isLoading">
+    <!-- Search Section -->
+    <div class="filter-section">
+      <mat-card class="tagus-card">
+        <mat-card-content>
+          <div class="filter-header">
+            <h3>Explore Learning Paths</h3>
+            <div class="search-container">
+              <div class="search-box">
+                <mat-icon class="search-icon">search</mat-icon>
+                <input type="text" placeholder="Search learning paths..." [(ngModel)]="searchTerm" (input)="search()">
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Assigned Learning Paths -->
+    <div class="active-paths-section" *ngIf="assignedPaths.length > 0">
+      <h2 class="section-title">
+        <mat-icon>assignment</mat-icon>
+        Assigned Learning Paths
+      </h2>
+
+      <div class="paths-grid active-grid">
+        <mat-card
+          class="tagus-card path-card active-path"
+          *ngFor="let path of assignedPaths"
+          (click)="viewDetail(path)">
+          <mat-card-content>
+            <div class="path-header">
+              <div class="path-meta">
+                <span class="level-badge" [ngClass]="getLevelClass(path.level)">{{path.level || 'N/A'}}</span>
+              </div>
+              <span class="enrolled-badge assigned-badge">Assigned</span>
+            </div>
+
+            <h3 class="path-title">{{path.name}}</h3>
+            <p class="path-description">{{path.description}}</p>
+
+            <div class="progress-section">
+              <div class="progress-info">
+                <span class="progress-label">Progress</span>
+                <span class="progress-value">{{getProgress(path.learningPathId)}}%</span>
+              </div>
+              <mat-progress-bar mode="determinate" [value]="getProgress(path.learningPathId)"></mat-progress-bar>
+            </div>
+
+            <div class="path-stats">
+              <div class="stat-item">
+                <mat-icon>person</mat-icon>
+                <span>{{path.createdByName}}</span>
+              </div>
+              <div class="stat-item">
+                <mat-icon>schedule</mat-icon>
+                <span>{{path.duration ? path.duration + ' days' : 'N/A'}}</span>
+              </div>
+              <div class="stat-item">
+                <mat-icon>event</mat-icon>
+                <span>{{path.createdAt | date:'MMM d, y'}}</span>
+              </div>
+            </div>
+
+            <div class="path-actions">
+              <button mat-flat-button color="primary" (click)="continuePath(path, $event)" class="action-btn">
+                <mat-icon>play_arrow</mat-icon>
+                Continue Learning
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Self-Enrolled Learning Paths -->
+    <div class="active-paths-section" *ngIf="selfEnrolledPaths.length > 0">
+      <h2 class="section-title">
+        <mat-icon>bookmark</mat-icon>
+        Self-Enrolled Learning Paths
+      </h2>
+
+      <div class="paths-grid active-grid">
+        <mat-card
+          class="tagus-card path-card active-path"
+          *ngFor="let path of selfEnrolledPaths"
+          (click)="viewDetail(path)">
+          <mat-card-content>
+            <div class="path-header">
+              <div class="path-meta">
+                <span class="level-badge" [ngClass]="getLevelClass(path.level)">{{path.level || 'N/A'}}</span>
+              </div>
+              <span class="enrolled-badge">Enrolled</span>
+            </div>
+
+            <h3 class="path-title">{{path.name}}</h3>
+            <p class="path-description" [matTooltip]="path.description">{{path.description}}</p>
+
+            <div class="progress-section">
+              <div class="progress-info">
+                <span class="progress-label">Progress</span>
+                <span class="progress-value">{{getProgress(path.learningPathId)}}%</span>
+              </div>
+              <mat-progress-bar mode="determinate" [value]="getProgress(path.learningPathId)"></mat-progress-bar>
+            </div>
+
+            <div class="path-stats">
+              <div class="stat-item">
+                <mat-icon>person</mat-icon>
+                <span>{{path.createdByName}}</span>
+              </div>
+              <div class="stat-item">
+                <mat-icon>schedule</mat-icon>
+                <span>{{path.duration ? path.duration + ' days' : 'N/A'}}</span>
+              </div>
+              <div class="stat-item">
+                <mat-icon>event</mat-icon>
+                <span>{{path.createdAt | date:'MMM d, y'}}</span>
+              </div>
+            </div>
+
+            <div class="path-actions">
+              <button mat-flat-button color="primary" (click)="continuePath(path, $event)" class="action-btn">
+                <mat-icon>play_arrow</mat-icon>
+                Continue Learning
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- All Available Learning Paths -->
+    <div class="available-paths-section">
+      <h2 class="section-title">
+        <mat-icon>explore</mat-icon>
+        <span *ngIf="enrolledPaths.length > 0">More Learning Paths</span>
+        <span *ngIf="enrolledPaths.length === 0">All Learning Paths</span>
+      </h2>
+
+      <!-- Empty State -->
+      <div *ngIf="availablePaths.length === 0 && !isLoading" class="empty-state">
+        <mat-icon>school</mat-icon>
+        <h3>No Learning Paths Available</h3>
+        <p *ngIf="searchTerm">Try adjusting your search to find what you're looking for.</p>
+        <p *ngIf="!searchTerm">All learning paths have been enrolled.</p>
+      </div>
+
+      <!-- Paths Grid -->
+      <div class="paths-grid" *ngIf="availablePaths.length > 0">
+        <mat-card
+          class="tagus-card path-card"
+          *ngFor="let path of availablePaths"
+          (click)="viewDetail(path)">
+          <mat-card-content>
+            <div class="path-header">
+              <div class="path-meta">
+                <span class="level-badge" [ngClass]="getLevelClass(path.level)">{{path.level || 'N/A'}}</span>
+              </div>
+            </div>
+
+            <h3 class="path-title">{{path.name}}</h3>
+            <p class="path-description" [matTooltip]="path.description">{{path.description}}</p>
+
+            <div class="path-stats">
+              <div class="stat-item">
+                <mat-icon>person</mat-icon>
+                <span>{{path.createdByName}}</span>
+              </div>
+              <div class="stat-item">
+                <mat-icon>schedule</mat-icon>
+                <span>{{path.duration ? path.duration + ' days' : 'N/A'}}</span>
+              </div>
+              <div class="stat-item">
+                <mat-icon>event</mat-icon>
+                <span>{{path.createdAt | date:'MMM d, y'}}</span>
+              </div>
+            </div>
+
+            <div class="path-actions">
+              <button
+                *ngIf="!isEnrolled(path.learningPathId)"
+                mat-flat-button
+                color="primary"
+                (click)="enrollPath(path, $event)"
+                class="action-btn">
+                <mat-icon>add</mat-icon>
+                Enroll Now
+              </button>
+              <button
+                *ngIf="isEnrolled(path.learningPathId)"
+                mat-stroked-button
+                color="primary"
+                (click)="continuePath(path, $event)"
+                class="action-btn enrolled-btn">
+                <mat-icon>check_circle</mat-icon>
+                Enrolled
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</div>

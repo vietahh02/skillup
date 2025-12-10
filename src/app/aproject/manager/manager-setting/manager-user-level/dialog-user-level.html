@@ -1,0 +1,36 @@
+<div class="create-dialog-box">
+    <div class="title d-flex align-items-center justify-content-space-between">
+        <h4 class="mb-0">{{ isEditMode ? 'Edit Level' : 'Add New Level' }}</h4>
+        <button class="close-btn bg-transparent p-0 border-none" (click)="close()">
+            <i class="flaticon-close"></i>
+        </button>
+    </div>
+    <form [formGroup]="levelForm" (ngSubmit)="onSubmit()">
+        <div class="row">
+            <div class="col-12">
+                <div class="form-group">
+                    <label class="d-block fw-semibold">Level Name<span class="text-danger">*</span></label>
+                    <input 
+                        type="text" 
+                        class="input-control" 
+                        placeholder="Enter level name" 
+                        formControlName="name"
+                        [class.error]="levelForm.get('name')?.invalid && levelForm.get('name')?.touched">
+                    <div *ngIf="levelForm.get('name')?.hasError('required') && levelForm.get('name')?.touched" class="error-message">
+                        Level name is required
+                    </div>
+                    <div *ngIf="levelForm.get('name')?.hasError('maxlength') && levelForm.get('name')?.touched" class="error-message">
+                        Level name must be less than 100 characters
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex justify-content-end gap-2 mt-3">
+            <button type="button" mat-stroked-button (click)="close()" class="clear-btn">Cancel</button>
+            <button type="submit" mat-flat-button color="primary" class="apply-btn" [disabled]="levelForm.invalid">
+                {{ isEditMode ? 'Update' : 'Create' }}
+            </button>
+        </div>
+    </form>
+</div>
+

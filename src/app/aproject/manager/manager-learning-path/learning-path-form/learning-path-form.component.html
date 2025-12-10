@@ -1,0 +1,234 @@
+<!-- Header Toolbar -->
+<mat-toolbar class="form-toolbar">
+  <button mat-icon-button (click)="cancel()" class="back-btn">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span class="toolbar-title">
+    {{isEditMode ? 'Edit Learning Path' : 'Create New Learning Path'}}
+  </span>
+  <div class="toolbar-spacer"></div>
+  <div class="selected-courses-count" *ngIf="isEditMode">
+    {{pathItems.length}} courses selected
+  </div>
+</mat-toolbar>
+
+<!-- Loading Spinner -->
+<div *ngIf="isLoading" class="loading-container">
+  <mat-spinner diameter="50"></mat-spinner>
+</div>
+
+<!-- Main Content -->
+<div *ngIf="!isLoading" class="">
+  <mat-card class="form-card">
+    <mat-tab-group class="learning-path-tabs">
+      <!-- Learning Path Information Tab -->
+      <mat-tab label="Learning Path Information">
+        <div class="tab-content">
+          <form [formGroup]="pathForm" class="path-form">
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Learning Path Name</mat-label>
+                <input matInput formControlName="name" placeholder="Enter learning path name">
+                <mat-error *ngIf="pathForm.get('name')?.hasError('required')">
+                  Name is required
+                </mat-error>
+                <mat-error *ngIf="pathForm.get('name')?.hasError('maxlength')">
+                  Name must be less than 200 characters
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Description</mat-label>
+                <textarea
+                  matInput
+                  formControlName="description"
+                  rows="4"
+                  placeholder="Describe the learning path objectives and outcomes"
+                ></textarea>
+                <mat-error *ngIf="pathForm.get('description')?.hasError('required')">
+                  Description is required
+                </mat-error>
+                <mat-error *ngIf="pathForm.get('description')?.hasError('maxlength')">
+                  Description must be less than 1000 characters
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Level</mat-label>
+                <mat-select formControlName="levelId" placeholder="Select difficulty level" (selectionChange)="onLevelChange()">
+                  <mat-option *ngFor="let level of levels" [value]="level.levelId">
+                    {{level.name}}
+                  </mat-option>
+                </mat-select>
+                <mat-error *ngIf="pathForm.get('levelId')?.hasError('required')">
+                  Level is required
+                </mat-error>
+                <mat-hint *ngIf="isEditMode">Changing level will filter available courses</mat-hint>
+              </mat-form-field>
+            </div>
+
+            <!-- Duration Info -->
+            <div class="info-message-tab" *ngIf="isEditMode && pathItems.length > 0">
+              <mat-icon>schedule</mat-icon>
+              <p>Total duration is automatically calculated from the courses in this learning path.</p>
+            </div>
+          </form>
+
+          <!-- Info message for new paths -->
+          <div *ngIf="!isEditMode" class="info-message-tab">
+            <mat-icon>info</mat-icon>
+            <p>After creating the learning path, you'll be able to add courses in the next tab.</p>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Course Selection Tab (Only in edit mode) -->
+      <mat-tab label="Select & Order Courses" [disabled]="!isEditMode">
+        <div class="tab-content">
+          <!-- Course Selection Section -->
+          <div class="course-selection-section">
+            <h3 class="section-title">Available Courses</h3>
+
+            <!-- Search and Filter -->
+            <div class="course-filters">
+              <mat-form-field appearance="outline" class="search-field">
+                <mat-label>Search courses</mat-label>
+                <input matInput [(ngModel)]="courseSearchTerm" (input)="filterCourses()"
+                       placeholder="Search by course name or description">
+                <mat-icon matSuffix>search</mat-icon>
+              </mat-form-field>
+
+              <div class="selection-actions">
+                <span class="available-count">{{filteredAvailableCourses.length}} available</span>
+              </div>
+            </div>
+
+            <!-- Available Courses List -->
+            <div class="courses-list">
+              <div class="course-item" *ngFor="let course of filteredAvailableCourses">
+                <div class="course-info">
+                  <div class="course-header">
+                    <h4 class="course-title">{{getCourseDisplayName(course)}}</h4>
+                    <span class="course-level-badge" [ngClass]="getLevelBadgeClass(course.targetLevel || course.level)">
+                      {{course.targetLevel || course.level || 'N/A'}}
+                    </span>
+                  </div>
+                  <p class="course-description">{{course.description || 'No description available'}}</p>
+
+                  <!-- Add Course Form -->
+                  <div class="course-add-controls">
+                    <mat-form-field appearance="outline" class="description-field">
+                      <mat-label>Notes (Optional)</mat-label>
+                      <input matInput [(ngModel)]="courseNotes[course.courseId]"
+                             placeholder="Additional notes for this course">
+                    </mat-form-field>
+
+                    <mat-checkbox [(ngModel)]="courseMandatory[course.courseId]">
+                      Mandatory
+                    </mat-checkbox>
+
+                    <button
+                      mat-raised-button
+                      color="accent"
+                      (click)="addCourseToPath(course)"
+                      [disabled]="isCourseinPath(course.courseId)"
+                    >
+                      <mat-icon>{{isCourseinPath(course.courseId) ? 'check' : 'add'}}</mat-icon>
+                      {{isCourseinPath(course.courseId) ? 'Added' : 'Add'}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Empty State -->
+            <div class="empty-state" *ngIf="filteredAvailableCourses.length === 0">
+              <mat-icon>school</mat-icon>
+              <p>No courses found matching your criteria</p>
+            </div>
+          </div>
+
+          <!-- Selected Courses Section -->
+          <div class="selected-courses-section" *ngIf="pathItems.length > 0">
+            <div class="section-header">
+              <h3 class="section-title">Selected Courses ({{pathItems.length}})</h3>
+              <p class="section-subtitle">Drag to reorder the learning sequence</p>
+            </div>
+
+            <div class="selected-courses-list"
+                 cdkDropList
+                 (cdkDropListDropped)="dropCourse($event)">
+              <div class="selected-course-item"
+                   *ngFor="let item of pathItems; let i = index"
+                   cdkDrag>
+                <div class="course-order">
+                  <span class="order-number">{{i + 1}}</span>
+                  <mat-icon cdkDragHandle class="drag-handle">drag_indicator</mat-icon>
+                </div>
+
+                <div class="selected-course-info">
+                  <div class="selected-course-header">
+                    <h4 class="selected-course-title">{{item.courseName}}</h4>
+                    <div class="selected-course-actions">
+                      <button
+                        mat-stroked-button
+                        [color]="item.isMandatory ? 'warn' : 'primary'"
+                        (click)="toggleMandatory(item)"
+                        class="type-badge-small"
+                      >
+                        {{item.isMandatory ? 'Mandatory' : 'Optional'}}
+                      </button>
+                      <button mat-icon-button (click)="removeCourse(item)" class="remove-btn">
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="selected-course-meta" *ngIf="item.description">
+                    <span class="course-note">
+                      <mat-icon>note</mat-icon>
+                      {{item.description}}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty Selected State -->
+          <div class="empty-selected-state" *ngIf="pathItems.length === 0">
+            <mat-icon>playlist_add</mat-icon>
+            <h4>No courses selected</h4>
+            <p>Add courses from the available list above to build your learning path</p>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card>
+</div>
+
+<!-- Action Buttons -->
+<div class="form-actions" *ngIf="!isLoading">
+  <button mat-button (click)="cancel()" class="cancel-btn" [disabled]="isSaving">
+    Cancel
+  </button>
+  <div class="action-spacer"></div>
+  <div class="summary-info">
+    <span class="courses-summary" *ngIf="isEditMode">{{pathItems.length}} courses in path</span>
+    <span class="validation-status" *ngIf="pathForm.invalid">
+      Complete all required fields
+    </span>
+  </div>
+  <button mat-raised-button
+          color="primary"
+          [disabled]="pathForm.invalid || isSaving"
+          (click)="save()"
+          class="submit-btn">
+    <mat-icon *ngIf="isSaving">hourglass_empty</mat-icon>
+    <span>{{isSaving ? 'Saving...' : (isEditMode ? 'Update Learning Path' : 'Create Learning Path')}}</span>
+  </button>
+</div>

@@ -1,0 +1,441 @@
+// Statistics Cards
+.stats-card {
+  .icon-box {
+    width: 60px;
+    height: 60px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    
+    mat-icon {
+      color: white;
+    }
+    
+    &.primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    &.success {
+      background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+    }
+    
+    &.info {
+      background: linear-gradient(135deg, #3498db 0%, #85c1e9 100%);
+    }
+    
+    &.warning {
+      background: linear-gradient(135deg, #f39c12 0%, #f7dc6f 100%);
+    }
+  }
+  
+  .stats-content {
+    h3 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 5px;
+    }
+    
+    span {
+      font-size: 14px;
+      color: #7f8c8d;
+      font-weight: 500;
+    }
+  }
+}
+
+// Navigation Tabs
+.nav-tabs-container {
+  .nav-tabs {
+    display: flex;
+    gap: 8px;
+    
+    button {
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      
+      &.outline {
+        background: transparent;
+        border: 1px solid #e2e8f0;
+        color: #64748b;
+        
+        &:hover {
+          background: #f8fafc;
+          border-color: #cbd5e1;
+        }
+      }
+      
+      mat-icon {
+        margin-right: 6px;
+        font-size: 18px;
+      }
+    }
+  }
+}
+
+// Table Styling
+.tagus-mat-table {
+  .roadmap-info {
+    max-width: 300px;
+    
+    .roadmap-icon {
+      width: 40px;
+      height: 40px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      mat-icon {
+        color: #667eea;
+        font-size: 20px;
+      }
+    }
+    
+    .title {
+      strong {
+        font-size: 16px;
+        color: #2c3e50;
+        display: block;
+        margin-bottom: 4px;
+      }
+      
+      .text-truncate {
+        max-width: 250px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+    
+    .skills-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      margin-top: 6px;
+      
+      .skill-tag {
+        font-size: 10px;
+        padding: 2px 6px;
+        background: #e3f2fd;
+        color: #1976d2;
+        border-radius: 4px;
+        font-weight: 500;
+        
+        &.more {
+          background: #f3e5f5;
+          color: #7b1fa2;
+        }
+      }
+    }
+  }
+  
+  .user-stats {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      
+      .small-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        color: #6c757d;
+        
+        &.success {
+          color: #28a745;
+        }
+        
+        &.primary {
+          color: #007bff;
+        }
+      }
+      
+      span {
+        color: #495057;
+        font-weight: 500;
+      }
+    }
+  }
+  
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    img {
+      border: 2px solid #e9ecef;
+    }
+    
+    .title {
+      strong {
+        color: #2c3e50;
+        font-size: 15px;
+      }
+    }
+  }
+  
+  .roadmap-info {
+    strong {
+      color: #2c3e50;
+      font-size: 14px;
+    }
+    
+    small {
+      color: #6c757d;
+    }
+  }
+}
+
+// Badge Styles
+.badge {
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  
+  &.text-soft-success {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  &.text-soft-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  
+  &.text-soft-warning {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+  
+  &.text-soft-primary {
+    background-color: #cce7ff;
+    color: #0056b3;
+  }
+  
+  &.text-soft-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+  }
+}
+
+// Action Buttons
+.cell-action {
+  .mat-mdc-icon-button {
+    margin: 0 2px;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+      transform: scale(1.1);
+    }
+  }
+}
+
+// Progress Bar Styling
+mat-progress-bar {
+  height: 8px;
+  border-radius: 4px;
+  
+  ::ng-deep .mdc-linear-progress__bar-inner {
+    border-top-width: 8px;
+  }
+  
+  ::ng-deep .mdc-linear-progress__buffer {
+    background-color: #e9ecef;
+  }
+}
+
+// Menu Styling
+.mat-mdc-menu-panel {
+  .mat-mdc-menu-item {
+    &.text-danger {
+      color: #dc3545 !important;
+      
+      mat-icon {
+        color: #dc3545 !important;
+      }
+    }
+  }
+}
+
+// Card Header Styling
+mat-card-header {
+  padding: 20px 24px;
+  // border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  
+  h5 {
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 18px;
+  }
+  
+  .box-button {
+    display: flex;
+    gap: 10px;
+    
+    button {
+      padding: 8px 16px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+  }
+}
+
+// Search Box Styling
+.tagus-search-box {
+  padding: 0 24px;
+  margin-bottom: 20px !important;
+  
+  .input-search {
+    border: 1px solid #dee2e6;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    
+    &:focus {
+      border-color: #667eea;
+      box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+    }
+  }
+  
+  .tagus {
+    background: #667eea;
+    color: white;
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin-left: 10px;
+    
+    &:hover {
+      background: #5a6fd8;
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .stats-card {
+    margin-bottom: 20px;
+    
+    .stats-content h3 {
+      font-size: 24px;
+    }
+  }
+  
+  .nav-tabs-container {
+    .nav-tabs {
+      flex-direction: column;
+      gap: 8px;
+      
+      button {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+  
+  mat-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+    
+    .box-button {
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
+  
+  .tagus-search-box {
+    .input-search {
+      width: 100%;
+    }
+    
+    .tagus {
+      margin-left: 0;
+      margin-top: 10px;
+      width: 100%;
+    }
+  }
+  
+  .tagus-mat-table {
+    .roadmap-info {
+      max-width: 200px;
+      
+      .title .text-truncate {
+        max-width: 180px;
+      }
+    }
+    
+    .user-stats {
+      .stat-item {
+        font-size: 11px;
+      }
+    }
+  }
+}
+
+// Custom Scrollbar for Table
+.tagus-mat-table {
+  overflow-x: auto;
+  
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 3px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+    
+    &:hover {
+      background: #a8a8a8;
+    }
+  }
+}
+
+// Hover Effects
+.mat-mdc-row {
+  transition: background-color 0.3s ease;
+  
+  &:hover {
+    background-color: #f8f9fa;
+  }
+}
+
+// Loading States (for future use)
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  color: #6c757d;
+  
+  mat-icon {
+    margin-right: 10px;
+    animation: spin 1s linear infinite;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

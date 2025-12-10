@@ -1,0 +1,123 @@
+<div class="roadmap-container">
+  <!-- Hero Section -->
+  <mat-card class="tagus-card hero-card">
+    <mat-card-content>
+      <div class="hero-content">
+        <div class="hero-badge">
+          <mat-icon>explore</mat-icon>
+          <span>Your Learning Journey</span>
+        </div>
+        
+        <h1 class="hero-title">Learning Roadmap</h1>
+        <p class="hero-description">
+          Track your progress through our structured learning path. Complete each phase to build your skills step by step.
+        </p>
+
+        <div class="hero-stats">
+          <div class="stat-box">
+            <div class="stat-value">{{overallProgress}}%</div>
+            <div class="stat-label">Overall Progress</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">{{completedPhases}}/{{phases.length}}</div>
+            <div class="stat-label">Phases Completed</div>
+          </div>
+          <div class="stat-box" *ngIf="currentPhase">
+            <div class="stat-value">{{currentPhase.progress}}%</div>
+            <div class="stat-label">Current Phase</div>
+          </div>
+        </div>
+
+        <div class="progress-bar-container">
+          <mat-progress-bar mode="determinate" [value]="overallProgress"></mat-progress-bar>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="content-layout">
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Phases -->
+      <mat-card class="tagus-card">
+        <h3>Learning Phases</h3>
+
+        <mat-card-content>
+          <div class="phases-list">
+            <div class="phase-item" *ngFor="let phase of phases; let i = index" [ngClass]="getStatusClass(phase.status)">
+              <div class="phase-number">{{i + 1}}</div>
+              
+              <div class="phase-main">
+                <div class="phase-header">
+                  <div class="phase-info">
+                    <div>
+                      <h3 class="phase-title">{{phase.title}}</h3>
+                      <span class="phase-duration">{{phase.duration}}</span>
+                    </div>
+                  </div>
+                  
+                  <div class="phase-status-badge">
+                    <mat-icon>{{getStatusIcon(phase.status)}}</mat-icon>
+                  </div>
+                </div>
+
+                <p class="phase-description">{{phase.description}}</p>
+
+                <div class="phase-progress">
+                  <div class="progress-info">
+                    <span class="progress-label">Progress</span>
+                    <span class="progress-value">{{phase.progress}}%</span>
+                  </div>
+                  <mat-progress-bar mode="determinate" [value]="phase.progress"></mat-progress-bar>
+                </div>
+
+                <div class="milestones">
+                  <div class="milestone-item" *ngFor="let milestone of phase.milestones" [ngClass]="getStatusClass(milestone.status)">
+                    <mat-icon class="milestone-icon">{{getStatusIcon(milestone.status)}}</mat-icon>
+                    <span class="milestone-title">{{milestone.title}}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar-content">
+      <!-- Skills Progress -->
+      <mat-card class="tagus-card">
+        <h3>Skills Progress</h3>
+
+        <mat-card-content>
+          <div class="skill-item" *ngFor="let skill of skills">
+            <div class="skill-header">
+              <span class="skill-name">{{skill.name}}</span>
+              <span class="skill-value">{{skill.progress}}%</span>
+            </div>
+            <mat-progress-bar 
+              mode="determinate" 
+              [value]="skill.progress"
+              [ngStyle]="{'--progress-color': skill.color}">
+            </mat-progress-bar>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Upcoming Events -->
+      <mat-card class="tagus-card">
+        <h3>Upcoming Events</h3>
+        
+        <mat-card-content>
+          <div class="event-item" *ngFor="let event of upcomingEvents">
+            <div class="event-details">
+              <div class="event-title">{{event.title}}</div>
+              <div class="event-date">{{event.date}}</div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

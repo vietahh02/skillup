@@ -1,13 +1,9 @@
 export const environment = {
   production: false,
-    keycloakConfig: {
-        realm: 'digital-payment-hub',
-        url: 'https://ids-hub.mytelpay.com.mm/',
-        clientId: 'hub-fe',
-    },
   baseUrl: {
-    HUB: 'http://14.224.201.179:8081/api',
-    LOGIN_URL: 'https://ids-hub.mytelpay.com.mm/realms/digital-payment-hub/protocol/openid-connect/token',
-    GATEWAY_URL: 'https://gw.mytelpay.com.mm:9443/gateway' 
-  }
+    //SKILL_UP: 'https://m611zlpk-7128.asse.devtunnels.ms/api'
+       SKILL_UP: 'https://0cp3tk1z-7128.asse.devtunnels.ms/api'
+    //  SKILL_UP: 'https://api.skillup.id.vn/api'
+  },
+  googleClientId: '766419365895-fu2n28sacriqgpntg1f854skpmkk901p.apps.googleusercontent.com'
 };

@@ -3,7 +3,7 @@
     "version": 1,
     "newProjectRoot": "projects",
     "projects": {
-        "hubs": {
+        "tagus": {
             "projectType": "application",
             "schematics": {
                 "@schematics/angular:component": {
@@ -26,13 +26,7 @@
                         "assets": [
                             {
                                 "glob": "**/*",
-                                "input": "public",
-                                "output": "/"
-                            },                            
-                            {
-                                "glob": "**/*",
-                                "input": "src/assets",
-                                "output": "/assets"
+                                "input": "public"
                             }
                         ],
                         "styles": [
@@ -52,19 +46,13 @@
                             "budgets": [
                                 {
                                     "type": "initial",
-                                    "maximumWarning": "3mb",
-                                    "maximumError": "5mb"
+                                    "maximumWarning": "10MB",
+                                    "maximumError": "20MB"
                                 },
                                 {
                                     "type": "anyComponentStyle",
-                                    "maximumWarning": "75kb",
-                                    "maximumError": "90kb"
-                                }
-                            ],
-                            "fileReplacements": [
-                                {
-                                    "replace": "src/environments/environment.ts",
-                                    "with": "src/environments/environment.prod.ts"
+                                    "maximumWarning": "2MB",
+                                    "maximumError": "4MB"
                                 }
                             ],
                             "outputHashing": "all"
@@ -72,23 +60,19 @@
                         "development": {
                             "optimization": false,
                             "extractLicenses": false,
-                            "sourceMap": true,
-                            "namedChunks": true
+                            "sourceMap": true
                         }
                     },
-                    "defaultConfiguration": "development"
+                    "defaultConfiguration": "production"
                 },
                 "serve": {
                     "builder": "@angular/build:dev-server",
-                    "options": {
-                        // "proxyConfig": "proxy.conf.json"
-                    },
                     "configurations": {
                         "production": {
-                            "buildTarget": "hubs:build:production"
+                            "buildTarget": "tagus:build:production"
                         },
                         "development": {
-                            "buildTarget": "hubs:build:development"
+                            "buildTarget": "tagus:build:development"
                         }
                     },
                     "defaultConfiguration": "development"
@@ -108,13 +92,7 @@
                         "assets": [
                             {
                                 "glob": "**/*",
-                                "input": "public",
-                                "output": "/"
-                            },
-                            {
-                                "glob": "**/*",
-                                "input": "src/assets",
-                                "output": "/assets"
+                                "input": "public"
                             }
                         ],
                         "styles": [

@@ -1,0 +1,224 @@
+<div class="quiz-container">
+  <!-- Quiz Header -->
+  <div class="breadcrumb-card mb-25 d-md-flex align-items-center justify-content-space-between">
+    <div>
+      <h5 class="mb-0">Quiz: {{quizTitle}}</h5>
+      <ol class="breadcrumb mb-0 ps-0">
+        <li class="breadcrumb-item">
+          <a routerLink="/">
+            <i class="ri-home-8-line"></i>
+            Home
+          </a>
+        </li>
+        <li class="breadcrumb-item">
+          <a routerLink="/course/learn/{{quizId}}">Course</a>
+        </li>
+        <li class="breadcrumb-item fw-semibold">Quiz</li>
+      </ol>
+    </div>
+    <div class="quiz-meta">
+      <mat-chip color="accent" selected>
+        <mat-icon matChipAvatar>schedule</mat-icon>
+        {{quizDuration}} minutes
+      </mat-chip>
+    </div>
+  </div>
+
+  <!-- Progress Bar -->
+  <mat-card class="mb-25 tagus-card progress-card">
+    <mat-card-content>
+      <div class="progress-info">
+        <div class="progress-text">
+          <span class="question-number">Question {{currentQuestionIndex + 1}} of {{questions.length}}</span>
+          <span class="progress-percentage">{{progress.toFixed(0)}}% Complete</span>
+        </div>
+        <mat-progress-bar mode="determinate" [value]="progress" class="progress-bar"></mat-progress-bar>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <div class="row">
+    <!-- Main Quiz Area -->
+    <div class="col-lg-8 col-md-12">
+      <!-- Question Card -->
+      <mat-card class="mb-25 tagus-card question-card" *ngIf="currentQuestion">
+        <mat-card-header class="question-header">
+          <div class="question-number-badge">
+            <mat-icon>help_outline</mat-icon>
+            <span>Question {{currentQuestionIndex + 1}}</span>
+          </div>
+          <mat-chip [color]="getQuestionTypeColor(currentQuestion.type)" selected class="type-chip">
+            <mat-icon matChipAvatar>{{getQuestionTypeIcon(currentQuestion.type)}}</mat-icon>
+            {{getQuestionTypeLabel(currentQuestion.type)}}
+          </mat-chip>
+        </mat-card-header>
+
+        <mat-card-content>
+          <h3 class="question-text">{{currentQuestion.question}}</h3>
+          
+          <!-- Single Choice Answers -->
+          <div *ngIf="currentQuestion.type === 'single_choice'" class="answers-container">
+            <div *ngFor="let answer of currentQuestion.answers" 
+                 class="answer-option single-choice"
+                 [class.selected]="isAnswerSelected(currentQuestion.id, answer.id)"
+                 (click)="onSingleChoiceChange(currentQuestion.id, answer.id)">
+              <mat-radio-button 
+                [checked]="isAnswerSelected(currentQuestion.id, answer.id)"
+                [name]="'question-' + currentQuestion.id">
+              </mat-radio-button>
+              <span class="answer-text">{{answer.text}}</span>
+            </div>
+          </div>
+
+          <!-- Multiple Choice Answers -->
+          <div *ngIf="currentQuestion.type === 'multiple_choice'" class="answers-container">
+            <div *ngFor="let answer of currentQuestion.answers" 
+                 class="answer-option multiple-choice"
+                 [class.selected]="isAnswerSelected(currentQuestion.id, answer.id)">
+              <mat-checkbox 
+                [checked]="isAnswerSelected(currentQuestion.id, answer.id)"
+                (change)="onMultipleChoiceChange(currentQuestion.id, answer.id, $event.checked)">
+              </mat-checkbox>
+              <span class="answer-text">{{answer.text}}</span>
+            </div>
+          </div>
+
+          <!-- True/False Answers -->
+          <div *ngIf="currentQuestion.type === 'true_false'" class="answers-container true-false-container">
+            <div *ngFor="let answer of currentQuestion.answers" 
+                 class="answer-option true-false-option"
+                 [class.selected]="isAnswerSelected(currentQuestion.id, answer.id)"
+                 (click)="onSingleChoiceChange(currentQuestion.id, answer.id)">
+              <mat-radio-button 
+                [checked]="isAnswerSelected(currentQuestion.id, answer.id)"
+                [name]="'question-' + currentQuestion.id">
+              </mat-radio-button>
+              <div class="true-false-content">
+                <mat-icon class="option-icon">{{answer.text === 'True' ? 'check_circle' : 'cancel'}}</mat-icon>
+                <span class="answer-text">{{answer.text}}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Text Answer -->
+          <div *ngIf="currentQuestion.type === 'text'" class="text-answer-container">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Your Answer</mat-label>
+              <textarea 
+                matInput 
+                rows="6" 
+                [value]="getTextAnswer(currentQuestion.id)"
+                (input)="onTextAnswerChange(currentQuestion.id, $any($event.target).value)"
+                placeholder="Type your answer here...">
+              </textarea>
+              <mat-hint>Please provide a detailed answer to the question above.</mat-hint>
+            </mat-form-field>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Navigation Buttons -->
+      <div class="navigation-buttons">
+        <button 
+          mat-stroked-button 
+          (click)="previousQuestion()"
+          [disabled]="isFirstQuestion"
+          class="nav-btn">
+          <mat-icon>arrow_back</mat-icon>
+          Previous
+        </button>
+        
+        <button 
+          *ngIf="!isLastQuestion"
+          mat-raised-button 
+          color="primary"
+          (click)="nextQuestion()"
+          class="nav-btn">
+          Next
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+        
+        <button 
+          *ngIf="isLastQuestion"
+          mat-raised-button 
+          color="primary"
+          (click)="submitQuiz()"
+          [disabled]="!canSubmit"
+          class="nav-btn submit-btn">
+          <mat-icon>send</mat-icon>
+          Submit Quiz
+        </button>
+      </div>
+    </div>
+
+    <!-- Sidebar: Question Navigator -->
+    <div class="col-lg-4 col-md-12">
+      <mat-card class="question-navigator">
+        <mat-card-content>
+          <!-- Timer Display -->
+          <div class="timer-container-in-navigator" 
+               [class.timer-warning]="isTimeWarning() && !isTimeCritical()"
+               [class.timer-critical]="isTimeCritical()">
+            <div class="timer-header-nav">
+              <mat-icon class="timer-icon-nav">timer</mat-icon>
+              <span class="timer-title-nav">Time Remaining</span>
+            </div>
+            <div class="timer-value-nav" 
+                 [class.warning-text]="isTimeWarning() && !isTimeCritical()"
+                 [class.critical-text]="isTimeCritical()">
+              {{getFormattedTime()}}
+            </div>
+            <mat-progress-bar 
+              mode="determinate" 
+              [value]="getTimeRemainingPercentage()"
+              class="timer-progress-nav">
+            </mat-progress-bar>
+            <div class="timer-footer-nav">
+              <span *ngIf="isTimeCritical()" class="critical-warning-nav">
+                <mat-icon>warning</mat-icon>
+                Auto-submit when time runs out
+              </span>
+              <span *ngIf="!isTimeCritical() && isTimeWarning()" class="warning-text-nav">
+                <mat-icon>schedule</mat-icon>
+                Less than 5 minutes
+              </span>
+            </div>
+          </div>
+
+          <mat-divider class="timer-divider"></mat-divider>
+          <div class="questions-grid">
+            <div 
+              *ngFor="let question of questions; let i = index"
+              class="question-navigator-item"
+              [class.current]="i === currentQuestionIndex"
+              [class.answered]="getQuestionStatus(i) === 'answered'"
+              [class.unanswered]="getQuestionStatus(i) === 'unanswered'"
+              (click)="goToQuestion(i)">
+              <mat-icon class="status-icon">
+                {{getQuestionStatus(i) === 'answered' ? 'check_circle' : 
+                  getQuestionStatus(i) === 'current' ? 'radio_button_checked' : 'radio_button_unchecked'}}
+              </mat-icon>
+              <span class="question-number">{{i + 1}}</span>
+            </div>
+          </div>
+          
+          <div class="legend">
+            <div class="legend-item">
+              <div class="legend-color current"></div>
+              <span>Current Question</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color answered"></div>
+              <span>Answered</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color unanswered"></div>
+              <span>Not Answered</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>
+

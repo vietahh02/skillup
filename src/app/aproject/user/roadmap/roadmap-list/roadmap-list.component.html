@@ -1,0 +1,195 @@
+<div class="roadmap-container">
+  <!-- Hero Section -->
+  <mat-card class="tagus-card hero-card">
+    <mat-card-content>
+      <div class="hero-content">
+        <div class="hero-badge">
+          <mat-icon>map</mat-icon>
+          <span>Choose Your Path</span>
+        </div>
+        
+        <h1 class="hero-title">Learning Roadmaps</h1>
+        <p class="hero-description">
+          Discover structured learning paths designed to take you from beginner to expert. 
+          Pick a roadmap that matches your goals and start your journey today.
+        </p>
+
+        <div class="hero-stats">
+          <div class="stat-box">
+            <div class="stat-value">{{roadmaps.length}}</div>
+            <div class="stat-label">Available Roadmaps</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">{{enrolledRoadmaps.length}}</div>
+            <div class="stat-label">Your Active Roadmaps</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">{{categories.length - 1}}</div>
+            <div class="stat-label">Categories</div>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Search and Filter Section -->
+  <div class="filter-section">
+    <mat-card class="tagus-card">
+      <mat-card-content>
+        <div class="filter-header">
+          <h3>Explore Roadmaps</h3>
+          <div class="search-container">
+            <div class="search-box">
+              <mat-icon class="search-icon">search</mat-icon>
+              <input type="text" placeholder="Search roadmaps..." [(ngModel)]="searchTerm" (input)="search()">
+            </div>
+          </div>
+        </div>
+        
+        <div class="category-filters">
+          <button 
+            *ngFor="let category of categories"
+            mat-flat-button 
+            [class.active]="selectedCategory === category"
+            class="category-btn"
+            (click)="selectCategory(category)">
+            {{category}}
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- My Active Roadmaps -->
+  <div class="active-roadmaps-section" *ngIf="enrolledRoadmaps.length > 0">
+    <h2 class="section-title">
+      Your Active Roadmaps
+    </h2>
+    
+    <div class="roadmaps-grid active-grid">
+      <mat-card 
+        class="tagus-card roadmap-card active-roadmap" 
+        *ngFor="let roadmap of enrolledRoadmaps"
+        (click)="detailRoadmap(roadmap)">
+        <mat-card-content>
+          <div class="roadmap-header">
+            <div class="roadmap-meta">
+              <span class="category-badge">{{roadmap.category}}</span>
+              <span class="level-badge" [ngClass]="getLevelClass(roadmap.level)">{{roadmap.level}}</span>
+            </div>
+          </div>
+
+          <h3 class="roadmap-title">{{roadmap.title}}</h3>
+          <p class="roadmap-description">{{roadmap.description}}</p>
+
+          <div class="progress-section">
+            <div class="progress-info">
+              <span class="progress-label">Progress</span>
+              <span class="progress-value">{{roadmap.progress}}%</span>
+            </div>
+            <mat-progress-bar mode="determinate" [value]="roadmap.progress"></mat-progress-bar>
+          </div>
+
+          <div class="roadmap-stats">
+            <div class="stat-item">
+              <mat-icon>person</mat-icon>
+              <span>{{roadmap.instructor}}</span>
+            </div>
+            <div class="stat-item">
+              <mat-icon>schedule</mat-icon>
+              <span>{{roadmap.duration}}</span>
+            </div>
+            <div class="stat-item">
+              <mat-icon>library_books</mat-icon>
+              <span>{{roadmap.courses}} courses</span>
+            </div>
+          </div>
+
+          <div class="skills-section">
+            <div class="skill-chip" *ngFor="let skill of roadmap.skills.slice(0, 3)">{{skill}}</div>
+            <div class="skill-chip more" *ngIf="roadmap.skills.length > 3">+{{roadmap.skills.length - 3}}</div>
+          </div>
+
+          <button mat-flat-button color="primary" class="continue-btn" (click)="continueRoadmap(roadmap, $event)">
+            <mat-icon>play_arrow</mat-icon>
+            Continue Learning
+          </button>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- All Roadmaps -->
+  <div class="all-roadmaps-section">
+    <h2 class="section-title">
+      All Learning Roadmaps
+    </h2>
+    
+    <div class="roadmaps-grid">
+      <mat-card 
+        class="tagus-card roadmap-card" 
+        *ngFor="let roadmap of filteredRoadmaps"
+        [class.enrolled]="roadmap.isEnrolled"
+        (click)="detailRoadmap(roadmap)">
+        <mat-card-content>
+          <div class="roadmap-header">
+            <div class="roadmap-meta">
+              <span class="category-badge">{{roadmap.category}}</span>
+              <span class="level-badge" [ngClass]="getLevelClass(roadmap.level)">{{roadmap.level}}</span>
+            </div>
+          </div>
+
+          <h3 class="roadmap-title">{{roadmap.title}}</h3>
+          <p class="roadmap-description">{{roadmap.description}}</p>
+
+          <div class="roadmap-stats">
+            <div class="stat-item">
+              <mat-icon>person</mat-icon>
+              <span>{{roadmap.instructor}}</span>
+            </div>
+            <div class="stat-item">
+              <mat-icon>schedule</mat-icon>
+              <span>{{roadmap.duration}}</span>
+            </div>
+            <div class="stat-item">
+              <mat-icon>library_books</mat-icon>
+              <span>{{roadmap.courses}} courses</span>
+            </div>
+          </div>
+
+          <div class="skills-section">
+            <div class="skill-chip" *ngFor="let skill of roadmap.skills.slice(0, 4)">{{skill}}</div>
+            <div class="skill-chip more" *ngIf="roadmap.skills.length > 4">+{{roadmap.skills.length - 4}}</div>
+          </div>
+
+          <div class="roadmap-footer">
+
+            <button 
+              mat-flat-button 
+              [color]="roadmap.isEnrolled ? 'primary' : 'accent'"
+              class="action-btn"
+              (click)="roadmap.isEnrolled ? continueRoadmap(roadmap, $event) : enrollRoadmap(roadmap, $event)">
+              <mat-icon>{{roadmap.isEnrolled ? 'play_arrow' : 'add'}}</mat-icon>
+              {{roadmap.isEnrolled ? 'Continue' : 'Enroll Now'}}
+            </button>
+
+            <div class="enrollment-status" *ngIf="roadmap.isEnrolled">
+              <mat-icon class="enrolled-icon">check_circle</mat-icon>
+              <span>Enrolled</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="filteredRoadmaps.length === 0">
+    <mat-icon>search_off</mat-icon>
+    <h3>No roadmaps found</h3>
+    <p>Try adjusting your search or category filter to find the perfect learning path.</p>
+    <button mat-flat-button color="primary" (click)="selectCategory('All'); searchTerm = ''">
+      Show All Roadmaps
+    </button>
+  </div>
+</div>

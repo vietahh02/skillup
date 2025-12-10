@@ -1,0 +1,57 @@
+<div
+    class="pt-50 pb-50"
+>
+    <div class="d-table">
+        <div class="d-table-cell">
+            <div [formGroup]="loginForm" class="tagus-form ms-auto me-auto">
+                <div class="title">
+                    <div class="d-flex mb-10 align-items-center">
+                        <h2 class="mb-0 me-30">Get Started</h2>
+                        <img src="img/logo-icon.png" alt="logo-icon">
+                    </div>
+                </div>
+                    <div class="login-with-socials d-md-flex align-items-center justify-content-space-between">
+                        <button mat-flat-button class="gray fw-semibold d-block me-5 btn-google" (click)="loginWithGoogle()">
+                            <img src="img/icon/google.png" alt="google"> Login with Google
+                        </button>
+                    </div>
+                    <div class="or text-center position-relative">
+                        <span class="fw-semibold fs-16">or</span>
+                    </div>
+                    <div  class="bg-white border-radius pt-20 ps-20 pe-20 pb-20">
+                        <div class="tagus-form-group without-icon">
+                            <label class="d-block mb-12 fw-semibold gray-color">Email Address <span>*</span></label>
+                            <mat-form-field appearance="fill">
+                                <mat-label>Enter email address</mat-label>
+                                <input matInput formControlName="email" (keypress)="onKeyDown($event)">
+                                <mat-error *ngIf="loginForm.controls['email'].hasError('required')">Email is required</mat-error>
+                                <mat-error *ngIf="loginForm.controls['email'].hasError('email')">Invalid email format</mat-error>
+                                <mat-error *ngIf="loginForm.controls['email'].hasError('maxlength')">Email must be less than 255 characters</mat-error>
+                            </mat-form-field>
+                        </div>
+                        <div class="tagus-form-group without-icon">
+                            <label class="d-block mb-12 fw-semibold gray-color">Password <span>*</span></label>
+                            <mat-form-field appearance="fill">
+                                <mat-label>Enter your password</mat-label>
+                                <input matInput formControlName="password" [type]="hide ? 'password' : 'text'" (keypress)="onKeyDown($event)">
+                                <button mat-icon-button matSuffix (click)="hide = !hide" [attr.aria-label]="'Hide password'" [attr.aria-pressed]="hide">
+                                    <mat-icon>{{hide ? 'visibility_off' : 'visibility'}}</mat-icon>
+                                </button>
+                                <mat-error *ngIf="loginForm.controls['password'].hasError('required')">Password is required</mat-error>
+                                <mat-error *ngIf="loginForm.controls['password'].hasError('minlength')">
+                                    Minimum 6 characters
+                                </mat-error>
+                                <mat-error *ngIf="loginForm.controls['password'].hasError('maxlength')">Password must be less than 255 characters</mat-error>
+                            </mat-form-field>
+                        </div>
+
+                        <div class="d-flex info align-items-center justify-content-space-between">
+                            <mat-checkbox class="gray-color" formControlName="rememberMe" [checked]="loginForm.value.rememberMe">Remember me</mat-checkbox>
+                            <a routerLink="/authentication/forgot-password" class="d-inline-block main-color fw-medium">Forgot your password?</a>
+                        </div>
+                        <button mat-flat-button class="tagus d-block fw-semibold" (click)="onSubmit()" (keypress)="onKeyDown($event)">Log In</button>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>

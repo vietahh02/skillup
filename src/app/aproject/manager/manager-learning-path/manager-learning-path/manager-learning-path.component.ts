@@ -1,0 +1,385 @@
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+import { LearningPathService } from '../../../../services/learning-path.service';
+import { LearningPath, DetailedEnrollment } from '../../../../models/learning-path.models';
+import { firstValueFrom } from 'rxjs';
+
+@Component({
+  selector: 'app-manager-learning-path',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatCardModule,
+    MatButtonModule,
+    MatIconModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatProgressBarModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
+    MatTooltipModule,
+    MatMenuModule,
+    MatDividerModule,
+    MatFormFieldModule,
+    MatSelectModule
+  ],
+  templateUrl: './manager-learning-path.component.html',
+  styleUrls: ['./manager-learning-path.component.scss']
+})
+export class ManagerLearningPathComponent implements OnInit {
+  // View state
+  currentView: 'paths' | 'progress' = 'paths';
+
+  // Stats data for cards
+  totalPaths = 0;
+  activePaths = 0;
+  totalEnrolledUsers = 0;
+  averageCompletionRate = 0;
+
+  // Enrollment statistics (for User tab cards)
+  totalEnrollments = 0;
+  activeEnrollments = 0;
+  completedEnrollments = 0;
+
+  // Learning Paths table data
+  displayedColumns: string[] = ['roadmap', 'level', 'duration', 'users', 'avgProgress', 'status', 'created', 'actions'];
+  dataSource: LearningPath[] = [];
+  total = 0;
+  currentPage = 1;
+  pageSize = 10;
+  searchTerm = '';
+  isLoading = false;
+
+  // User Progress table data
+  progressDisplayedColumns: string[] = ['user', 'learningPath', 'enrollmentType', 'progress', 'status', 'startDate', 'actions'];
+  progressDataSource: DetailedEnrollment[] = [];
+  progressTotal = 0;
+  progressCurrentPage = 1;
+  progressPageSize = 10;
+  progressSearchTerm = '';
+  progressFilterType: 'all' | 'assigned' | 'self-enrolled' = 'all';
+  isLoadingProgress = false;
+
+  constructor(
+    private router: Router,
+    private learningPathService: LearningPathService,
+    private snackBar: MatSnackBar
+  ) {}
+
+  ngOnInit(): void {
+    this.loadLearningPaths();
+    this.loadStats();
+    this.loadUserProgress();
+  }
+
+  maxLengthText(text: string) : boolean {
+    return text.length > 20;
+  }
+
+  formatText(text: string) : string {
+      return this.maxLengthText(text) ? text.substring(0, 20) + '...' : text;
+  }
+
+  exportToExcel(): void {
+    this.isLoadingProgress = true;
+    
+    this.learningPathService.exportUserProgressExcel(
+      this.progressSearchTerm,
+      this.progressFilterType
+    ).subscribe({
+      next: (blob: Blob) => {
+        // Create download link
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        
+        // Generate filename with current date
+        const date = new Date();
+        const dateStr = date.toISOString().split('T')[0];
+        const filterStr = this.progressFilterType !== 'all' ? `-${this.progressFilterType}` : '';
+        link.download = `user-progress-tracking${filterStr}-${dateStr}.xlsx`;
+        
+        // Trigger download
+        document.body.appendChild(link);
+        link.click();
+        
+        // Cleanup
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        
+        this.isLoadingProgress = false;
+        this.snackBar.open('Export to Excel completed successfully', 'Close', {
+          duration: 3000,
+          panelClass: ['success-snackbar', 'custom-snackbar'],
+          horizontalPosition: 'right',
+          verticalPosition: 'top'
+        });
+      },
+      error: (error) => {
+        console.error('Error exporting to Excel:', error);
+        this.isLoadingProgress = false;
+        this.snackBar.open('Failed to export Excel file', 'Close', {
+          duration: 3000,
+          panelClass: ['error-snackbar', 'custom-snackbar'],
+          horizontalPosition: 'right',
+          verticalPosition: 'top'
+        });
+      }
+    });
+  }
+
+  loadLearningPaths(): void {
+    this.isLoading = true;
+    this.learningPathService.getLearningPaths(this.currentPage, this.pageSize, this.searchTerm).subscribe({
+      next: (response) => {
+        this.dataSource = response.items;
+        this.total = response.total;
+        this.currentPage = response.page;
+        this.pageSize = response.pageSize;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error loading learning paths:', error);
+        this.snackBar.open('Failed to load learning paths', 'Close', { duration: 3000 });
+        this.isLoading = false;
+      }
+    });
+  }
+
+  loadStats(): void {
+    this.learningPathService.getStatistics().subscribe({
+      next: (stats) => {
+        this.totalPaths = stats.totalPaths;
+        this.activePaths = stats.activePaths;
+        this.totalEnrolledUsers = stats.totalEnrolledUsers;
+        this.averageCompletionRate = stats.averageCompletionRate;
+      },
+      error: (error) => {
+        console.error('Error loading statistics:', error);
+        this.snackBar.open('Failed to load statistics', 'Close', { duration: 3000 });
+      }
+    });
+  }
+
+
+  loadUserProgress(): void {
+    this.isLoadingProgress = true;
+    // Load with larger pageSize to get all data for filtering
+    this.learningPathService.getAllEnrollments(1, 1000, this.progressSearchTerm).subscribe({
+      next: (response) => {
+        // Filter by enrollment type if needed
+        let filteredItems = response.items;
+        if (this.progressFilterType === 'assigned') {
+          filteredItems = response.items.filter(item => item.enrollmentType === 'assigned');
+        } else if (this.progressFilterType === 'self-enrolled') {
+          filteredItems = response.items.filter(item => item.enrollmentType === 'self-enrolled');
+        }
+        
+        // Apply pagination to filtered results
+        const startIndex = (this.progressCurrentPage - 1) * this.progressPageSize;
+        const endIndex = startIndex + this.progressPageSize;
+        const paginatedItems = filteredItems.slice(startIndex, endIndex);
+        
+        this.progressDataSource = paginatedItems;
+        this.progressTotal = filteredItems.length; // Use filtered count
+        this.progressCurrentPage = this.progressCurrentPage;
+        this.progressPageSize = this.progressPageSize;
+        this.isLoadingProgress = false;
+      },
+      error: (error) => {
+        console.error('Error loading user progress:', error);
+        this.snackBar.open('Failed to load user progress', 'Close', { duration: 3000 });
+        this.isLoadingProgress = false;
+      }
+    });
+  }
+
+  onFilterTypeChange(): void {
+    this.progressCurrentPage = 1;
+    this.loadUserProgress();
+  }
+
+  searchPaths(): void {
+    this.currentPage = 1;
+    this.loadLearningPaths();
+  }
+
+  searchProgress(): void {
+    this.progressCurrentPage = 1;
+    this.loadUserProgress();
+  }
+
+  onPaginatorChange(event: PageEvent): void {
+    this.pageSize = event.pageSize;
+    this.currentPage = event.pageIndex + 1;
+    this.loadLearningPaths();
+  }
+
+  onProgressPaginatorChange(event: PageEvent): void {
+    this.progressPageSize = event.pageSize;
+    this.progressCurrentPage = event.pageIndex + 1;
+    this.loadUserProgress();
+  }
+
+  switchView(view: 'paths' | 'progress'): void {
+    this.currentView = view;
+  }
+
+  createPath(): void {
+    this.router.navigate(['/manager/learning-paths/create']);
+  }
+
+  viewPath(path: LearningPath): void {
+    this.router.navigate(['/manager/learning-paths/detail', path.learningPathId]);
+  }
+
+  editPath(path: LearningPath): void {
+    this.router.navigate(['/manager/learning-paths/edit', path.learningPathId]);
+  }
+
+  async togglePathStatus(path: LearningPath): Promise<void> {
+    const isActive = path.status === 'Active';
+    const newStatus = isActive ? 'Inactive' : 'Active';
+    const action = isActive ? 'deactivate' : 'activate';
+    const confirmMsg = `Are you sure you want to ${action} "${path.name}"?\n\n${
+      isActive
+        ? 'This learning path will be marked as Inactive. Users will no longer see it.'
+        : 'This learning path will be marked as Active. Users will be able to see and enroll in it.'
+    }`;
+
+    if (!confirm(confirmMsg)) {
+      return;
+    }
+
+    try {
+      // Call the new status update API
+      await firstValueFrom(
+        this.learningPathService.updateLearningPathStatus(path.learningPathId, newStatus)
+      );
+      this.snackBar.open(`Learning path ${action}d successfully`, 'Close', { duration: 3000 });
+      this.loadLearningPaths();
+      this.loadStats();
+    } catch (error) {
+      console.error(`Error ${action}ing learning path:`, error);
+      this.snackBar.open(`Failed to ${action} learning path`, 'Close', { duration: 3000 });
+    }
+  }
+
+  async deletePath(path: LearningPath): Promise<void> {
+    const confirmMsg = `⚠️ WARNING: Delete "${path.name}"?\n\nThis learning path will be soft deleted (IsDeleted = true).\nIt will remain in the database but won't be visible.\n\nAll user enrollments and progress data will be preserved.`;
+
+    if (!confirm(confirmMsg)) {
+      return;
+    }
+
+    try {
+      // Soft delete - set IsDeleted = true in database
+      await firstValueFrom(
+        this.learningPathService.deleteLearningPath(path.learningPathId)
+      );
+      this.snackBar.open('Learning path deleted successfully', 'Close', { duration: 3000 });
+      this.loadLearningPaths();
+      this.loadStats();
+    } catch (error) {
+      console.error('Error deleting learning path:', error);
+      this.snackBar.open('Failed to delete learning path', 'Close', { duration: 3000 });
+    }
+  }
+
+  // Helper methods
+  getPathStatusClass(status?: string): string {
+    switch (status) {
+      case 'Active':
+        return 'text-soft-success';
+      case 'Inactive':
+        return 'text-soft-danger';
+      case 'Draft':
+        return 'text-soft-warning';
+      default:
+        return 'text-soft-success';
+    }
+  }
+
+  getLevelBadgeClass(level?: string): string {
+    if (!level) return 'level-default';
+
+    switch (level.toLowerCase()) {
+      case 'intern':
+        return 'level-intern';
+      case 'fresher':
+        return 'level-fresher';
+      case 'junior':
+        return 'level-junior';
+      case 'middle':
+      case 'intermediate':
+        return 'level-middle';
+      case 'senior':
+        return 'level-senior';
+      case 'leader':
+        return 'level-leader';
+      default:
+        return 'level-default';
+    }
+  }
+
+  getStatusBadgeClass(status: string): string {
+    switch (status) {
+      case 'Completed':
+        return 'text-soft-success';
+      case 'InProgress':
+        return 'text-soft-info';
+      case 'NotStarted':
+        return 'text-soft-secondary';
+      default:
+        return '';
+    }
+  }
+
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  }
+
+  // User Progress Actions
+  viewEnrollmentProgress(enrollment: DetailedEnrollment): void {
+    // Navigate to user detail page instead
+    this.router.navigate(['/manager/users', enrollment.userId]);
+  }
+
+  async unenrollUser(enrollment: DetailedEnrollment): Promise<void> {
+    if (!confirm(`Are you sure you want to unenroll "${enrollment.userName}" from "${enrollment.learningPathName}"?`)) {
+      return;
+    }
+
+    try {
+      await firstValueFrom(
+        this.learningPathService.unenrollFromLearningPath(enrollment.learningPathEnrollmentId)
+      );
+      this.snackBar.open('User unenrolled successfully', 'Close', { duration: 3000 });
+      this.loadUserProgress();
+    } catch (error) {
+      console.error('Error unenrolling user:', error);
+      this.snackBar.open('Failed to unenroll user', 'Close', { duration: 3000 });
+    }
+  }
+}

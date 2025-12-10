@@ -1,0 +1,40 @@
+<div class="create-dialog-box">
+    <div class="title d-flex align-items-center justify-content-space-between">
+        <h4 class="mb-0">{{ isEdit ? 'Edit Lesson' : 'Create New Lesson' }}</h4>
+        <button class="close-btn bg-transparent p-0 border-none" (click)="close()"><i class="flaticon-close"></i></button>
+    </div>
+    <form [formGroup]="lessonForm" (ngSubmit)="onSubmit()">
+        <div class="row">
+            <div class="col-lg-12 col-md-12">
+                <div class="form-group">
+                    <label class="d-block fw-semibold">Name <span class="text-danger">*</span></label>
+                    <input type="text" class="input-control" placeholder="Event Name" formControlName="name">
+                    <div *ngIf="lessonForm.get('name')?.hasError('required') && lessonForm.get('name')?.touched" class="error-message">
+                        Name is required
+                    </div>
+                    <div *ngIf="lessonForm.get('name')?.hasError('maxlength') && lessonForm.get('name')?.touched" class="error-message">
+                        Name must be less than 200 characters
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12 col-md-12">
+                <div class="form-group">
+                    <label class="d-block fw-semibold">Description <span class="text-danger">*</span></label>
+                    <textarea class="input-control" rows="3" placeholder="Description" formControlName="description"></textarea>
+                    <div *ngIf="lessonForm.get('description')?.hasError('required') && lessonForm.get('description')?.touched" class="error-message">
+                        Description is required
+                    </div>
+                    <div *ngIf="lessonForm.get('description')?.hasError('maxlength') && lessonForm.get('description')?.touched" class="error-message">
+                        Description must be less than 1000 characters
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="text-end">
+            <button type="button" class="gray" (click)="close()"><i class="ri-close-fill"></i> Cancel</button>
+            <button type="button" (click)="onSubmit()"> <i class="ri-add-fill"></i> Save</button>
+        </div>
+    </form>
+</div>

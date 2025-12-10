@@ -1,0 +1,89 @@
+.tagus-mat-table {
+  width: 100%;
+  min-width: 1000px;
+}
+
+.search {
+    margin: 15px 0;
+}
+
+.search-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.error-message {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.role-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 500;
+  text-transform: capitalize;
+  font-size: 13px;
+  text-align: center;
+  min-width: 80px;
+}
+
+.actions-container {
+  justify-content: center;
+  display: flex;
+}
+
+/* Màu sắc theo role */
+.employee {
+  background-color: #dbeafe; /* xanh nhạt */
+  color: #1e3a8a;
+}
+
+.lecturer {
+  background-color: #fef9c3; /* vàng nhạt */
+  color: #854d0e;
+}
+
+.admin {
+  background-color: #fca5a5; /* đỏ nhạt */
+  color: #7f1d1d;
+}
+
+.manager {
+  background-color: #bbf7d0; /* xanh lá nhạt */
+  color: #14532d;
+}
+
+/* Loading styles */
+.loading-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.loading-text {
+  padding: 10px 20px;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  font-weight: 500;
+}
+
+.recentOrdersTable {
+  position: relative;
+}
+
+table.loading {
+  opacity: 0.5;
+  pointer-events: none;
+}

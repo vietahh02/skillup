@@ -1,0 +1,43 @@
+.search {
+  margin: 15px 0;
+}
+
+.title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  button {
+    position: relative;
+    top: -10px;
+  }
+}
+
+tr.example-element-row:not(.example-expanded-row):hover {
+    background: whitesmoke;
+}
+
+tr.example-element-row:not(.example-expanded-row):active {
+    background: #efefef;
+}
+
+.actions-container {
+  display: flex;
+  gap: 4px;
+}
+
+.gap-2 {
+  gap: 1em;
+}
+
+.clear-btn {
+  color: #efefef;
+}
+
+.error-message {
+  color: #f44336;
+  font-size: 12px;
+  margin-top: 4px;
+  font-weight: 500;
+  position: absolute;
+}

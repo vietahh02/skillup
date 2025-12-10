@@ -1,0 +1,48 @@
+<div class="video-player-dialog">
+    <h2 mat-dialog-title class="dialog-title">
+      <mat-icon>play_circle</mat-icon>
+      {{data.title}}
+    </h2>
+    
+    <mat-dialog-content class="dialog-content">
+      <div class="video-container">
+        <video 
+          #videoPlayer
+          controls 
+          preload="metadata"
+          [src]="data.contentUrl"
+          (loadedmetadata)="onVideoLoaded()"
+          (error)="onVideoError()"
+          class="video-element">
+          <source [src]="data.contentUrl" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+        
+        <!-- Fallback for demo - since we don't have real videos -->
+        <div *ngIf="showFallback" class="video-fallback">
+          <mat-icon class="large-icon">movie</mat-icon>
+          <h3>Video Preview</h3>
+          <p>{{data.title}}</p>
+          <p class="fallback-note">
+            This is a demo - the actual video would play here.<br>
+            Video URL: {{data.contentUrl}}
+          </p>
+          <button mat-raised-button color="primary" (click)="simulatePlay()">
+            <mat-icon>play_arrow</mat-icon>
+            Simulate Play
+          </button>
+        </div>
+      </div>
+    </mat-dialog-content>
+
+    <mat-dialog-actions class="dialog-actions">
+      <button mat-button (click)="close()">
+        <mat-icon>close</mat-icon>
+        Close
+      </button>
+      <button mat-raised-button color="primary" (click)="toggleFullscreen()" *ngIf="!showFallback">
+        <mat-icon>fullscreen</mat-icon>
+        Fullscreen
+      </button>
+    </mat-dialog-actions>
+  </div>

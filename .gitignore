@@ -19,6 +19,7 @@ yarn-error.log
 *.launch
 .settings/
 *.sublime-workspace
+.cursor/
 
 # Visual Studio Code
 .vscode/*
@@ -40,5 +41,3 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
-
-.yarn/

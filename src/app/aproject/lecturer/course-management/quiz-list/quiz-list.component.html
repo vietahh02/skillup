@@ -1,0 +1,106 @@
+<mat-card class="mb-25 tagus-card">
+    <div class="search">
+        <div class="title">
+            <h5>Quiz Management</h5>
+        </div>
+
+        <div>
+            <div class="tagus-search-box">
+                <input type="text" class="input-search border-radius" placeholder="Search quiz..." [(ngModel)]="searchTerm" (keyup.enter)="search()">
+                <button mat-flat-button class="tagus" (click)="search()"><i class="ri-search-line"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <mat-card-content>
+        <div class="mat-elevation-z8 recentOrdersTable tagus-mat-table">
+            <table mat-table [dataSource]="data">
+
+                <!-- Quiz ID Column -->
+                <ng-container matColumnDef="quizId">
+                    <th mat-header-cell *matHeaderCellDef>ID</th>
+                    <td mat-cell *matCellDef="let element">{{element.quizId}}</td>
+                </ng-container>
+
+                <!-- Quiz Title Column -->
+                <ng-container matColumnDef="title">
+                    <th mat-header-cell *matHeaderCellDef>Quiz Title</th>
+                    <td mat-cell *matCellDef="let element" [matTooltip]="maxLengthText(element.title) ? element.title : ''">{{formatText(element.title)}}</td>
+                </ng-container>
+
+                <!-- Course Name Column -->
+                <ng-container matColumnDef="courseName">
+                    <th mat-header-cell *matHeaderCellDef>Course</th>
+                    <td mat-cell *matCellDef="let element" [matTooltip]="maxLengthText(element.courseName) ? element.courseName : ''">{{formatText(element.courseName)}}</td>
+                </ng-container>
+
+                <!-- Questions Count Column -->
+                <ng-container matColumnDef="questionsCount">
+                    <th mat-header-cell *matHeaderCellDef>Questions</th>
+                    <td mat-cell *matCellDef="let element">{{element.questions?.length || 0}}</td>
+                </ng-container>
+
+                <!-- Pass Score Column -->
+                <ng-container matColumnDef="passScore">
+                    <th mat-header-cell *matHeaderCellDef>Pass Score</th>
+                    <td mat-cell *matCellDef="let element">{{element.passScore}}%</td>
+                </ng-container>
+
+                <!-- Attempt Limit Column -->
+                <ng-container matColumnDef="attemptLimit">
+                    <th mat-header-cell *matHeaderCellDef>Attempts</th>
+                    <td mat-cell *matCellDef="let element">{{element.attemptLimit}}</td>
+                </ng-container>
+
+                <!-- Created Date Column -->
+                <ng-container matColumnDef="createdAt">
+                    <th mat-header-cell *matHeaderCellDef>Created</th>
+                    <td mat-cell *matCellDef="let element">{{element.createdAt | date:'short'}}</td>
+                </ng-container>
+
+                <!-- Actions Column -->
+                <ng-container matColumnDef="action">
+                    <th mat-header-cell *matHeaderCellDef>Actions</th>
+                    <td mat-cell *matCellDef="let element">
+                        <div class="actions-container">
+                            <button
+                                mat-icon-button
+                                matTooltip="View Quiz"
+                                (click)="viewQuiz(element)"
+                            >
+                                <mat-icon>visibility</mat-icon>
+                            </button>
+                            <button
+                                mat-icon-button
+                                matTooltip="Edit Quiz"
+                                (click)="editQuiz(element)"
+                            >
+                                <mat-icon>edit</mat-icon>
+                            </button>
+                            <button
+                                mat-icon-button
+                                matTooltip="Delete Quiz"
+                                (click)="deleteQuiz(element)"
+                            >
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </div>
+                    </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="example-element-row"></tr>
+
+            </table>
+            <mat-paginator
+                [pageSizeOptions]="[5, 10, 20, 50]"
+                showFirstLastButtons
+                [pageSize]="pageSize"
+                [pageIndex]="currentPage - 1"
+                (page)="onPaginatorChange($event)"
+                [disabled]="false"
+                [length]="totalItems">
+            </mat-paginator>
+        </div>
+    </mat-card-content>
+</mat-card>

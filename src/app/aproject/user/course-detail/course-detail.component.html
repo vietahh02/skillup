@@ -1,0 +1,282 @@
+<div class="breadcrumb-card mb-25 d-md-flex align-items-center justify-content-space-between">
+    <h5 class="mb-0">Course Details</h5>
+    <ol class="breadcrumb mb-0 ps-0">
+        <li class="breadcrumb-item">
+            <a routerLink="/">
+                <i class="ri-home-8-line"></i>
+                Home
+            </a>
+        </li>
+        <li class="breadcrumb-item fw-semibold">Course Details</li>
+    </ol>
+</div>
+
+<mat-card class="mb-25 tagus-card">
+    <mat-card-content>
+        <div class="course-details-header mb-25 border-radius">
+            <div class="d-md-flex mb-25 align-items-top">
+                <img [src]="course.imageUrl || 'img/lms/lms1.jpg'" class="border-radius" width="200" alt="lms">
+                <h3 class="mb-0 ms-20 text-white" [title]="maxLengthText(course.name) ? course.name : ''">{{formatText(course.name) || ''}}</h3>
+            </div>
+            <!-- <p class="text-white">{{course.description || ''}}</p> -->
+             <div>
+                 <a mat-raised-button class="tagus mt-10" (click)="enrollCourse()">{{course.isEnrolled ? 'Continue' : 'Enroll Now'}}</a>
+             </div>
+        </div>
+        <div class="course-details-desc">
+            <div class="d-md-flex meta mb-25 pb-25 justify-content-space-between align-items-center">
+                <ul class="list mb-0 d-md-flex mt-0 ps-0">
+                    <li class="gray-color fw-semibold">
+                        Course For
+                        <span class="d-block fw-semibold position-relative"><i class="ri-bar-chart-2-line"></i> {{course.targetLevel || ''}}</span>
+                    </li>
+                    <li class="gray-color fw-semibold">
+                        Lecturer
+                        <div class="d-flex align-items-center">
+                            <img [src]="course.lecturerImageUrl || 'img/user/user2.jpg'" class="rounded-circle" width="30" alt="user">
+                            <span class="d-block fw-semibold">{{course.createdByName || ''}}</span>
+                        </div>
+                    </li>
+                    <li class="gray-color fw-semibold">
+                        Course Duration
+                        <span class="d-block fw-semibold position-relative"><i class="ri-time-line"></i> {{formatSeconds(totalDuration) || 0}}</span>
+                    </li>
+                </ul>
+                <!-- <div class="rating-box text-end">
+                    <span class="d-block mb-10 fw-semibold gray-color">20 Ratings</span>
+                    <div class="rating">
+                        <i class="flaticon-star-1"></i>
+                        <i class="flaticon-star-1"></i>
+                        <i class="flaticon-star-1"></i>
+                        <i class="flaticon-star-2"></i>
+                        <i class="flaticon-star"></i>
+                    </div>
+                </div> -->
+            </div>
+            <div class="row">
+                <div class="col-lg-6 col-md-12">
+                    <h5 class="mb-25">Table Of Contents</h5>
+                    <mat-accordion>
+                        <mat-expansion-panel *ngFor="let lesson of course.lessons">
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    {{lesson.title}}
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <ul class="mb-0 mt-0 ps-0 content-list">
+                                <li class="d-flex align-items-center justify-content-space-between" *ngFor="let subLesson of lesson.subLessons">
+                                    <span class="d-block gray-color fw-medium position-relative"><i class="ri-play-circle-line"></i> {{subLesson.title}}</span>
+                                    <span class="badge" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                                                color: white;
+                                                                padding: 4px 12px;
+                                                                border-radius: 6px;
+                                                                font-size: 12px;
+                                                                font-weight: 600;">
+                                        {{formatSeconds(subLesson.duration) || 0}}
+                                    </span>
+                                </li>
+
+                            </ul>
+                        </mat-expansion-panel>
+                        
+                        <mat-expansion-panel *ngIf="course.quiz">
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    Final Quiz
+                                    <!-- Passed: Green -->
+                                    <span class="ms-10" *ngIf="course.quiz.isCompleted && (course.quiz.userScore ?? 0) >= course.quiz.passScore"
+                                          style="color: #22c55e; font-weight: bold;">
+                                        <i class="ri-check-line"></i> Passed
+                                    </span>
+                                    <!-- Failed: Red -->
+                                    <span class="ms-10" *ngIf="course.quiz.isCompleted && (course.quiz.userScore ?? 0) < course.quiz.passScore"
+                                          style="color: #ef4444; font-weight: bold;">
+                                        <i class="ri-close-line"></i> Failed
+                                    </span>
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+                            <ul class="mb-0 mt-0 ps-0 content-list">
+                                <li class="d-flex align-items-center justify-content-space-between">
+                                    <span class="d-block gray-color fw-medium position-relative">
+                                        <!-- Passed: Green check icon -->
+                                        <i class="ri-checkbox-circle-fill" style="color: #22c55e;"
+                                           *ngIf="course.quiz.isCompleted && (course.quiz.userScore ?? 0) >= course.quiz.passScore"></i>
+                                        <!-- Failed: Red X icon -->
+                                        <i class="ri-close-circle-fill" style="color: #ef4444;"
+                                           *ngIf="course.quiz.isCompleted && (course.quiz.userScore ?? 0) < course.quiz.passScore"></i>
+                                        <!-- Not completed: Play icon -->
+                                        <i class="ri-play-circle-line" *ngIf="!course.quiz.isCompleted"></i>
+                                        Quiz: {{course.quiz.title || course.name}}
+                                    </span>
+                                    <span class="badge" *ngIf="course.quiz.userScore !== undefined"
+                                          style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                                 color: white;
+                                                 padding: 4px 12px;
+                                                 border-radius: 6px;
+                                                 font-size: 12px;
+                                                 font-weight: 600;">
+                                        {{course.quiz.userScore}}%
+                                    </span>
+                                </li>
+                            </ul>
+                        </mat-expansion-panel>
+                    </mat-accordion>
+                </div>
+                <div class="col-lg-6 col-md-12">
+                    <div class="p-md-25">
+                        <h5 class="mb-12">About The Course :</h5>
+                        <p>{{course.description || ''}}</p>
+                        <!-- <h5 class="mt-25 mb-18">What You Will Learn :</h5>
+                        <span class="d-block gray-color fw-semibold mb-12">Become an expert in Statistics</span>
+                        <span class="d-block gray-color fw-semibold mb-12">Gather, organize, data</span>
+                        <span class="d-block gray-color fw-semibold mb-12">Present information KPIs</span>
+                        <span class="d-block gray-color fw-semibold mb-12">Analyze current data</span>
+                        <span class="d-block gray-color fw-semibold mb-12">Understand the fundamentals</span>
+                        <span class="d-block gray-color fw-semibold mb-12">Boost your resume with skills</span>
+                        <span class="d-block gray-color fw-semibold mb-0">Use data for improved</span> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </mat-card-content>
+</mat-card>
+
+<!-- User Feedback Section -->
+<mat-card class="mb-25 tagus-card">
+    <mat-card-content>
+        <div class="p-md-25 feedback-section">
+            <div class="d-flex justify-content-between align-items-center feedback-header">
+                <h5 class="mb-0">Student Feedback ({{totalFeedbacks || 0}} reviews)</h5>
+                <button mat-flat-button class="tagus" *ngIf="course.progressPct && course.progressPct === 100" (click)="toggleWriteFeedback()">Write Feedback</button>
+            </div>
+
+            <!-- Write Feedback Input -->
+            <div class="write-feedback-input" id="write-feedback-input" style="display: none;">
+                <div class="d-flex align-items-start">
+                    <img [src]="currentUser?.avatarUrl || 'img/user/user1.jpg'" class="rounded-circle me-15 avatar-feedback" alt="user">
+                    <div class="flex-grow-1">
+                        <textarea 
+                            class="feedback-textarea" 
+                            id="feedback-content" 
+                            [(ngModel)]="feedbackContent"
+                            [maxlength]="maxFeedbackLength"
+                            placeholder="Share your experience with this course... What did you like? What could be improved?" 
+                            rows="5">
+                        </textarea>
+                        <div class="feedback-char-count" [class.error]="getFeedbackLength() > maxFeedbackLength">
+                            <span *ngIf="getFeedbackLength() > maxFeedbackLength" class="text-danger">
+                                Feedback cannot exceed {{ maxFeedbackLength }} characters
+                            </span>
+                            <span *ngIf="getFeedbackLength() <= maxFeedbackLength">
+                                {{ getFeedbackLength() }} / {{ maxFeedbackLength }} characters
+                            </span>
+                        </div>
+                        <div class="feedback-actions">
+                            <button 
+                                mat-flat-button 
+                                class="tagus me-10" 
+                                (click)="createFeedback()"
+                                [disabled]="!isFeedbackValid()">
+                                Post Feedback
+                            </button>
+                            <button mat-button (click)="toggleWriteFeedback()">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback List -->
+            <div class="feedback-list">
+                <!-- Feedback Item 1 -->
+                <div class="feedback-item" *ngFor="let feedback of feedbacks">
+                    <div class="d-flex align-items-start">
+                        <img [src]="feedback.userAvatarUrl || 'img/user/user1.jpg'" class="rounded-circle me-15 avatar-feedback" alt="user">
+                        <div class="flex-grow-1">
+                            <div class="feedback-header">
+                                <div class="user-info">
+                                    <h6>{{feedback.userName || ''}}</h6>
+                                    <span class="timestamp">{{getTimeAgo(feedback.createdAt) || ''}}</span>
+                                </div>
+                            </div>
+                            <p class="feedback-content">
+                                {{feedback.content || ''}}
+                            </p>
+                            
+                            <!-- Reply and Delete buttons -->
+                            <div class="mb-15 d-flex align-items-center">
+                                <button mat-button class="reply-btn me-15" (click)="toggleReply(feedback.feedbackId.toString())">
+                                    <i class="ri-reply-line me-5"></i> Reply
+                                </button>
+                                <button mat-button class="delete-feedback-btn" *ngIf="canDelete(feedback.userId)" (click)="deleteFeedback(feedback.feedbackId)">
+                                    <i class="ri-delete-bin-line me-5"></i> Delete
+                                </button>
+                            </div>
+
+                            <!-- Reply input (hidden by default) -->
+                            <div class="reply-input" id="reply-{{feedback.feedbackId}}" style="display: none;">
+                                <div class="d-flex align-items-start">
+                                    <img [src]="currentUser?.avatarUrl || 'img/user/user1.jpg'" class="rounded-circle me-10 avatar-feedback" alt="user">
+                                    <div class="flex-grow-1">
+                                        <textarea 
+                                            class="reply-textarea" 
+                                            id="reply-content-{{feedback.feedbackId}}" 
+                                            [(ngModel)]="commentContents[feedback.feedbackId]"
+                                            [maxlength]="maxCommentLength"
+                                            rows="3" 
+                                            placeholder="Write a thoughtful reply...">
+                                        </textarea>
+                                        <div class="reply-char-count" [class.error]="getCommentLength(feedback.feedbackId) > maxCommentLength">
+                                            <span *ngIf="getCommentLength(feedback.feedbackId) > maxCommentLength" class="text-danger">
+                                                Reply cannot exceed {{ maxCommentLength }} characters
+                                            </span>
+                                            <span *ngIf="getCommentLength(feedback.feedbackId) <= maxCommentLength">
+                                                {{ getCommentLength(feedback.feedbackId) }} / {{ maxCommentLength }} characters
+                                            </span>
+                                        </div>
+                                        <div class="reply-actions">
+                                            <button 
+                                                mat-flat-button 
+                                                class="tagus me-10" 
+                                                (click)="createComment(feedback)"
+                                                [disabled]="!isCommentValid(feedback.feedbackId)">
+                                                Post Reply
+                                            </button>
+                                            <button mat-button (click)="toggleReply(feedback.feedbackId.toString())">Cancel</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Comments for this feedback -->
+                            <div class="comments-section">
+                                <!-- Comment 1 -->
+                                <div class="comment-item d-flex align-items-start" *ngFor="let comment of feedback.comments">
+                                    <img [src]="comment.userAvatarUrl || 'img/user/user1.jpg'" class="rounded-circle me-10" width="35" alt="user">
+                                    <div class="flex-grow-1">
+                                        <div class="comment-content">
+                                            <div class="comment-header d-flex justify-content-between align-items-center">
+                                                <div class="comment-info">
+                                                    <span class="comment-user">{{comment.userName || ''}}</span>
+                                                    <span class="comment-time ms-15">{{getTimeAgo(comment.createdAt) || ''}}</span>
+                                                </div>
+                                                <button mat-icon-button class="delete-comment-btn" *ngIf="canDelete(comment.userId)" (click)="deleteComment(comment.commentId, feedback.feedbackId)" title="Delete comment">
+                                                    <mat-icon class="small-icon">delete</mat-icon>
+                                                </button>
+                                            </div>
+                                            <p class="comment-text">{{comment.commentText || ''}}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Load More Button -->
+            <div class="load-more-reviews" *ngIf="totalFeedbacks > feedbacks.length">
+                <button mat-flat-button class="gray" (click)="loadMoreFeedbacks()">Load More Reviews</button>
+            </div>
+        </div>
+    </mat-card-content>
+</mat-card>

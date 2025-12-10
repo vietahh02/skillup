@@ -1,0 +1,218 @@
+<div class="quiz-creator-container">
+  <mat-card class="quiz-header-card">
+    <mat-card-header>
+      <mat-card-title class="mb-15">
+        {{ isEditMode ? 'Edit Final Quiz' : 'Final Quiz Creator' }}
+      </mat-card-title>
+      <mat-card-subtitle>
+        {{ isEditMode ? 'Update your quiz with new questions or modify existing ones' : 'Create engaging quizzes with multiple question types' }}
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-container" style="text-align: center; padding: 40px;">
+        <mat-spinner diameter="50" style="margin: 0 auto;"></mat-spinner>
+        <p style="margin-top: 20px; color: #666;">Loading quiz data...</p>
+      </div>
+
+      <form *ngIf="!isLoading" [formGroup]="quizForm" (ngSubmit)="onSubmit()">
+        <!-- Quiz Info -->
+        <div class="quiz-info-section">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Quiz Title</mat-label>
+            <input matInput formControlName="title" placeholder="Enter an engaging quiz title...">
+            <mat-error *ngIf="quizForm.get('title')?.hasError('required')">
+              Quiz title is required
+            </mat-error>
+          </mat-form-field>
+
+          <div class="row">
+            <mat-form-field appearance="outline" class="col-md-6">
+              <mat-label>Pass Score (%)</mat-label>
+              <input matInput formControlName="passScore" type="number" min="0" max="100" placeholder="e.g. 70">
+              <mat-hint>Minimum score needed to pass (0-100)</mat-hint>
+              <mat-error *ngIf="quizForm.get('passScore')?.hasError('required')">
+                Pass score is required
+              </mat-error>
+              <mat-error *ngIf="quizForm.get('passScore')?.hasError('min') || quizForm.get('passScore')?.hasError('max')">
+                Pass score must be between 0 and 100
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="col-md-6">
+              <mat-label>Attempt Limit</mat-label>
+              <input matInput formControlName="attemptLimit" type="number" min="1" placeholder="e.g. 3">
+              <mat-hint>How many times students can attempt this quiz</mat-hint>
+              <mat-error *ngIf="quizForm.get('attemptLimit')?.hasError('required')">
+                Attempt limit is required
+              </mat-error>
+              <mat-error *ngIf="quizForm.get('attemptLimit')?.hasError('min')">
+                Must be at least 1 attempt
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <mat-divider></mat-divider>
+
+        <!-- Questions Section -->
+        <div class="questions-section">
+          <div class="section-header">
+            <h3>Question</h3>
+            <button
+              mat-raised-button
+              color="accent"
+              type="button"
+              (click)="openAIGenDialog()"
+              class="ai-gen-btn">
+              <mat-icon>auto_awesome</mat-icon>
+              AI Generate Quiz
+            </button>
+          </div>
+
+          <!-- Question Cards -->
+          <div formArrayName="questions">
+            <mat-card *ngFor="let question of questions.controls; let qi = index" 
+                      class="question-card" [formGroupName]="qi">
+              <mat-card-header>
+                <mat-card-title>Question {{ qi + 1 }}</mat-card-title>
+                <button mat-icon-button color="warn" type="button" 
+                        (click)="removeQuestion(qi)" class="delete-question-btn">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </mat-card-header>
+
+              <mat-card-content>
+                <!-- Question Type -->
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Question Type</mat-label>
+                  <mat-select formControlName="type" (selectionChange)="onQuestionTypeChange(qi)">
+                    <mat-option *ngFor="let type of questionTypes" [value]="type.value">
+                      {{ type.label }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <!-- Question Text -->
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Question Content</mat-label>
+                  <textarea matInput formControlName="question" rows="3" 
+                            placeholder="Write your question clearly and concisely..."></textarea>
+                  <mat-hint>Make sure your question is easy to understand</mat-hint>
+                  <mat-error *ngIf="question.get('question')?.hasError('required')">
+                    Question content is required
+                  </mat-error>
+                </mat-form-field>
+
+                <!-- Text Answer (for TEXT type) -->
+                <div *ngIf="isTextQuestion(qi)" class="text-answer-section">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Correct Answer</mat-label>
+                    <input matInput formControlName="textAnswer" 
+                           placeholder="Enter the expected answer...">
+                    <mat-hint>Students will need to type this exact answer</mat-hint>
+                    <mat-error *ngIf="question.get('textAnswer')?.hasError('required')">
+                      Correct answer is required
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <!-- Answers Section (for non-TEXT types) -->
+                <div *ngIf="!isTextQuestion(qi)" class="answers-section">
+                  <div class="answers-header">
+                    <h4>Answer</h4>
+                    <button mat-raised-button color="accent" type="button" 
+                            (click)="addAnswer(qi)"
+                            *ngIf="canAddAnswer(qi)">
+                      <mat-icon>add</mat-icon>
+                      Add answer
+                    </button>
+                  </div>
+
+                  <div formArrayName="answers">
+                    <div *ngFor="let answer of getAnswers(qi).controls; let ai = index" 
+                         class="answer-item" [formGroupName]="ai">
+                      
+                      <!-- Single Choice (Radio) -->
+                      <div *ngIf="isSingleChoice(qi) || isTrueFalseQuestion(qi)" class="answer-row">
+                        <mat-radio-button [checked]="answer.get('isCorrect')?.value"
+                                          [name]="getName(qi)"
+                                          (change)="onSingleChoiceChange(qi, ai)">
+                        </mat-radio-button>
+                        <mat-form-field appearance="outline" class="answer-input">
+                          <mat-label>Answer {{ ai + 1 }}</mat-label>
+                          <input matInput formControlName="text" 
+                                 [readonly]="isTrueFalseQuestion(qi)">
+                          <mat-error *ngIf="answer.get('text')?.hasError('required')">
+                            Answer is required
+                          </mat-error>
+                        </mat-form-field>
+                        <button mat-icon-button color="warn" type="button" 
+                                (click)="removeAnswer(qi, ai)"
+                                [disabled]="!canRemoveAnswer(qi) || isTrueFalseQuestion(qi)">
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                      </div>
+
+                      <!-- Multiple Choice (Checkbox) or True/False -->
+                      <div *ngIf="!isSingleChoice(qi) && !isTrueFalseQuestion(qi)" class="answer-row">
+                        <mat-checkbox formControlName="isCorrect"></mat-checkbox>
+                        <mat-form-field appearance="outline" class="answer-input">
+                          <mat-label>Answer {{ ai + 1 }}</mat-label>
+                          <input matInput formControlName="text" 
+                                 [readonly]="isTrueFalseQuestion(qi)">
+                          <mat-error *ngIf="answer.get('text')?.hasError('required')">
+                            Answer is required
+                          </mat-error>
+                        </mat-form-field>
+                        <button mat-icon-button color="warn" type="button" 
+                                (click)="removeAnswer(qi, ai)"
+                                [disabled]="!canRemoveAnswer(qi) || isTrueFalseQuestion(qi)">
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+
+          <!-- Empty State -->
+          <div *ngIf="questions.length === 0" class="empty-state">
+            <mat-icon>quiz</mat-icon>
+            <h3>Ready to Create Your Quiz?</h3>
+            <p>Click "Add new question" above to start building your quiz. You can create multiple question types including multiple choice, true/false, and text questions!</p>
+          </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="form-actions">
+          <button mat-raised-button color="primary" type="submit"
+                  [disabled]="questions.length === 0 || isSubmitting">
+            <mat-spinner *ngIf="isSubmitting" diameter="20" style="display: inline-block; margin-right: 8px;"></mat-spinner>
+            <mat-icon *ngIf="!isSubmitting">save</mat-icon>
+            <ng-container *ngIf="isSubmitting">
+              {{ isEditMode ? 'Updating Quiz...' : 'Creating Quiz...' }}
+            </ng-container>
+            <ng-container *ngIf="!isSubmitting">
+              {{ isEditMode ? 'Update Quiz' : 'Save Quiz' }}
+            </ng-container>
+          </button>
+        </div>
+      </form>
+
+      <!-- Floating Action Button for Add Question -->
+      <button *ngIf="!isLoading"
+              mat-fab
+              color="primary"
+              class="fab-add-question"
+              type="button"
+              (click)="addQuestion()"
+              matTooltip="Add new question"
+              matTooltipPosition="left">
+        <mat-icon>add</mat-icon>
+      </button>
+    </mat-card-content>
+  </mat-card>
+</div>

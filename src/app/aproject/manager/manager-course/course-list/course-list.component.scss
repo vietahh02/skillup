@@ -1,0 +1,32 @@
+.search {
+    margin: 15px 0;
+}
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 500;
+  text-transform: capitalize;
+  display: inline-block;
+  font-size: 13px;
+  text-align: center;
+}
+.actions-container {
+  display: flex;
+  justify-content: center;
+}
+
+.approved {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.rejected {
+  background-color: #f8d7da;
+  color: #721c24;
+}
