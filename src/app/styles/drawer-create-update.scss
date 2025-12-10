@@ -1,0 +1,45 @@
+.text-danger {
+    color: #e53935;
+}
+
+.loading-bar {
+    position: absolute;
+    width: 90%;
+}
+
+.drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+
+    h3 {
+        margin: 0;
+        font-weight: 700;
+    }
+}
+
+.drawer-footer {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-top: 12px;
+    button {
+      cursor: pointer;
+    }
+}
+
+::ng-deep .mat-drawer-inner-container{
+    overflow-x: hidden;
+}
+
+
+// .drawer-container {
+//     width: 420px;
+//     max-width: 90vw;
+//     padding: 16px 18px;
+//     box-sizing: border-box;
+//     background: #fff;
+//     border-radius: 0; 
+//     box-shadow: -4px 0 20px rgba(0,0,0,0.08);
+// }

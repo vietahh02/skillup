@@ -1,0 +1,52 @@
+<div class="container">
+    <!-- Header Section -->
+    <div class="header mb-2">
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <h1 class="title mb-2">{{ 'system.partner.title' | translate }}</h1>
+            </div>
+
+            @if (authService.isPermissionGranted(permissions.PARTNER_CREATE)) {
+            <div class="action-buttons">
+                <button mat-flat-button color="primary" class="btn-primary-flat" (click)="onAddPartner()">
+                        <mat-icon>add</mat-icon>
+                        {{ 'common.create' | translate }}
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="wrapper-card">
+        <div class="row mb-3">
+            <div class="col-12">
+                <h4 class="title">{{ 'system.partner.list' | translate }}</h4>
+                <generic-filter   
+                    [config]="partnerFilterConfig"
+                    [isSearchLoading]="isLoadingFilter"
+                    (applyFilters)="onApplyFilters($event)"
+                    (clearFilters)="onClearFilters()">
+                </generic-filter>
+            </div>
+        </div>
+            
+        <div class="row mb-4">
+            <div class="col-12">
+                <generic-table
+                    [dataSource]="partners"
+                    [config]="partnerTableConfig"
+                    [loading]="loading"
+                    [totalItems]="total"
+                    [currentPage]="page"
+                    [totalPages]="totalPages"
+                    [pageSize]="size"
+                    (pageChange)="onPageChange($event)"
+                    (pageSizeChange)="onPageSizeChange($event)"
+                    (statusToggle)="onStatusToggle($event.item, $event.event)"
+                    >
+                </generic-table>
+            </div>
+        </div>
+    </div>
+</div>

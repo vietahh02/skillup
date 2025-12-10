@@ -1,0 +1,132 @@
+.page-create-update-container {
+    padding-left: 40px;
+    background-color: #f5f5f5;
+    min-height: 100vh;
+  
+    &.active {
+      padding-left: 60px;
+    }
+  
+    .header {
+      .btn-back {
+        display: flex;
+        gap: 5px;
+        cursor: pointer;
+      }
+  
+      .btn-save {
+        font-weight: 600;
+        height: 40px !important;
+        padding: 0 18px !important;
+  
+        i {
+          margin-right: 4px;
+          font-size: 18px;
+        }
+      }
+    }
+  
+    .stats-card {
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      padding: 30px !important;
+    }
+  
+    // Bootstrap-like helpers
+    .mb-4 {
+      margin-bottom: 1.5rem !important;
+    }
+  
+    .mb-2 {
+      margin-bottom: 0.5rem !important;
+    }
+  
+    .d-flex {
+      display: flex !important;
+    }
+  
+    .d-grid {
+      display: grid !important;
+    }
+  
+    .align-items-center {
+      align-items: center !important;
+    }
+  
+    .justify-content-space-between {
+      justify-content: space-between !important;
+    }
+  
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      margin-right: -15px;
+      margin-left: -15px;
+    }
+  
+    .col-md-6 {
+      flex: 0 0 50%;
+      max-width: 50%;
+      padding-right: 15px;
+      padding-left: 15px;
+    }
+  
+    @media (max-width: 991.98px) {
+      .col-md-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+      }
+    }
+  }
+  
+  .header {
+    .title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #2c3e50;
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      letter-spacing: -0.5px;
+      line-height: 1.2;
+    }
+  }
+  
+  /* App form fields */
+  .app-form {
+    .text-danger {
+      color: red;
+    }
+  
+    .mb-12 {
+      margin-bottom: 12px;
+    }
+  
+    .fw-semibold {
+      font-weight: 600;
+    }
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .schedule-container {
+      padding: 15px;
+    }
+  
+    .header {
+      .title {
+        font-size: 1.8rem;
+      }
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .schedule-container {
+      padding: 10px;
+    }
+  
+    .header {
+      .title {
+        font-size: 1.5rem;
+      }
+    }
+  }

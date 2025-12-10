@@ -1,0 +1,45 @@
+<div class="container">
+    <!-- Header Section -->
+    <div class="header mb-2">
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <h1 class="title mb-2">{{ 'system.transaction.title' | translate }}</h1>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="wrapper-card ">
+        <div class="row mb-15">
+            <div class="col-12">
+                <h4 class="title">{{ 'system.transaction.list' | translate }}</h4>
+                <generic-filter
+                    [config]="transactionFilterConfig"
+                    [isSearchLoading]="isLoadingFilter"
+                    [initialValues]="initialFilterValues"
+                    (applyFilters)="onApplyFilters($event)"
+                    (clearFilters)="onClearFilters()"
+                    (customButtonClick)="onCustomButtonClick($event)">
+                </generic-filter>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <generic-table
+                    [dataSource]="transactions"
+                    [config]="transactionTableConfig"
+                    [loading]="loading"
+                    [totalItems]="total"
+                    [currentPage]="page"
+                    [totalPages]="totalPages"
+                    [pageSize]="size"
+                    (pageChange)="onPageChange($event)"
+                    (pageSizeChange)="onPageSizeChange($event)"
+                >
+                </generic-table>
+            </div>
+        </div>
+    </div>
+</div>
+

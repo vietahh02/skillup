@@ -1,0 +1,152 @@
+<mat-progress-bar *ngIf="loading" mode="indeterminate" class="loading-bar"></mat-progress-bar>
+
+<div class="dialog-container">
+  <div class="dialog-header">
+    <h3>{{ id ? ('system.purchaseOrder.editOrder' | translate) : ('system.purchaseOrder.createOrder' | translate) }}</h3>
+    <button mat-icon-button (click)="onCloseDialog()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <div class="dialog-body" [formGroup]="form">
+    <!-- Order Type -->
+    <div class="form-field">
+      <label class="form-label">
+        {{ 'system.purchaseOrder.orderType' | translate }}
+      </label>
+      <mat-form-field appearance="outline" class="w-100 thin-select ">
+        <mat-select formControlName="requestType">
+          <mat-option *ngFor="let option of orderTypeOptions" [value]="option.value">
+            {{ option.label | translate }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.get('requestType')?.hasError('required')">
+          {{ 'system.purchaseOrder.orderTypeRequired' | translate }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Payment Method -->
+    <div class="form-field">
+      <label class="form-label">
+        {{ 'system.purchaseOrder.paymentMethod' | translate }}
+      </label>
+      <mat-form-field appearance="outline" class="w-100 thin-select">
+        <mat-select formControlName="paymentType">
+          <mat-option *ngFor="let option of paymentMethodOptions" [value]="option.value">
+            {{ option.label | translate }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.get('paymentType')?.hasError('required')">
+          {{ 'system.purchaseOrder.paymentMethodRequired' | translate }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Amount -->
+    <div class="form-field">
+      <label class="form-label">
+        {{ 'system.purchaseOrder.amount' | translate }}
+      </label>
+      <mat-form-field appearance="outline" class="w-100 thin-select">
+        <input matInput type="text" formControlName="amount" [placeholder]="'system.purchaseOrder.amountPlaceholder' | translate" />
+        <mat-error *ngIf="form.get('amount')?.hasError('required')">
+          {{ 'system.purchaseOrder.amountRequired' | translate }}
+        </mat-error>
+        <mat-error *ngIf="form.get('amount')?.hasError('min')">
+          {{ 'system.purchaseOrder.amountMin' | translate }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- Stock ID -->
+    <div class="form-field">
+      <label class="form-label">
+        {{ 'system.purchaseOrder.stockId' | translate }}
+      </label>
+      <generic-searchable-select
+        [dataSource]="stockDataSource"
+        [nameControl]="'stockId'"
+        [form]="form"
+        [config]="searchStockSelectConfig"
+        [initialOptions]="initialStockOptions"
+        [multiple]="false">
+      </generic-searchable-select>
+    </div>
+
+    @if (isBankPayment) {
+      <div class="form-field">
+        <label class="form-label">
+          {{ 'system.purchaseOrder.bankCode' | translate }}
+        </label>
+        <mat-form-field appearance="outline" class="w-100 thin-select">
+          <input matInput formControlName="bankCode" [placeholder]="'system.purchaseOrder.bankCode' | translate" />
+        </mat-form-field>
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">
+          {{ 'system.purchaseOrder.bankName' | translate }}
+        </label>
+        <mat-form-field appearance="outline" class="w-100 thin-select">
+          <input matInput formControlName="bankName" [placeholder]="'system.purchaseOrder.bankName' | translate" />
+        </mat-form-field>
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">
+          {{ 'system.purchaseOrder.bankAccount' | translate }}
+        </label>
+        <mat-form-field appearance="outline" class="w-100 thin-select">
+          <input matInput formControlName="bankAccount" [placeholder]="'system.purchaseOrder.bankAccount' | translate" />
+        </mat-form-field>
+      </div>
+
+      <div class="form-field">
+        <label class="form-label">
+          {{ 'system.purchaseOrder.bankTransactionId' | translate }}
+        </label>
+        <mat-form-field appearance="outline" class="w-100 thin-select">
+          <input matInput formControlName="bankTransactionId" [placeholder]="'system.purchaseOrder.bankTransactionId' | translate" />
+        </mat-form-field>
+      </div>
+    }
+
+    <!-- File Attachment (tạm thời không gửi lên API) -->
+    <div class="form-field full-width">
+      <label class="form-label">
+        {{ 'system.purchaseOrder.fileAttachment' | translate }}
+      </label>
+      <div class="file-upload-container">
+        <input type="file" #fileInput (change)="onFileSelected($event)" accept="image/*" style="display: none;" />
+        <button mat-stroked-button type="button" (click)="fileInput.click()" class="file-button thin-select">
+          {{ 'system.purchaseOrder.chooseFile' | translate }}
+        </button>
+        <span class="file-name">{{ selectedFileName || ('system.purchaseOrder.noFileSelected' | translate) }}</span>
+      </div>
+      <p class="file-hint">{{ 'system.purchaseOrder.fileHint' | translate }}</p>
+    </div>
+
+
+
+    <!-- Note -->
+    <div class="form-field full-width">
+      <label class="form-label">
+        {{ 'system.purchaseOrder.note' | translate }}
+      </label>
+      <mat-form-field appearance="outline" class="w-100 gray_border">
+        <textarea matInput formControlName="note" rows="4" [placeholder]="'system.purchaseOrder.notePlaceholder' | translate"></textarea>
+      </mat-form-field>
+    </div>
+  </div>
+
+  <div class="dialog-footer">
+    <button mat-flat-button type="button" class="btn-primary-flat btn-cancel" (click)="onCloseDialog()">
+      {{ 'common.cancel' | translate }}
+    </button>
+    <button mat-flat-button color="primary" class="btn-primary-flat" (click)="onSubmit()" [disabled]="isSubmit">
+      {{ 'common.submit' | translate }}
+    </button>
+  </div>
+</div>
+

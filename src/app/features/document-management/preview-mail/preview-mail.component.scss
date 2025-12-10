@@ -1,0 +1,10 @@
+@import url('../../../styles/popup-create-update.scss');  
+
+.mail-content {
+  flex: 1;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  padding: 0 24px;
+  background-color: #fff;
+  min-height: 70vh;
+}

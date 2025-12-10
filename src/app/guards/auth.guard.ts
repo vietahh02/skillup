@@ -1,17 +1,16 @@
 import { inject } from '@angular/core';
 import { Router, CanActivateFn } from '@angular/router';
-import { TokenService } from '../context/token.service';
+import { ApiAuthServices } from '../services/auth.service';
 
 export const authGuard: CanActivateFn = (route, state) => {
+  const authService = inject(ApiAuthServices);
   const router = inject(Router);
-  const tokenService = inject(TokenService);
-  const token = tokenService.getToken();
-  const isExpired = tokenService.isTokenExpired(token);
 
-    if (isExpired) {
-        router.navigate(['/login']);
-        return false;
-    }
+  if (authService.isAuthenticated()) {
     return true;
+  }
+
+  router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
+  return false;
 };
 

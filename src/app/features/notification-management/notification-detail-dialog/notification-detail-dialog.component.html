@@ -1,0 +1,205 @@
+<div class="notification-detail-dialog">
+  <!-- Header -->
+  <div class="dialog-header">
+    <h2 class="dialog-title">Purchase Order #{{ notification?.orderId || notification?.id }}</h2>
+    <button mat-icon-button class="close-btn" (click)="onBack()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  @if (loading) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  <!-- Content -->
+  @if (purchaseOrderDetail && !loading) {
+    <div class="dialog-content">
+    <div class="content-wrapper">
+      <!-- Left Side - Order Information -->
+      <div class="order-info-section">
+        <h3 class="section-title">INFORMATION</h3>
+
+        <div class="info-item">
+          <span class="info-label">Order Id:</span>
+          <span class="info-value">{{ purchaseOrderDetail.id || purchaseOrderDetail.orderId || '-' }}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Order Type:</span>
+          <span class="info-value">
+            <span class="badge" [style.background-color]="getRequestTypeColor(getRequestType(purchaseOrderDetail.requestType))">
+              {{ getRequestTypeLabel(getRequestType(purchaseOrderDetail.requestType)) | translate }}
+            </span>
+          </span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Partner Name:</span>
+          <span class="info-value">{{ purchaseOrderDetail.partnerName || '-' }}</span>
+        </div>
+
+
+        <div class="info-item">
+          <span class="info-label">Payment Type:</span>
+          <span class="info-value">
+            <span class="badge" [class.badge-blue]="purchaseOrderDetail.bankCode || purchaseOrderDetail.bankName" [class.badge-gray]="!purchaseOrderDetail.bankCode && !purchaseOrderDetail.bankName">
+              {{ (purchaseOrderDetail.bankCode || purchaseOrderDetail.bankName) ? 'Bank' : 'Cash' }}
+            </span>
+          </span>
+        </div>
+
+        @if (purchaseOrderDetail.bankCode || purchaseOrderDetail.bankName) {
+          <div class="info-item">
+            <span class="info-label">Bank Code:</span>
+            <span class="info-value">{{ purchaseOrderDetail.bankCode || '-' }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Bank Name:</span>
+            <span class="info-value">{{ purchaseOrderDetail.bankName || '-' }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Bank Account:</span>
+            <span class="info-value">{{ purchaseOrderDetail.bankAccount || '-' }}</span>
+          </div>
+
+          <div class="info-item">
+            <span class="info-label">Bank Transaction ID:</span>
+            <span class="info-value">{{ purchaseOrderDetail.bankTransactionId || '-' }}</span>
+          </div>
+        }
+
+        <div class="info-item">
+          <span class="info-label">Amount:</span>
+          <span class="info-value">
+            <mat-icon class="amount-icon">account_balance_wallet</mat-icon>
+            Ks {{ formatAmount(purchaseOrderDetail.amount) }}
+          </span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Total Amount:</span>
+          <span class="info-value">Ks {{ formatAmount(purchaseOrderDetail.totalAmount) }}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Discount:</span>
+          <span class="info-value">Ks {{ formatAmount(purchaseOrderDetail.discount) }}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Created By:</span>
+          <span class="info-value">{{ purchaseOrderDetail.createdBy || '-' }}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Approved By:</span>
+          <span class="info-value">{{ purchaseOrderDetail.approvedBy || '-' }}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Created Date:</span>
+          <span class="info-value">{{ formatDate(purchaseOrderDetail.createdAt) }}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Updated Date:</span>
+          <span class="info-value">{{ formatDate(purchaseOrderDetail.updatedAt) }}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Note:</span>
+          <span class="info-value">{{ purchaseOrderDetail.note || '-' }}</span>
+        </div>
+
+        <div class="info-item">
+          <span class="info-label">Approval Status:</span>
+          <span class="info-value">
+            <mat-icon class="status-icon" [style.color]="getStatusColor(getStatusNumber(purchaseOrderDetail.status))">check_circle</mat-icon>
+            <span class="badge" [style.background-color]="getStatusColor(getStatusNumber(purchaseOrderDetail.status))">
+              {{ getStatusString(getStatusNumber(purchaseOrderDetail.status)) | translate }}
+            </span>
+          </span>
+        </div>
+      </div>
+
+      <!-- Right Side - Timeline -->
+      <div class="timeline-section">
+        <h3 class="section-title">WORKFLOW</h3>
+        <div class="timeline">
+          <!-- Step 1: Order Create -->
+          <div class="timeline-item">
+            <div class="timeline-dot dot-purple"></div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <div class="timeline-step">{{ 'system.purchaseOrder.orderCreate' | translate }}</div>
+                <div class="timeline-date">{{ formatDate(purchaseOrderDetail.createdAt) }}</div>
+              </div>
+              <div class="timeline-actor">{{ purchaseOrderDetail.createdBy || '-' }}</div>
+            </div>
+          </div>
+
+          <!-- Step 2: Approved (if exists) -->
+          @if (getStatusNumber(purchaseOrderDetail.status) === 1 && purchaseOrderDetail.approvedBy) {
+            <div class="timeline-item">
+            <div class="timeline-dot dot-purple"></div>
+            <div class="timeline-content">
+              <div class="timeline-header">
+                <div class="timeline-step">{{ 'system.purchaseOrder.approved' | translate }}</div>
+                <div class="timeline-date">{{ formatDate(purchaseOrderDetail.updatedAt) }}</div>
+              </div>
+              <div class="timeline-actor">{{ purchaseOrderDetail.approvedBy }}</div>
+            </div>
+          </div>
+          }
+
+          <!-- Step 3: Pending/Rejected -->
+          @if (getStatusNumber(purchaseOrderDetail.status) === 0 || getStatusNumber(purchaseOrderDetail.status) === -1) {
+            <div class="timeline-item">
+              <div class="timeline-dot" [class.dot-gray]="getStatusNumber(purchaseOrderDetail.status) === 0" [class.dot-red]="getStatusNumber(purchaseOrderDetail.status) === -1"></div>
+              <div class="timeline-content">
+                <div class="timeline-header">
+                  <div class="timeline-step">{{ getStatusString(getStatusNumber(purchaseOrderDetail.status)) | translate }}</div>
+                  <div class="timeline-date">-</div>
+                </div>
+                <div class="timeline-actor">-</div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Loading State -->
+  @if (loading && !purchaseOrderDetail) {
+    <div class="loading-state">
+      <p>{{ 'common.loading' | translate }}...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (!loading && !purchaseOrderDetail && notification) {
+    <div class="loading-state">
+      <p>Failed to load order details</p>
+    </div>
+  }
+
+  <!-- Footer Actions -->
+  <div class="dialog-footer">
+      @if (isHubAdmin) {
+          <button mat-flat-button class="btn-approve" (click)="onApprove()">
+              {{ 'system.notification.approve' | translate }}
+          </button>
+          <button mat-flat-button class="btn-reject" (click)="onReject()">
+              {{ 'system.notification.reject' | translate }}
+          </button>
+      }
+    <button mat-flat-button class="btn-back" (click)="onBack()">
+      {{ 'system.notification.back' | translate }}
+    </button>
+  </div>
+</div>
+

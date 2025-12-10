@@ -1,0 +1,88 @@
+<!-- Version with form -->
+<mat-form-field *ngIf="form" appearance="outline" class="w-100 thin-select" [formGroup]="form">
+    <mat-select 
+      [formControlName]="nameControl"
+      [placeholder]="getPlaceholder()" 
+      [multiple]="multiple"
+      #selectRef 
+      (openedChange)="onPanelOpen($event)" 
+      (selectionChange)="onValueChange($event.value)"
+  >
+      
+      <!-- Search box -->
+      <mat-option aria-disabled="true" class="search-option">
+        <input 
+          matInput 
+          type="text" 
+          [placeholder]="getSearchPlaceholder()"
+          [value]="searchTerm"
+          (click)="$event.stopPropagation()"
+          (keydown)="$event.stopPropagation()"
+          (input)="onSearch($any($event.target).value)"
+          />
+      </mat-option>
+  
+      <!-- Results -->
+      <mat-option *ngFor="let item of options" [value]="item.value" (onSelectionChange)="item.handleItem ? item.handleItem($event) : null">
+        {{ item.translate ? (getDisplayText(item) | translate) : getDisplayText(item) }}
+      </mat-option>
+  
+      <!-- No results -->
+      <mat-option disabled *ngIf="!loading && options.length === 0">
+        {{ getNoResultsMessage() }}
+      </mat-option>
+  
+      <!-- Loading -->
+      <mat-option disabled *ngIf="loading">
+        {{ getLoadingMessage() }}
+      </mat-option>
+    </mat-select>
+    @for (error of errorList; track error.key) {
+      <mat-error *ngIf="form?.get(nameControl)?.hasError(error.key)">{{error.value | translate}}
+      </mat-error>
+    }
+    <!-- <ng-content></ng-content> -->
+  </mat-form-field>
+  
+  <!-- Version without form -->
+  <mat-form-field *ngIf="!form" appearance="outline" class="w-100 thin-select">
+    <mat-select 
+      [placeholder]="getPlaceholder()" 
+      [disabled]="disabled" 
+      [multiple]="multiple"
+      [value]="internalValue"
+      #selectRefStandalone 
+      (openedChange)="onPanelOpen($event)" 
+      (selectionChange)="onValueChange($event.value)"
+    >
+      
+      <!-- Search box -->
+      <mat-option aria-disabled="true" class="search-option">
+        <input 
+          matInput 
+          type="text" 
+          [placeholder]="getSearchPlaceholder()"
+          [value]="searchTerm"
+          (click)="$event.stopPropagation()"
+          (keydown)="$event.stopPropagation()"
+          (input)="onSearch($any($event.target).value)"
+          />
+      </mat-option>
+      
+      <!-- Results -->
+      <mat-option *ngFor="let item of options" [value]="item.value" (click)="item.handleItem ? item.handleItem(item) : null">
+        {{ item.translate ? (getDisplayText(item) | translate) : getDisplayText(item) }}
+      </mat-option>
+  
+      <!-- No results -->
+      <mat-option disabled *ngIf="!loading && options.length === 0">
+        {{ getNoResultsMessage() }}
+      </mat-option>
+  
+      <!-- Loading -->
+      <mat-option disabled *ngIf="loading">
+        {{ getLoadingMessage() }}
+      </mat-option>
+    </mat-select>
+    <!-- <ng-content></ng-content> -->
+  </mat-form-field>

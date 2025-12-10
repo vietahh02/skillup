@@ -13,7 +13,6 @@ export interface ConfirmOptions {
   confirmText?: string;
   cancelText?: string;
   destructive?: boolean; // style confirm button as warn
-  isDisabledConfirm?: boolean; 
 }
 
 @Component({

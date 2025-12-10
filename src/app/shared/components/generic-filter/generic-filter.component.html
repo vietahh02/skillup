@@ -1,0 +1,188 @@
+<div class="border-radius-size" *ngIf="visibleFields">
+  <div class="filters-content">
+    <div class="row g-2 mt-20">
+
+      <!-- Dynamic Filter Fields -->
+      <ng-container *ngFor="let field of config.fields">
+        <div [class]="getColumnClass(field)">
+
+          <!-- Text Input Field -->
+          <mat-form-field *ngIf="field.type === 'text' && isFieldVisible(field)" appearance="outline" class="w-100 thin-select">
+            <input
+              matInput
+              [ngModel]="getFieldValue(field.key)"
+              (ngModelChange)="onFieldChange(field.key, $event)"
+              type="text"
+              [placeholder]="getPlaceholder(field) | translate"
+              (keydown.enter)="onApplyFilters()"
+            />
+            <mat-icon *ngIf="field.icon" matSuffix>{{ field.icon }}</mat-icon>
+          </mat-form-field>
+
+          <!-- Number Input Field -->
+          <mat-form-field *ngIf="field.type === 'number' && isFieldVisible(field)" appearance="outline" class="w-100 thin-select">
+            <input
+              matInput
+              [ngModel]="getFieldValue(field.key)"
+              (ngModelChange)="onFieldChange(field.key, $event)"
+              type="number"
+              [placeholder]="getPlaceholder(field) | translate"
+              (keydown.enter)="onApplyFilters()"
+            />
+            <mat-icon *ngIf="field.icon" matSuffix>{{ field.icon }}</mat-icon>
+          </mat-form-field>
+
+          <!-- Select Dropdown Field -->
+          <mat-form-field *ngIf="field.type === 'select' && isFieldVisible(field)" appearance="outline" class="w-100 thin-select">
+            <mat-select
+              [ngModel]="getFieldValue(field.key)"
+              (ngModelChange)="onFieldChange(field.key, $event)"
+            >
+              <mat-option *ngFor="let option of field.options; let index = index" [value]="option.value">
+                {{ field.isTranslate || index === 0 ? (option.displayName | translate) : option.displayName }}
+              </mat-option>
+            </mat-select>
+            <mat-icon *ngIf="field.icon" matSuffix>{{ field.icon }}</mat-icon>
+          </mat-form-field>
+
+          <!-- Select Searchable Field -->
+          <generic-searchable-select *ngIf="field.type === 'select-searchable' && isFieldVisible(field) && field.searchableConfig && field.searchableConfig.dataSource"
+            [dataSource]="field.searchableConfig.dataSource"
+            [config]="getSearchableSelectConfig(field)"
+            [multiple]="field.searchableConfig.multiple || false"
+            [disabled]="field.searchableConfig.disabled || false"
+            [value]="getFieldValue(field.key)"
+            [initialOptions]="field.options || []"
+            (valueChange)="onFieldChange(field.key, $event)">
+          </generic-searchable-select>
+
+          <!-- Date Field -->
+          <mat-form-field *ngIf="field.type === 'date' && isFieldVisible(field)" appearance="outline" class="w-100 thin-select">
+            <input
+              matInput
+              [matDatepicker]="picker"
+              [ngModel]="getFieldValue(field.key)"
+              (ngModelChange)="onFieldChange(field.key, $event)"
+              [placeholder]="getPlaceholder(field) | translate"
+              readonly
+            />
+            <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+
+          <!-- Date Range Field -->
+          <mat-form-field *ngIf="field.type === 'dateRange' && isFieldVisible(field)" appearance="outline" class="w-100 thin-select">
+            <mat-date-range-input [rangePicker]="rangePicker">
+              <input
+                matStartDate
+                [ngModel]="getDateRangeStart(field.key)"
+                (ngModelChange)="onDateRangeChange(field.key, 'start', $event)"
+                [placeholder]="'system.purchaseOrder.startDate' | translate"
+                readonly
+              />
+              <input
+                matEndDate
+                [ngModel]="getDateRangeEnd(field.key)"
+                (ngModelChange)="onDateRangeChange(field.key, 'end', $event)"
+                [placeholder]="'system.purchaseOrder.endDate' | translate"
+                readonly
+              />
+            </mat-date-range-input>
+            <mat-datepicker-toggle matSuffix [for]="rangePicker"></mat-datepicker-toggle>
+            <mat-date-range-picker #rangePicker></mat-date-range-picker>
+          </mat-form-field>
+
+        </div>
+      </ng-container>
+
+      <!-- Action Buttons -->
+        <div class="text-end" [class]="getButtonClass()"
+             *ngIf="shouldShowApplyButton() || shouldShowClearButton() || hasCustomButtons()">
+
+        <!-- Apply Button -->
+        <button
+          *ngIf="shouldShowApplyButton()"
+          mat-flat-button
+          color="primary"
+          (click)="onApplyFilters()"
+          class="me-2 apply-btn"
+          style="margin-right: 15px;"
+          [disabled]="isSearchLoading"
+        >
+          <ng-container>
+            <mat-icon>{{ getApplyButtonIcon() }}</mat-icon>
+            {{ getApplyButtonText() | translate }}
+          </ng-container>
+          <!-- <ng-container *ngIf="!isSearchLoading">
+            <mat-icon>{{ getApplyButtonIcon() }}</mat-icon>
+            {{ getApplyButtonText() | translate }}
+          </ng-container>
+          <ng-container *ngIf="isSearchLoading">
+            <mat-icon class="">refresh</mat-icon>
+            {{ getApplyButtonText() | translate }}...
+          </ng-container> -->
+        </button>
+
+        <!-- Clear Button -->
+        <button
+          *ngIf="shouldShowClearButton()"
+          mat-stroked-button
+          color="primary"
+          (click)="onClearFilters()"
+          class="clear-btn"
+          [disabled]="isSearchLoading"
+        >
+          {{ getClearButtonText() | translate }}
+        </button>
+
+            <!-- Custom Buttons -->
+            <ng-container *ngFor="let customButton of getCustomButtons()">
+                <button
+                    *ngIf="customButton.buttonType === 'flat'"
+                    mat-flat-button
+                    (click)="onCustomButtonClick(customButton.key)"
+                    class="custom-btn me-2"
+                    [style.margin-right.px]="15"
+                    [style.background-color]="customButton.backgroundColor"
+                    [style.color]="customButton.textColor"
+                    [disabled]="customButton.disabled || isSearchLoading"
+                    [attr.data-button-key]="customButton.key"
+                >
+                    <mat-icon *ngIf="customButton.icon">{{ customButton.icon }}</mat-icon>
+                    {{ customButton.label | translate }}
+                </button>
+                <button
+                    *ngIf="customButton.buttonType === 'stroked'"
+                    mat-stroked-button
+                    (click)="onCustomButtonClick(customButton.key)"
+                    class="custom-btn me-2"
+                    [style.margin-right.px]="15"
+                    [style.background-color]="customButton.backgroundColor"
+                    [style.color]="customButton.textColor"
+                    [style.border-color]="customButton.backgroundColor"
+                    [disabled]="customButton.disabled || isSearchLoading"
+                    [attr.data-button-key]="customButton.key"
+                >
+                    <mat-icon *ngIf="customButton.icon">{{ customButton.icon }}</mat-icon>
+                    {{ customButton.label | translate }}
+                </button>
+                <button
+                    *ngIf="customButton.buttonType === 'raised'"
+                    mat-raised-button
+                    (click)="onCustomButtonClick(customButton.key)"
+                    class="custom-btn me-2"
+                    [style.margin-right.px]="15"
+                    [style.background-color]="customButton.backgroundColor"
+                    [style.color]="customButton.textColor"
+                    [disabled]="customButton.disabled || isSearchLoading"
+                    [attr.data-button-key]="customButton.key"
+                >
+                    <mat-icon *ngIf="customButton.icon">{{ customButton.icon }}</mat-icon>
+                    {{ customButton.label | translate }}
+                </button>
+            </ng-container>
+
+      </div>
+    </div>
+  </div>
+</div>

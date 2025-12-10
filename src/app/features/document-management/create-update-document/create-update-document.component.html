@@ -1,0 +1,272 @@
+<div class="create-update-container">
+  <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+  <!-- Header -->
+  <div class="header mb-2 d-flex align-items-center justify-content-between">
+    <div class="d-flex align-items-center">
+      <div>
+        <h2 class="title">{{ title }}</h2>
+      </div>
+    </div>
+    <button mat-icon-button (click)="onCancel()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Form Content -->
+  <form [formGroup]="documentForm" (ngSubmit)="onSubmit()">
+    <div class="stats-card mb-4 body">
+
+      <div class="app-form">
+        <div class="row">
+          <!-- Code -->
+          <div class="col-md-6">
+            <label class="d-block mb-12 fw-semibold">
+              Code <span class="text-danger">*</span>
+            </label>
+            <mat-form-field appearance="outline" class="w-100 thin-select">
+              <mat-select formControlName="code" placeholder="Select Code">
+                <mat-option *ngFor="let code of codeOptions" [value]="code.value">
+                  {{ code.label }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="documentForm.get('code')?.hasError('required')">
+                {{ 'system.document.codeRequired' | translate }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Type -->
+          <div class="col-md-6">
+            <label class="d-block mb-12 fw-semibold">
+              Type <span class="text-danger">*</span>
+            </label>
+            <mat-form-field appearance="outline" class="w-100 thin-select">
+              <mat-select formControlName="type" placeholder="Select Type">
+                <mat-option *ngFor="let type of typeOptions" [value]="type.value">
+                  {{ type.label }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="documentForm.get('type')?.hasError('required')">
+                {{ 'system.document.typeRequired' | translate }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Language -->
+          <div class="col-md-6">
+            <label class="d-block mb-12 fw-semibold">
+              Language <span class="text-danger">*</span>
+            </label>
+            <mat-form-field appearance="outline" class="w-100 thin-select">
+              <mat-select formControlName="language" placeholder="Select Language">
+                <mat-option *ngFor="let language of languageOptions" [value]="language.value">
+                  {{ language.label }}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="documentForm.get('language')?.hasError('required')">
+                {{ 'system.document.languageRequired' | translate }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Title -->
+          <div class="col-md-6">
+            <label class="d-block mb-12 fw-semibold">
+              Title <span class="text-danger">*</span>
+            </label>
+            <mat-form-field appearance="outline" class="w-100 thin-select">
+              <input matInput formControlName="title" placeholder="Enter title" />
+              <mat-error *ngIf="documentForm.get('title')?.hasError('required')">
+                {{ 'system.document.titleRequired' | translate }}
+              </mat-error>
+              <mat-error *ngIf="documentForm.get('title')?.hasError('maxlength')">
+                {{ 'system.document.titleMaxLength' | translate }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Content -->
+          <div class="col-md-12">
+              <div class="d-flex align-items-center mb-12">
+                  <label class="d-block mb-0 fw-semibold">
+                      Content <span class="text-danger">*</span>
+                  </label>
+                  <button
+                      mat-icon-button
+                      type="button"
+                      class="help-button"
+                      [class.active]="showHelpPanel"
+                      (click)="showHelpPanel = !showHelpPanel; $event.preventDefault(); $event.stopPropagation();">
+                      <mat-icon>{{ showHelpPanel ? 'help' : 'help_outline' }}</mat-icon>
+                  </button>
+              </div>
+
+              <!-- Help Panel -->
+              <div class="help-panel" *ngIf="showHelpPanel">
+                  <div class="help-panel-header">
+                      <h4>{{ helpTitle }}</h4>
+                      <button mat-icon-button type="button" (click)="showHelpPanel = false" class="close-help">
+                          <mat-icon>close</mat-icon>
+                      </button>
+                  </div>
+                  <div class="help-panel-content">
+                      <div class="help-section">
+                          <h5>
+                              <mat-icon>view_quilt</mat-icon>
+                              {{ helpSections.layoutsTitle }}
+                          </h5>
+                          <ul>
+                              <li *ngFor="let layout of availableLayouts">
+                                  <code>{{ layout.key }}</code> - {{ layout.name }}
+                              </li>
+                          </ul>
+                          <p class="help-note">
+                              {{ helpSections.layoutUsageText }}
+                              <code>{{ helpSections.layoutUsageCode }}</code>
+                              {{ helpSections.layoutUsageNote }}
+                          </p>
+                      </div>
+
+                      <div class="help-section">
+                          <h5>
+                              <mat-icon>email</mat-icon>
+                              {{ helpSections.templatesTitle }}
+                          </h5>
+                          <ul>
+                              <li *ngFor="let template of availableTemplates">
+                                  <strong>{{ template.key }}</strong> - {{ template.name }}
+                                  <br>
+                                  <span class="help-fields">{{ helpSections.requiredFields }}
+                                      : {{ template.requiredFields.join(', ') }}</span>
+                              </li>
+                          </ul>
+                          <p class="help-note">{{ helpSections.templateNote }}</p>
+                      </div>
+
+                      <div class="help-section">
+                          <h5>
+                              <mat-icon>code</mat-icon>
+                              {{ helpSections.placeholdersTitle }}
+                          </h5>
+                          <ul>
+                              <li><code>@Model.Username</code></li>
+                              <li><code>@Model.Password</code></li>
+                              <li><code>@Model.Link</code></li>
+                              <li><code>@Model.BaseUrl</code></li>
+                              <li><code>@Model.Ip</code></li>
+                          </ul>
+                          <p class="help-note">{{ helpSections.placeholderNote }}</p>
+                      </div>
+
+                      <div class="help-section">
+                          <h5>
+                              <mat-icon>info</mat-icon>
+                              {{ helpSections.notesTitle }}
+                          </h5>
+                          <ul>
+                              <li>{{ helpSections.note1 }}</li>
+                              <li>{{ helpSections.note2 }}</li>
+                              <li>{{ helpSections.note3 }}</li>
+                              <li>{{ helpSections.note4 }}</li>
+                          </ul>
+                      </div>
+
+                      <div class="help-section">
+                          <h5>
+                              <mat-icon>play_circle</mat-icon>
+                              {{ helpSections.exampleTitle }}
+                          </h5>
+                          <pre class="help-example"><code>{{ '@{' }}
+                              Layout = "base-layout-content-en-us";
+                              {{ '}' }}
+
+                              &lt;p&gt;Hello @Model.Username!&lt;/p&gt;
+                &lt;p&gt;Your password is: @Model.Password&lt;/p&gt;
+                &lt;a href="@Model.BaseUrl@Model.Link"&gt;Click here&lt;/a&gt;</code></pre>
+                      </div>
+                  </div>
+              </div>
+
+              <!-- Template Info -->
+              <div class="template-info mb-2" *ngIf="currentTemplate">
+                  <mat-icon class="template-icon">description</mat-icon>
+                  <div>
+                      <span><strong>Template:</strong> {{ currentTemplate.name }}</span>
+                      <span class="ml-3" *ngIf="requiredFields.length > 0">
+                  <strong>Required fields:</strong> {{ requiredFields.join(', ') }}
+                </span>
+                  </div>
+              </div>
+
+              <!-- Layout Info -->
+              <div class="layout-info mb-2" *ngIf="detectedLayout">
+                  <mat-icon class="layout-icon">info</mat-icon>
+                  <span>Layout detected: <strong>{{ detectedLayout }}</strong></span>
+              </div>
+
+              <!-- Validation Error -->
+              <div class="validation-error mb-2" *ngIf="!isContentValid && missingFields.length > 0">
+                  <mat-icon class="error-icon">error</mat-icon>
+                  <span>Missing required fields: <strong>{{ missingFields.join(', ') }}</strong></span>
+              </div>
+
+              <mat-form-field appearance="outline" class="w-100 ">
+              <textarea
+                  matInput
+                  formControlName="content"
+                  [placeholder]="'@{ Layout = \'base-layout-content-en-us\'; }\n\nYour content here. Use @FieldName or @Model.FieldName for dynamic fields (e.g., @Username, @Password, @Link, @BaseUrl, @Ip)'"
+                  rows="12"
+                  class="content-textarea "
+                  [class.error]="!isContentValid">
+              </textarea>
+                  <mat-error
+                      *ngIf="documentForm.get('content')?.hasError('required') && documentForm.get('content')?.touched">
+                      {{ 'system.document.contentRequired' | translate }}
+                  </mat-error>
+              </mat-form-field>
+
+
+          </div>
+
+            <!-- Preview Section -->
+            <div class="col-md-12">
+                <label class="d-block mb-12 fw-semibold">
+                    Preview
+                </label>
+                <div class="preview-container">
+                    <div class="preview-content" [innerHTML]="previewContent"></div>
+                    <div class="preview-empty" *ngIf="!documentForm.get('content')?.value">
+                        <mat-icon>preview</mat-icon>
+                        <p>Preview will appear here when you enter content</p>
+                    </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex gap-3 justify-content-end footer">
+      <button mat-flat-button type="button" class="btn-primary-flat btn-cancel" (click)="onCancel()">
+        {{ 'common.cancel' | translate }}
+      </button>
+        <button
+            type="submit"
+            mat-flat-button
+            color="primary"
+        class="btn-primary-flat"
+          [disabled]=" isSubmitting"
+          [ngClass]="{
+            'btn-disabled': isSubmitting,
+            'btn-update': data.document?.id && !(documentForm.invalid || isSubmitting),
+            'btn-create': !data.document?.id && !(documentForm.invalid || isSubmitting)
+        }"
+        [class.loading]="isSubmitting">
+        <mat-icon *ngIf="!isSubmitting">{{ data.document?.id ? 'save' : 'add' }}</mat-icon>
+        <mat-icon *ngIf="isSubmitting" class="spin">refresh</mat-icon>
+        {{ submitButtonText }}
+      </button>
+    </div>
+  </form>
+</div>

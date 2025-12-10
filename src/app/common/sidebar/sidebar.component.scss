@@ -1,0 +1,240 @@
+// The CSS is Available on the _sidebar.scss file because of Angular Material CSS didn't work in Component CSS.
+.logo {
+    // a {
+        // text-align: center;
+            transition: all .5s ease-in-out;
+        img {
+            width: 100% ;
+            transition: all .5s ease-in-out;
+            transform: translateY(10px) !important;
+        }
+    // }
+}
+
+.logo-sidebar {
+    img {
+            width: 80% ;
+        }
+}
+
+.title {
+    // color: #fff;
+    // white-space: nowrap;
+    // overflow: hidden;
+    // text-overflow: ellipsis;
+}
+.icon-title {
+    font-size: 18px !important;
+    // width: 20px !important;
+    // height: 20px !important;
+    // line-height: 1;
+    // margin-left: -2px !important;
+}
+
+.sidebar-sub-menu {
+    .sidemenu-item {
+        // position: relative;
+        // right: 0px;
+        margin-left: auto;
+        width: 96.5%;
+        margin-top: 3px;
+        .sidemenu-link {
+            color: #2c3e50 ;
+            display: flex !important;
+            align-items: flex-end;
+            gap: 10px;
+            padding-left: 15px !important;
+            border-radius: 15px !important;
+            span {
+                font-size: 20px;
+            }
+            &::after {
+                display: none;
+            }
+        }
+    }
+    // Nested sub-menu styles - override default styles
+    &.nested-sub-menu {
+        .sidemenu-item {
+            .sidemenu-link {
+                padding-left: 30px !important;
+                padding-top: 6px !important;
+                padding-bottom: 6px !important;
+                font-size: 13px !important;
+
+                &::after,
+                &::before {
+                    display: none !important;
+                    content: none !important;
+                }
+
+                span.material-symbols-outlined {
+                    font-size: 14px !important;
+                    width: 14px !important;
+                    height: 14px !important;
+                    margin-right: 6px;
+                    line-height: 1;
+                }
+            }
+        }
+    }
+}
+
+.sidebar-inner {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    width: 100%;
+    margin: auto;
+
+}
+
+.sidebar-area.active .sidebar-inner {
+    // padding-top: 80px;
+    // padding-left: 12px;
+    // padding-right: 12px;
+}
+
+.sidebar-area .mat-accordion .sidebar-menu-link {
+    margin-bottom: 3px;
+    &:hover {
+        color: #fff;
+    }
+    &.active {
+        color: #fff;
+
+    }
+}
+
+.sidebar-menu-link {
+    &:hover, &.active {
+        background-color: var(--heraBlueColor) !important;
+    }
+    i{
+        font-size: 16px;
+    }
+}
+
+.mat-expansion-panel-header {
+    &:hover, &.mat-expanded  {
+        background-color: var(--heraBlueColor) !important;
+    }
+}
+
+.mat-expansion-indicator {
+    color: var(--heraBlueColor) !important;
+}
+
+// ::ng-deep .mat-expansion-panel-header {
+//     color: #2166fdb9;
+// }
+
+::ng-deep .sidebar-area {
+    // background-color: #1a2332 !important;
+}
+
+.burger-menu {
+    .top-bar, .middle-bar, .bottom-bar {
+        // background-color: #fff !important;
+    }
+}
+
+::ng-deep .mat-expansion-panel-header {
+  &:hover {
+    .mat-expansion-panel-header-title {
+        transition: color .5s ease;
+        // color: #fff !important;
+    }
+    .mat-expansion-indicator {
+        svg {
+            // fill: #fff !important;
+        }
+    }
+  }
+}
+
+.mat-expansion-panel {
+    margin-bottom: 3px !important;
+    &:has(> .mat-expansion-panel-content-wrapper > .mat-expansion-panel-content > .mat-expansion-panel-body > .sidebar-sub-menu > .sidemenu-item > .sidemenu-link.active) {
+        .mat-expansion-panel-header {
+            background-color: #f0f0f0 !important;
+            .mat-expansion-panel-header-title {
+                // color: #2c3e50 !important;
+            }
+        }
+    }
+
+    &:has(> .mat-expansion-panel-content-wrapper > .mat-expansion-panel-content > .mat-expansion-panel-body > .sidebar-sub-menu > .sidemenu-item > .sidemenu-link) {
+        .mat-expansion-panel-header {
+            background-color: #f0f0f0 !important;
+            // background-color: transparent !important;
+            &:hover {
+                background-color: #f0f0f0 !important;
+                // color: #2c3e50 !important;
+            }
+        }
+    }
+}
+
+::ng-deep .mat-expansion-indicator {
+  svg {
+    // fill: red !important;
+  }
+}
+
+// Nested expansion panel styles
+.nested-expansion-panel {
+  margin: 0 !important;
+  box-shadow: none !important;
+  &:hover {
+    background-color: transparent !important;
+  }
+  .mat-expansion-panel-header {
+    padding-bottom: 8px !important;
+    padding-right: 60px !important;
+    padding-left: 37px !important;
+    padding-top: 8px !important;
+    height: auto !important;
+
+  
+
+    .mat-panel-title {
+      span.material-symbols-outlined {
+        font-size: 13px !important;
+        width: 13px !important;
+        height: 13px !important;
+        line-height: 1;
+      }
+    }
+  }
+
+  .nested-sub-menu {
+    padding-left: 0 !important;
+    margin-top: 0 !important;
+
+    .sidemenu-item {
+      margin-left: 0 !important;
+      width: 100% !important;
+
+      .sidemenu-link {
+        padding-left: 30px !important;
+        padding-top: 6px !important;
+        padding-bottom: 6px !important;
+        font-size: 13px !important;
+
+        &::after,
+        &::before {
+          display: none !important;
+          content: none !important;
+        }
+
+        span.material-symbols-outlined {
+          font-size: 14px !important;
+          width: 14px !important;
+          height: 14px !important;
+          margin-right: 6px;
+          line-height: 1;
+        }
+      }
+    }
+  }
+}

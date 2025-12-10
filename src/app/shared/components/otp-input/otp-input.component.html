@@ -1,0 +1,23 @@
+<div class="otp-input-container">
+  <div class="otp-inputs-wrapper">
+    <input
+      *ngFor="let item of otpValues; let i = index"
+      #otpInput
+      type="text"
+      inputmode="numeric"
+      maxlength="1"
+      class="otp-input"
+      [class.filled]="otpValues[i] !== ''"
+      [class.focused]="focusedIndex === i"
+      [disabled]="disabled"
+      [value]="otpValues[i]"
+      (keydown)="onKeyDown($event, i)"
+      (paste)="onPaste($event)"
+      (focus)="onFocus(i)"
+      (blur)="onBlur(i)"
+      autocomplete="off"
+      spellcheck="false"
+    />
+  </div>
+</div>
+

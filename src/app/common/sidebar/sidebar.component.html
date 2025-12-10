@@ -1,0 +1,220 @@
+<div
+    class="sidebar-area bg-white box-shadow"
+    [ngClass]="{ active: isToggled }"
+    [class.dark-sidebar]="themeService.isSidebarDark()"
+    [class.right-sidebar]="themeService.isRightSidebar()"
+    [class.hide-sidebar]="themeService.isHideSidebar()"
+    (mouseenter)="onSidebarMouseEnter()"
+    (mouseleave)="onSidebarMouseLeave()"
+>
+    <div class="logo bg-white" [class]="checkChangeLogoSize()">
+        <!-- <a href="/"> -->
+            <img [src]="checkChangeLogo()" alt="logo" />
+        <!-- </a> -->
+    </div>
+    <div
+        class="burger-menu"
+        (click)="toggle()"
+        [ngClass]="{ active: isToggled }"
+    >
+        <span class="top-bar"></span>
+        <span class="middle-bar"></span>
+        <span class="bottom-bar"></span>
+    </div>
+    <ng-scrollbar visibility="hover" style="height: 100vh">
+        <div class="sidebar-inner">
+            <div class="sidebar-menu">
+                <mat-accordion>
+                    <!--                     <a routerLink="/" class="sidebar-menu-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">-->
+                    <!--                         <i class="flaticon-worldwide"></i>-->
+                    <!--                         <span class="title">{{ 'sidebar.dashboard' | translate }}</span>-->
+                    <!--                     </a>-->
+                    <a routerLink="/dashboard" class="sidebar-menu-link" routerLinkActive="active">
+                        <i class="material-symbols-outlined">dashboard_customize</i>
+                        <span class="title">{{ 'sidebar.dashboardV2' | translate }}</span>
+                     </a>
+                    <mat-expansion-panel
+                        [expanded]="false"
+                        (opened)="panelOpenState = true"
+                        (closed)="panelOpenState = true"
+                        *ngIf="authService.isPageGranted(path.TRANSACTION)"
+                    >
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                <i class="material-symbols-outlined icon-title">currency_exchange</i>
+                                <span class="title">{{ 'sidebar.transactionOrder' | translate }}</span>
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <ul class="sidebar-sub-menu">
+                            <!--                            <li class="sidemenu-item">-->
+                            <!--                                <a-->
+                            <!--                                    routerLink="/system/transaction-management"-->
+                            <!--                                    routerLinkActive="active"-->
+                            <!--                                    class="sidemenu-link"-->
+                            <!--                                >-->
+                            <!--                                    <span class="material-symbols-outlined">receipt_long</span>-->
+                            <!--                                    {{ 'sidebar.transactionManagement' | translate }}-->
+                            <!--                                </a>-->
+                            <!--                            </li>-->
+                            <li class="sidemenu-item">
+                                <a
+                                    routerLink="/system/purchase-order-management"
+                                    routerLinkActive="active"
+                                    class="sidemenu-link"
+                                >
+                                    <span class="material-symbols-outlined">shopping_cart</span>
+                                    {{ 'sidebar.purchaseOrder' | translate }}
+                                </a>
+                            </li>
+                            <!--                            <li class="sidemenu-item">-->
+                            <!--                                <a-->
+                            <!--                                    routerLink="/system/balance-management"-->
+                            <!--                                    routerLinkActive="active"-->
+                            <!--                                    class="sidemenu-link"-->
+                            <!--                                >-->
+                            <!--                                    <span class="material-symbols-outlined">account_balance</span>-->
+                            <!--                                    {{ 'sidebar.balanceManagement' | translate }}-->
+                            <!--                                </a>-->
+                            <!--                            </li>-->
+                            <!--                            <li class="sidemenu-item">-->
+                            <!--                                <a-->
+                            <!--                                    routerLink="/system/reconciliation-management"-->
+                            <!--                                    routerLinkActive="active"-->
+                            <!--                                    class="sidemenu-link"-->
+                            <!--                                >-->
+                            <!--                                    <span class="material-symbols-outlined">sync_alt</span>-->
+                            <!--                                    {{ 'sidebar.reconciliationManagement' | translate }}-->
+                            <!--                                </a>-->
+                            <!--                            </li>-->
+                        </ul>
+                    </mat-expansion-panel>
+                    <mat-expansion-panel
+                        [expanded]="true"
+                        (opened)="panelOpenState = true"
+                        (closed)="panelOpenState = true"
+                    >
+                        <mat-expansion-panel-header>
+                            <mat-panel-title>
+                                <i class="material-symbols-outlined icon-title">settings</i>
+                                <span class="title">{{ 'sidebar.system' | translate }}</span>
+                            </mat-panel-title>
+                        </mat-expansion-panel-header>
+                        <ul class="sidebar-sub-menu">
+                            @if (authService.isAdmin() || authService.isPageGranted(pages.USER)) {
+                            <li class="sidemenu-item">
+                                <a
+                                    routerLink="/system/user"
+                                    routerLinkActive="active"
+                                    class="sidemenu-link"
+                                >
+                                    <span class="material-symbols-outlined">person</span>
+                                    {{ 'sidebar.user' | translate }}
+                                </a>
+                            </li>
+                            }
+                            @if (authService.isAdmin() || authService.isPageGranted(pages.ROLE)) {
+                            <li class="sidemenu-item">
+                                <a
+                                    routerLink="/system/role"
+                                    routerLinkActive="active"
+                                    class="sidemenu-link"
+                                >
+                                    <span class="material-symbols-outlined">group</span>
+                                    {{ 'sidebar.role' | translate }}
+                                </a>
+                            </li>
+                            }
+                            @if (authService.isAdminHub()) {
+                            <li class="sidemenu-item">
+                                <a
+                                    routerLink="/system/partner-management"
+                                    routerLinkActive="active"
+                                    class="sidemenu-link"
+                                >
+                                    <span class="material-symbols-outlined">partner_exchange</span>
+                                    {{ 'sidebar.partnerManagement' | translate }}
+                                </a>
+                            </li>
+                            }
+                            <li class="sidemenu-item">
+                                <a
+                                    routerLink="/system/stock-management"
+                                    routerLinkActive="active"
+                                    class="sidemenu-link"
+                                >
+                                    <span class="material-symbols-outlined">inventory</span>
+                                    {{ 'sidebar.stockManagement' | translate }}
+                                </a>
+                            </li>
+                            @if (authService.isPageGranted(pages.PRODUCT)) {
+                            <li class="sidemenu-item">
+                                <a
+                                    routerLink="/system/product-management"
+                                    routerLinkActive="active"
+                                    class="sidemenu-link"
+                                >
+                                    <span class="material-symbols-outlined">package_2</span>
+                                    {{ 'sidebar.productList' | translate }}
+                                </a>
+                            </li>
+                            }
+                            @if (authService.isAdmin() || authService.isPageGranted(pages.CONFIG)) {
+                            <li class="sidemenu-item">
+                                <a
+                                    routerLink="/system/config"
+                                    routerLinkActive="active"
+                                    class="sidemenu-link"
+                                >
+                                    <span class="material-symbols-outlined">handyman</span>
+                                    {{ 'sidebar.config' | translate }}
+                                </a>
+                            </li>
+                            }
+                            @if (authService.isPageGranted(pages.CONFIG)) {
+                                <li class="sidemenu-item">
+                                <a
+                                    routerLink="/system/document-management"
+                                    routerLinkActive="active"
+                                    class="sidemenu-link"
+                                >
+                                    <span class="material-symbols-outlined">description</span>
+                                    {{ 'sidebar.documentManagement' | translate }}
+                                </a>
+                            </li>
+                            }
+                            <li class="sidemenu-item">
+                                <a
+                                    routerLink="/system/notification"
+                                    routerLinkActive="active"
+                                    class="sidemenu-link"
+                                >
+                                    <span class="material-symbols-outlined">notifications</span>
+                                    {{ 'sidebar.notification' | translate }}
+                                </a>
+                            </li>
+                            @if (authService.isAdminHub()) {
+                            <li class="sidemenu-item">
+                                <a
+                                    routerLink="/system/help-management"
+                                    routerLinkActive="active"
+                                    class="sidemenu-link">
+                                    <span class="material-symbols-outlined">help</span>
+                                    {{ 'sidebar.helpManagement' | translate }}
+                                </a>
+                                </li>
+                            }
+                        </ul>
+                    </mat-expansion-panel>
+
+
+
+                    <!-- <a routerLink="/application-management" class="sidebar-menu-link" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">
+                        <i class="flaticon-worldwide"></i>
+                        <span class="title">Application Management</span>
+                    </a> -->
+                </mat-accordion>
+            </div>
+        </div>
+    </ng-scrollbar>
+</div>
+

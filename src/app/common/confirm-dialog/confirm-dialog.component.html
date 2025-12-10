@@ -13,11 +13,10 @@
 </div>
 
 <mat-dialog-actions align="end">
-  @if(data.isDisabledConfirm) {
   <button mat-stroked-button color="primary" (click)="close(false)" class="clear-btn">
     {{ data.cancelText || 'Cancel' }}
   </button>
-  }
+
   <button mat-flat-button color="primary" class="apply-btn" (click)="close(true)">
     {{ data.confirmText || (data.type === 'success' ? 'OK' : 'Confirm') }}
   </button>

@@ -1,0 +1,498 @@
+.dashboard-wrapper {
+  padding-left: 40px;
+  background-color: #f5f5f5;
+  min-height: 100vh;
+    margin-bottom: 50px;
+}
+.chart-amount-transaction {
+  display: flex;
+  gap: 20px;
+  margin-top: 0;
+    padding: 10px;
+
+  .col-6 {
+    flex: 1;
+    padding: 20px;
+  }
+}
+
+// Utility classes
+.bg-white {
+  background-color: var(--whiteColor) !important;
+}
+
+.box-shadow {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.border-radius-size-main {
+  border-radius: 10px !important;
+}
+
+.dashboard-header {
+  margin-bottom: 20px;
+
+  .title {
+    font-size: 2rem;
+    font-weight: 600;
+    color: var(--blackColor);
+    margin: 0;
+  }
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  grid-auto-rows: minmax(300px, auto);
+    margin-bottom: 11px;
+  .reconciliation-purchase-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-height: 0;
+
+    .dashboard-panel {
+      flex: 1;
+      min-height: 0;
+    }
+  }
+
+  // Amount và Transaction chart chia đôi row - mỗi cái chiếm 50%
+  .dashboard-panel:nth-last-child(2) {
+    grid-column: 1 / 2.5;
+  }
+
+  .dashboard-panel:last-child {
+    grid-column: 2.5 / 4;
+  }
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr);
+
+    .reconciliation-purchase-wrapper {
+      grid-column: 1 / -1;
+      flex-direction: row;
+    }
+
+    .dashboard-panel:nth-last-child(2),
+    .dashboard-panel:last-child {
+      grid-column: span 1;
+    }
+  }
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+
+    .reconciliation-purchase-wrapper {
+      grid-column: 1;
+      flex-direction: column;
+    }
+
+    .dashboard-panel:nth-last-child(2),
+    .dashboard-panel:last-child {
+      grid-column: 1;
+    }
+  }
+}
+
+.dashboard-panel {
+    padding: 20px 20px 85px;
+    border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  &.full-width {
+    grid-column: 1 / -1;
+  }
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+
+  .panel-title-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .panel-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .panel-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--blackColor);
+    margin: 0;
+  }
+
+  .panel-date {
+    font-size: 0.875rem;
+    color: var(--paragraphColor);
+  }
+
+  .view-all-link {
+    font-size: 0.875rem;
+    color: var(--heraBlueColor);
+    text-decoration: none;
+    font-weight: 500;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.amount-icon {
+  background-color: #fff4e6;
+  color: #ea580c;
+}
+
+.transaction-icon {
+  background-color: #e0f2fe;
+  color: #2563eb;
+}
+
+.reconciliation-header {
+  align-items: flex-start;
+
+  .panel-title-column {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
+.panel-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-container {
+  flex: 1;
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+
+  &.product-distribution-chart {
+    align-items: flex-start;
+    padding-top: 20px;
+  }
+}
+
+.chart-center-label {
+  position: absolute;
+  top: 90%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  pointer-events: none;
+  z-index: 10;
+
+  .center-label-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--blackColor);
+    margin-bottom: 4px;
+    line-height: 1.2;
+  }
+
+  .center-label-text {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--paragraphColor);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+}
+
+.balance-info {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #e0e0e0;
+
+  .balance-info-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+
+    .balance-label {
+      font-size: 0.875rem;
+      color: var(--paragraphColor);
+      font-weight: 500;
+    }
+  }
+
+  .balance-amount {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--blackColor);
+  }
+
+  .details-link {
+    font-size: 0.875rem;
+    color: #10B981;
+    text-decoration: none;
+    font-weight: 500;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.reconciliation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+    margin-bottom: 20px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.reconciliation-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background-color: #e9ecef;
+  }
+
+  &.success {
+    .reconciliation-icon {
+      background-color: #d1fae5;
+      color: #10B981;
+    }
+  }
+
+  &.failure {
+    .reconciliation-icon {
+      background-color: #fee2e2;
+      color: #ef4444;
+    }
+  }
+
+  &.missed {
+    .reconciliation-icon {
+      background-color: #fef3c7;
+      color: #f59e0b;
+    }
+  }
+
+  .reconciliation-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #e5e7eb;
+    color: var(--paragraphColor);
+
+    mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  .reconciliation-info {
+    flex: 1;
+
+    .reconciliation-value {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--blackColor);
+      margin-bottom: 4px;
+    }
+
+    .reconciliation-label {
+      font-size: 0.875rem;
+      color: var(--paragraphColor);
+    }
+  }
+}
+
+.purchase-order-panel {
+  .panel-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    padding: 20px 0;
+  }
+}
+
+.purchase-order-container {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.purchase-order-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  background: transparent;
+
+  &.deposit-item {
+    align-items: flex-start;
+    padding-right: 15px;
+  }
+
+  &.withdraw-item {
+    align-items: flex-end;
+    padding-left: 15px;
+  }
+}
+
+.purchase-order-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.purchase-order-icon-square {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  &.deposit-icon-square {
+    background-color: #a7f3d0;
+    color: #399806;
+  }
+
+  &.withdraw-icon-square {
+    background-color: #fecaca;
+    color: #e81d1d;
+  }
+}
+
+.purchase-order-label-text {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--blackColor);
+
+  &.deposit-label {
+    color: var(--blackColor);
+  }
+
+  &.withdraw-label {
+    color: var(--blackColor);
+  }
+}
+
+.purchase-order-waiting {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  display: inline-block;
+
+  &.deposit-waiting {
+    background-color: #fef3c7;
+    color: #F6AC2F;
+  }
+
+  &.withdraw-waiting {
+    background-color: #a4e8ef;
+    color: #3252d5;
+  }
+}
+
+.purchase-order-date {
+  font-size: 0.875rem;
+  color: var(--blackColor);
+  font-weight: 500;
+}
+
+.purchase-order-divider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 1px;
+  margin: 0 20px;
+  position: relative;
+}
+
+.divider-line {
+  flex: 1;
+  width: 1px;
+  background-color: #e5e7eb;
+}
+
+.divider-vs {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--paragraphColor);
+  margin: 8px 0;
+  flex-shrink: 0;
+}
+
+// Chart specific styles
+::ng-deep {
+  .chart {
+    width: 100%;
+    height: 100%;
+
+    .apexcharts-canvas {
+      width: 100% !important;
+    }
+  }
+}
+

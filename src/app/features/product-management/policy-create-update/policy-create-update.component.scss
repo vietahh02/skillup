@@ -1,0 +1,67 @@
+.text-danger {
+    color: #e53935;
+}
+
+.loading-bar {
+    position: absolute;
+    width: 90%;
+}
+
+.drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+
+    h3 {
+        margin: 0;
+        font-weight: 700;
+    }
+}
+
+.drawer-body {
+    overflow-x: hidden;
+    margin-left: 10.5px;
+    margin-right: 10.5px;
+    .row {
+        margin: 0;
+    }
+
+    .col-md-12 {
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+
+.drawer-footer {
+    display: flex;
+    justify-content: flex-start;
+    gap: 10px;
+    margin-top: 12px;
+    button {
+      cursor: pointer;
+    }
+}
+
+.date-separator {
+    font-size: 18px;
+    font-weight: 600;
+    color: #666;
+    margin-top: 8px;
+}
+
+.gap-2 {
+    gap: 8px;
+}
+
+::ng-deep {
+    .mat-drawer-inner-container {
+        overflow-x: hidden !important;
+    }
+
+    .w-100 {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+}
+

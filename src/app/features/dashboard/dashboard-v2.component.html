@@ -1,0 +1,177 @@
+<div class="dashboard-v2-wrapper">
+    <div class="dashboard-header">
+        <h1 class="title">{{ 'dashboard.v2.title' | translate }}</h1>
+    </div>
+
+    <div class="dashboard-content">
+        <!-- Revenue Chart Section -->
+        <div class="revenue-chart-panel">
+            <div class="panel-header">
+                <h3 class="panel-title">{{ 'dashboard.v2.revenue.title' | translate }}</h3>
+                <div class="filter-control">
+                    <mat-form-field appearance="outline" class="filter-select thin-select">
+                        <mat-select [(ngModel)]="filterType" (selectionChange)="onFilterChange()">
+                            <mat-option value="day">{{ 'dashboard.v2.revenue.filterDay' | translate }}</mat-option>
+                            <mat-option value="week">{{ 'dashboard.v2.revenue.filterWeek' | translate }}</mat-option>
+                            <mat-option value="month">{{ 'dashboard.v2.revenue.filterMonth' | translate }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div class="panel-content">
+                <div class="chart-container" *ngIf="!loading">
+                    <apx-chart
+                        [series]="revenueChartOptions.series!"
+                        [chart]="revenueChartOptions.chart!"
+                        [stroke]="revenueChartOptions.stroke!"
+                        [xaxis]="revenueChartOptions.xaxis!"
+                        [yaxis]="revenueChartOptions.yaxis!"
+                        [legend]="revenueChartOptions.legend!"
+                        [tooltip]="revenueChartOptions.tooltip!"
+                        [colors]="revenueChartOptions.colors!"
+                        [markers]="revenueChartOptions.markers!"
+                        [annotations]="revenueChartOptions.annotations!"
+                        [dataLabels]="revenueChartOptions.dataLabels!">
+                    </apx-chart>
+                </div>
+                <div class="loading-container" *ngIf="loading">
+                    <div class="spinner"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="bottom-grid">
+            <!-- Wallet Balance Card -->
+            <div class="wallet-balance-panel" [ngClass]="'status-' + walletBalance.status">
+                <div class="wallet-card">
+                    <div class="wallet-card-header">
+                        <div class="header-left">
+                            <mat-icon class="header-icon">account_balance_wallet</mat-icon>
+                            <div>
+                                <h3 class="wallet-title">{{ 'dashboard.v2.wallet.title' | translate }}</h3>
+                                <p class="wallet-subtitle">{{ 'dashboard.v2.wallet.subtitle' | translate }}</p>
+                            </div>
+                        </div>
+                        <div class="critical-tag" *ngIf="walletBalance.status === 'danger'">
+                            <span>{{ 'dashboard.v2.wallet.critical' | translate }}</span>
+                        </div>
+                    </div>
+
+                    <div class="wallet-card-body">
+                        <div class="balance-section">
+                            <div class="balance-label-row">
+                                <span
+                                    class="balance-label">{{ 'dashboard.v2.wallet.currentBalance' | translate }}</span>
+                                <mat-icon class="trend-icon"
+                                          [ngClass]="{'trend-up': walletBalance.status === 'normal', 'trend-down': walletBalance.status !== 'normal'}">
+                                    {{ walletBalance.status === 'normal' ? 'trending_up' : 'trending_down' }}
+                                </mat-icon>
+                            </div>
+                            <div class="balance-amount">{{ formatCurrency(walletBalance.currentBalance) }} KS</div>
+                        </div>
+
+                        <div class="pending-info" *ngIf="walletBalance.pendingRequests.length > 0">
+                            <div class="pending-header">
+                                <span
+                                    class="pending-label">{{ 'dashboard.v2.wallet.pendingRequests' | translate }}</span>
+                                <span class="pending-count">{{ walletBalance.pendingRequests.length }}</span>
+                            </div>
+                            <div class="pending-total">
+                                <span class="total-label">{{ 'dashboard.v2.wallet.total' | translate }}:</span>
+                                <span class="total-amount">{{ formatCurrency(walletBalance.totalPendingAmount) }}
+                                    KS</span>
+                            </div>
+                        </div>
+
+                        <div class="status-section" *ngIf="walletBalance.status !== 'normal'">
+                            <div class="status-description" [ngClass]="'status-' + walletBalance.status">
+                                {{ walletBalance.status === 'danger' ? ('dashboard.v2.wallet.insufficientFunds' | translate) : ('dashboard.v2.wallet.lowBalance' | translate) }}
+                            </div>
+                            <div class="status-value" [ngClass]="'status-' + walletBalance.status">
+                                <span
+                                    *ngIf="walletBalance.status === 'danger'">-</span>{{ formatCurrency(walletBalance.status === 'danger' ? (walletBalance.requiredTopUp || 0) : (walletBalance.currentBalance - walletBalance.totalPendingAmount)) }}
+                                KS
+                            </div>
+
+                        </div>
+
+                        <div class="action-banner" *ngIf="walletBalance.status === 'danger'">
+                            <mat-icon class="banner-icon">info</mat-icon>
+                            <span class="banner-text">{{ 'dashboard.v2.wallet.actionRequired' | translate }}</span>
+                        </div>
+
+                        <div class="action-banner warning" *ngIf="walletBalance.status === 'warning'">
+                            <mat-icon class="banner-icon">warning</mat-icon>
+                            <span class="banner-text">{{ 'dashboard.v2.wallet.warningMessage' | translate }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Donut Charts -->
+            <div class="donut-panel">
+                <div class="panel-header">
+                    <div>
+                        <h3 class="panel-title">Revenue Distribution</h3>
+                        <p class="panel-subtitle">Click on segments to drill down</p>
+                    </div>
+                    <button mat-stroked-button color="primary" *ngIf="isDetailPie" (click)="onBackPie()">
+                        Back
+                    </button>
+                </div>
+                <div class="panel-content donut-content">
+                    <div class="donut-chart">
+                        <apx-chart
+                            *ngIf="!isDetailPie"
+                            [series]="mainPieOptions.series!"
+                            [chart]="mainPieOptions.chart!"
+                            [labels]="mainPieOptions.labels!"
+                            [dataLabels]="mainPieOptions.dataLabels!"
+                            [legend]="mainPieOptions.legend!"
+                            [colors]="mainPieOptions.colors!"
+                            [stroke]="mainPieOptions.stroke!"
+                            [tooltip]="mainPieOptions.tooltip!"
+                            [plotOptions]="mainPieOptions.plotOptions!">
+                        </apx-chart>
+
+                        <apx-chart
+                            *ngIf="isDetailPie"
+                            [series]="detailPieOptions.series!"
+                            [chart]="detailPieOptions.chart!"
+                            [labels]="detailPieOptions.labels!"
+                            [dataLabels]="detailPieOptions.dataLabels!"
+                            [legend]="detailPieOptions.legend!"
+                            [colors]="detailPieOptions.colors!"
+                            [stroke]="detailPieOptions.stroke!"
+                            [tooltip]="detailPieOptions.tooltip!"
+                            [plotOptions]="detailPieOptions.plotOptions!">
+                        </apx-chart>
+                    </div>
+
+                    <div class="donut-legend">
+                        <div *ngIf="!isDetailPie">
+                            <div class="legend-row clickable" *ngFor="let val of mainPieData.values; let i = index"
+                                 (click)="onPieSelect(i)">
+                                <span class="legend-dot" [style.background]="mainPieData.colors[i]"></span>
+                                <div class="legend-label">{{ mainPieData.labels[i] }}</div>
+                                <div class="legend-value">{{ val | number }} USD</div>
+                                <div class="legend-percent">{{ (val / mainTotal * 100) | number:'1.0-1' }}%</div>
+                            </div>
+                        </div>
+
+                        <div *ngIf="isDetailPie">
+                            <h4 class="detail-title">{{ selectedSliceLabel }} - Revenue by Agent</h4>
+                            <div class="legend-row" *ngFor="let val of currentDetailValues; let i = index">
+                                <span class="legend-dot" [style.background]="detailPieOptions.colors?.[i]"></span>
+                                <div class="legend-label">{{ currentDetailLabels[i] }}</div>
+                                <div class="legend-value">{{ val | number }} USD</div>
+                                <div class="legend-percent">{{ (val / detailTotal * 100) | number:'1.0-1' }}%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

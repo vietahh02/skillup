@@ -1,0 +1,87 @@
+<div class="create-update-container">
+    <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+    <!-- Header -->
+    <div class="header mb-2 d-flex align-items-center justify-content-between">
+      <div class="d-flex align-items-center">
+        <div>
+          <h2 class="title">{{ roleId ? ('system.role.update' | translate) : ('system.role.create' | translate) }}</h2>
+        </div>
+      </div>
+      <button mat-icon-button (click)="onCancel()" class="close-button">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Form Content -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="stats-card mb-4 body">
+            <div class="app-form">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="d-block mb-12 fw-semibold">
+                            {{ 'system.role.roleCode' | translate }} <span class="text-danger">*</span>
+                        </label>
+                        <mat-form-field appearance="outline" class="w-100 thin-select">
+                            <input matInput formControlName="roleCode" [placeholder]="'system.role.roleCodePlaceholder' | translate" />
+                            <mat-error *ngIf="form.get('roleCode')?.hasError('required')">{{ 'system.role.roleCodeRequired' | translate }}</mat-error>
+                            <mat-error *ngIf="form.get('roleCode')?.hasError('maxlength')">{{ 'system.role.roleCodeMaxLength' | translate }}</mat-error>
+                        </mat-form-field>
+                    </div>
+                
+                    <div class="col-md-6">
+                        <label class="d-block mb-12 fw-semibold">
+                            {{ 'system.role.roleName' | translate }} <span class="text-danger">*</span>
+                        </label>
+                        <mat-form-field appearance="outline" class="w-100 thin-select">
+                            <input matInput formControlName="roleName" [placeholder]="'system.role.roleNamePlaceholder' | translate" />
+                            <mat-error *ngIf="form.get('roleName')?.hasError('required')">{{ 'system.role.roleNameRequired' | translate }}</mat-error>
+                            <mat-error *ngIf="form.get('roleName')?.hasError('maxlength')">{{ 'system.role.roleNameMaxLength' | translate }}</mat-error>
+                        </mat-form-field>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <label class="d-block mb-12 fw-semibold">
+                            {{ 'system.role.pages' | translate }}
+                        </label>
+                        <generic-searchable-select [dataSource]="dataSourcePage" [nameControl]="'pages'" [form]="form" 
+                            [config]="searchPageSelectConfig" [multiple]="true" [options]="pageOptions" [initialOptions]="initialPageOptions">
+                        </generic-searchable-select>
+                    </div>
+                
+                    <div class="col-md-6">
+                        <label class="d-block mb-12 fw-semibold">
+                            {{ 'system.role.permissions' | translate }}
+                        </label>
+                        <generic-searchable-select [dataSource]="dataSourcePermission" [nameControl]="'permissions'" [form]="form" 
+                            [config]="searchPermissionSelectConfig" [multiple]="true" [options]="permissionOptions" [initialOptions]="initialPermissionOptions">
+                        </generic-searchable-select>
+                    </div>
+                
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-3 justify-content-end footer">
+            <button mat-flat-button type="button" class="btn-primary-flat btn-cancel" (click)="onCancel()">
+              {{ 'common.cancel' | translate }}
+            </button>
+            <button 
+              type="submit" 
+              mat-flat-button 
+              color="primary" 
+              class="btn-primary-flat"
+                [disabled]=" isSubmit"
+                [ngClass]="{
+                  'btn-disabled': isSubmit,
+                  'btn-update': roleId && !(form.invalid || isSubmit),
+                  'btn-create': !roleId && !(form.invalid || isSubmit)
+              }"
+              [class.loading]="isSubmit">
+              <mat-icon *ngIf="!isSubmit">{{ roleId ? 'save' : 'add' }}</mat-icon>
+              <mat-icon *ngIf="isSubmit" class="spin">refresh</mat-icon>
+              {{ roleId ? ('common.update' | translate) : ('common.create' | translate) }}
+            </button>
+          </div>
+    </form>
+
+</div>

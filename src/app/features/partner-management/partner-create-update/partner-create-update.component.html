@@ -1,0 +1,254 @@
+<div class="page-create-update-container">
+    <!-- Header Section -->
+    <div class="header mb-2 d-flex align-items-center justify-content-space-between">
+        <div class="d-flex align-items-center justify-content-space-between">
+            <div class="d-grid align-items-center mb-2">
+
+                <div class="d-flex">
+                    <a class="d-flex align-items-center btn-back" (click)="onBack()">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                            class="lucide lucide-arrow-left h-4 w-4">
+                            <path d="m12 19-7-7 7-7"></path>
+                            <path d="M19 12H5"></path>
+                        </svg>
+                        {{ 'system.partner.backToPartners' | translate }}
+                    </a>
+                </div>
+
+                <div>
+                    <h1 class="title">{{ getTileName() }}</h1>
+                </div>
+
+            </div>
+        </div>
+        <div class="action-buttons">
+            <button mat-flat-button color="primary" class="btn-primary-flat" (click)="onSubmit()"
+                 [ngClass]="{
+                    'btn-disabled': submitting,
+                }"
+                [disabled]="submitting"
+                >
+                <mat-icon>save</mat-icon>
+                {{ submitButtonText() }}
+            </button>
+        </div>
+    </div>
+
+    <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+    <div [formGroup]="form">
+    <div class="stats-card bg-white border-radius-size-main h-100 mb-4">
+        <h5>{{ 'system.partner.basicInformation' | translate }}</h5>
+        <div class="app-form">
+            <!-- Row 1: Project Name / Project Type -->
+            <div class="row position-relative">
+                <div class="col-md-6">
+                    <label class="d-block mb-12 fw-semibold">
+                        {{ 'system.partner.partnerCode' | translate }} <span class="text-danger">*</span>
+                    </label>
+                    <mat-form-field appearance="outline" class="w-100 thin-select">
+                        <input matInput formControlName="partnerCode" [placeholder]="'system.partner.partnerCodePlaceholder' | translate" />
+                        <mat-error *ngIf="form.get('partnerCode')?.hasError('required')">{{ 'system.partner.partnerCodeRequired' | translate }}</mat-error>
+                        <mat-error *ngIf="form.get('partnerCode')?.hasError('maxlength')">{{ 'system.partner.maxLength255' | translate }}</mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="d-block mb-12 fw-semibold">
+                        {{ 'system.partner.partnerType' | translate }} <span class="text-danger">*</span>
+                    </label>
+                    <mat-form-field appearance="outline" class="w-100 thin-select">
+                        <mat-select formControlName="partnerType" [placeholder]="'system.partner.partnerTypePlaceholder' | translate">
+                            <mat-option *ngFor="let type of typeOptions" [value]="type.code">
+                                {{ type.labelKey ? (type.labelKey | translate) : type.label }}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="form.get('partnerType')?.hasError('required')">{{ 'system.partner.partnerTypeRequired' | translate }}</mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="col-md-12">
+                    <label class="d-block mb-12 fw-semibold">
+                        {{ 'system.partner.partnerName' | translate }} <span class="text-danger">*</span>
+                    </label>
+                    <mat-form-field appearance="outline" class="w-100 thin-select">
+                        <input matInput formControlName="partnerName" [placeholder]="'system.partner.namePlaceholder' | translate" />
+                        <mat-error *ngIf="form.get('partnerName')?.hasError('required')">{{ 'system.partner.nameRequired' | translate }}</mat-error>
+                        <mat-error *ngIf="form.get('partnerName')?.hasError('maxlength')">{{ 'system.partner.maxLength255' | translate }}</mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="d-block mb-12 fw-semibold">{{ 'system.partner.city' | translate }} <span class="text-danger">*</span>
+                    </label>
+                    <mat-form-field appearance="outline" class="w-100 thin-select">
+                        <mat-select formControlName="cityId" [placeholder]="'system.partner.cityPlaceholder' | translate">
+                            <mat-option *ngFor="let city of cityOptions" [value]="city.id">
+                                {{ city.name }}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="form.get('cityId')?.hasError('required')">{{ 'system.partner.cityRequired' | translate }}</mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="d-block mb-12 fw-semibold">
+                        {{ 'system.partner.township' | translate }} <span class="text-danger">*</span>
+                    </label>
+                    <mat-form-field appearance="outline" class="w-100 thin-select">
+                        <mat-select formControlName="townshipId" [placeholder]="'system.partner.townshipPlaceholder' | translate">
+                            <mat-option *ngFor="let township of townshipOptions" [value]="township.id">
+                                {{ township.name }}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="form.get('townshipId')?.hasError('required')">{{ 'system.partner.townshipRequired' | translate }}</mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="col-md-12">
+                    <label class="d-block mb-12 fw-semibold">
+                        {{ 'system.partner.address' | translate }} <span class="text-danger">*</span>
+                    </label>
+                    <mat-form-field appearance="outline" class="w-100 thin-select">
+                        <input matInput formControlName="address" [placeholder]="'system.partner.addressPlaceholder' | translate" />
+                        <mat-error *ngIf="form.get('address')?.hasError('required')">{{ 'system.partner.addressRequired' | translate }}</mat-error>
+                        <mat-error *ngIf="form.get('address')?.hasError('maxlength')">{{ 'system.partner.maxLength255' | translate }}</mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="d-block mb-12 fw-semibold">
+                        {{ 'system.partner.contactPhone' | translate }} <span class="text-danger">*</span>
+                    </label>
+                    <mat-form-field appearance="outline" class="w-100 thin-select">
+                        <input matInput formControlName="contactPhone" [placeholder]="'system.partner.contactPhonePlaceholder' | translate" />
+                        <mat-error *ngIf="form.get('contactPhone')?.hasError('required')">{{ 'system.partner.contactPhoneRequired' | translate }}</mat-error>
+                        <mat-error *ngIf="form.get('contactPhone')?.hasError('pattern')">{{ 'system.partner.contactPhoneInvalid' | translate }}</mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="d-block mb-12 fw-semibold">
+                        {{ 'system.partner.email' | translate }} <span class="text-danger">*</span>
+                    </label>
+                    <mat-form-field appearance="outline" class="w-100 thin-select">
+                        <input matInput formControlName="email" [placeholder]="'system.partner.emailPlaceholder' | translate" />
+                        <mat-error *ngIf="form.get('email')?.hasError('required')">{{ 'system.partner.emailRequired' | translate }}</mat-error>
+                        <mat-error *ngIf="form.get('email')?.hasError('maxlength')">{{ 'system.partner.maxLength255' | translate }}</mat-error>
+                        <mat-error *ngIf="form.get('email')?.hasError('email')">{{ 'system.partner.emailInvalid' | translate }}</mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="col-md-12">
+                    <label class="d-block mb-12 fw-semibold">
+                        {{ 'system.partner.contactPerson' | translate }} <span class="text-danger">*</span>
+                    </label>
+                    <mat-form-field appearance="outline" class="w-100 thin-select">
+                        <input matInput formControlName="contactPerson" [placeholder]="'system.partner.contactPersonPlaceholder' | translate" />
+                        <mat-error *ngIf="form.get('contactPerson')?.hasError('required')">{{ 'system.partner.contactPersonRequired' | translate }}</mat-error>
+                        <mat-error *ngIf="form.get('contactPerson')?.hasError('maxlength')">{{ 'system.partner.maxLength255' | translate }}</mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="col-md-12">
+                    <label class="d-block mb-12 fw-semibold">
+                        {{ 'system.partner.taxId' | translate }}
+                    </label>
+                    <mat-form-field appearance="outline" class="w-100 thin-select">
+                        <input matInput formControlName="taxId" [placeholder]="'system.partner.taxIdPlaceholder' | translate" />
+                        <mat-error *ngIf="form.get('taxId')?.hasError('maxlength')">{{ 'system.partner.maxLength255' | translate }}</mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="col-md-12">
+                    <label class="d-block mb-12 fw-semibold">
+                        {{ 'system.partner.notes' | translate }}
+                    </label>
+                    <mat-form-field appearance="outline" class="w-100 gray_border">
+                        <textarea matInput formControlName="notes" [placeholder]="'system.partner.notesPlaceholder' | translate" rows="4"></textarea>
+                        <mat-error *ngIf="form.get('notes')?.hasError('maxlength')">{{ 'system.partner.maxLength5000' | translate }}</mat-error>
+                    </mat-form-field>
+                </div>
+            </div>            
+
+        </div>
+    </div>
+
+
+    <div class="stats-card bg-white border-radius-size-main h-100 mb-4">
+        <h5>{{ 'system.partner.contractInformation' | translate }}</h5>
+        <div class="app-form">
+            <!-- Row 1: CEO Name / CEO Phone / CEO Email -->
+            <div class="row position-relative">
+                <div class="col-md-12">
+                    <label class="d-block mb-12 fw-semibold">
+                        {{ 'system.partner.contractNumber' | translate }} <span class="text-danger">*</span>
+                    </label>
+                    <mat-form-field appearance="outline" class="w-100 thin-select">
+                        <input matInput formControlName="contractNumber" [placeholder]="'system.partner.contractNumberPlaceholder' | translate" />
+                        <mat-error *ngIf="form.get('contractNumber')?.hasError('required')">{{ 'system.partner.contractNumberRequired' | translate }}</mat-error>
+                        <mat-error *ngIf="form.get('contractNumber')?.hasError('maxlength')">{{ 'system.partner.maxLength255' | translate }}</mat-error>
+                    </mat-form-field>
+                </div>
+
+                <!-- <div class="col-md-6">
+                    <label class="d-block mb-12 fw-semibold">
+                        {{ 'system.partner.phoneNumber' | translate }} <span class="text-danger">*</span>
+                    </label>
+                    <mat-form-field appearance="outline" class="w-100 thin-select">
+                        <input matInput formControlName="phoneNumber" [placeholder]="'system.partner.phoneNumberPlaceholder' | translate" />
+                        <mat-error *ngIf="form.get('phoneNumber')?.hasError('required')">{{ 'system.partner.phoneNumberRequired' | translate }}</mat-error>
+                        <mat-error *ngIf="form.get('phoneNumber')?.hasError('pattern')">{{ 'system.partner.phoneNumberPattern' | translate }}</mat-error>
+                    </mat-form-field>
+                </div> -->
+
+                <div class="col-md-6">
+                    <label class="d-block mb-12 fw-semibold">
+                        {{ 'system.partner.contractStartDate' | translate }} <span class="text-danger">*</span>
+                    </label>
+                    <mat-form-field appearance="outline" class="w-100 thin-select">
+                        <input matInput formControlName="contractStartDate" [matDatepicker]="contractStartDatePicker" [placeholder]="'system.partner.contractStartDatePlaceholder' | translate" readonly />
+                        <mat-datepicker-toggle matIconSuffix [for]="contractStartDatePicker"></mat-datepicker-toggle>
+                        <mat-datepicker #contractStartDatePicker></mat-datepicker>
+                        <mat-error *ngIf="form.get('contractStartDate')?.hasError('required')">
+                            {{ 'system.partner.contractStartDateRequired' | translate }}
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="d-block mb-12 fw-semibold">
+                        {{ 'system.partner.contractEndDate' | translate }} <span class="text-danger">*</span>
+                    </label>
+                    <mat-form-field appearance="outline" class="w-100 thin-select">
+                        <input matInput formControlName="contractEndDate" [matDatepicker]="contractEndDatePicker" [placeholder]="'system.partner.contractEndDatePlaceholder' | translate" readonly />
+                        <mat-datepicker-toggle matIconSuffix [for]="contractEndDatePicker"></mat-datepicker-toggle>
+                        <mat-datepicker #contractEndDatePicker></mat-datepicker>
+                        <mat-error *ngIf="form.get('contractEndDate')?.hasError('required')">
+                            {{ 'system.partner.contractEndDateRequired' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="form.get('contractEndDate')?.hasError('rangeDate')">
+                            {{ 'system.partner.contractEndDateRangeDate' | translate }}
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="col-md-12">
+                    <label class="d-block mb-12 fw-semibold">
+                        {{ 'system.partner.file' | translate }}
+                    </label>
+                    
+                    <file-upload class="file-uploader" label="Upload" formControlName="file" (onUpload)="onUpload($event)" [multiple]="false" />
+                </div>
+            </div>
+
+        </div>
+    </div>
+    </div>
+</div>
+
+
+
+
+
+

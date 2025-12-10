@@ -1,0 +1,44 @@
+@import url('../../../styles/management.scss');
+
+.wrapper-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+    .title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 20px;
+    }
+}
+
+::ng-deep {
+    .error-snackbar {
+        background-color: #f44336 !important;
+        color: white !important;
+
+        .mat-simple-snack-bar-content {
+            color: white !important;
+        }
+
+        .mat-mdc-button {
+            color: white !important;
+        }
+    }
+
+    .success-snackbar {
+        background-color: #4caf50 !important;
+        color: white !important;
+
+        .mat-simple-snack-bar-content {
+            color: white !important;
+        }
+
+        .mat-mdc-button {
+            color: white !important;
+        }
+    }
+}
+

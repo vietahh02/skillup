@@ -1,122 +1,97 @@
-<mat-card
-    class="mb-25 tagus-card"
->
-    <mat-card-header class="border-bottom">
-        <h5 class="mb-0">Settings</h5>
-    </mat-card-header>
-    <mat-card-content>
-        <nav>
-            <ul class="ps-0 mt-0">
-                <li>
-                    <a [routerLink]="getProfileRoute()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Profile</a>
-                </li>
-                <li>
-                    <a [routerLink]="getSecurityRoute()" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}">Security</a>
-                </li>
-            </ul>
-        </nav>
-        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
-            <h5 class="fw-semibold mb-8 mt-5">Your Photo</h5>
-            <p>This will be displayed on your profile.</p>
-            <div class="d-flex align-items-center mb-20">
-                <img [src]="previewUrl || userProfile?.avatarUrl" class="rounded-circle avatar-image" alt="user">
+<div class="page-create-update-container">
+
+    <div class="header mb-2 d-flex align-items-center justify-content-space-between">
+        <div class="d-flex align-items-center justify-content-space-between">
+            <div class="d-grid align-items-center mb-2">
+                <div>
+                    <h1 class="title">Profile</h1>
+                </div>
+  
+            </div>
+        </div>
+        <div class="action-buttons">
+            <button mat-flat-button color="primary" class="btn-primary-flat" (click)="onSubmit()"
+                 [ngClass]="{
+                    'btn-disabled': isSubmitting,
+                }"
+                [disabled]="isSubmitting"
+                >
+                <mat-icon>save</mat-icon>
+                {{ 'common.update' | translate }}
+            </button>
+        </div>
+    </div>
+
+    <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+    <div [formGroup]="profileForm">
+        <div class="stats-card bg-white border-radius-size-main h-100 mb-4">
+            <h5>Your Photo</h5>
+            <div class="app-form">
+            <div class="d-flex align-items-center mb-4">
+                <img [src]="previewAvatarUrl || profile?.avatarUrl || 'img/admin.jpg'" class="rounded-circle" width="110" alt="user">
                 <div class="tagus-form-group ms-20">
                     <label class="d-block mb-12 fw-semibold gray-color">Upload Image</label>
-                    <input type="file" 
-                           #fileInput 
-                           accept="image/*" 
-                           (change)="onFileSelected($event)">
-                    <button type="button" 
-                            mat-flat-button
-                            *ngIf="previewUrl" 
-                            class="mt-2 remove-avatar-btn" 
-                            (click)="clearPreview()">
-                        Remove Avatar
-                    </button>
+                    <input type="file" (change)="onFileChange($event)" accept="image/*">
                 </div>
             </div>
+            </div>
+            <div class="app-form">
             <h5 class="fw-semibold mb-8">Profile</h5>
-            <p>Update your photo and personal details here.</p>
-            <div class="row mt-20">
-                <div class="col-lg-6 col-md-6 col-sm-6">
-                    <div class="tagus-form-group">
-                        <label class="d-block mb-12 fw-semibold gray-color">Full Name</label>
-                        <mat-form-field appearance="fill">
-                            <i class="ri-user-3-line"></i>
-                            <input matInput formControlName="fullName">
-                            <mat-error *ngIf="profileForm.get('fullName')?.hasError('required')">Full Name is required</mat-error>
-                            <mat-error *ngIf="profileForm.get('fullName')?.hasError('maxlength')">Full Name must be less than 255 characters</mat-error>
-                        </mat-form-field>
-                    </div>
+            <div class="row position-relative">
+                <div class="col-md-6">
+                    <label class="d-block mb-12 fw-semibold">{{ 'profile.fullName' | translate }}</label>
+                    <mat-form-field appearance="outline" class="w-100 thin-select">
+                        <input matInput formControlName="fullName" placeholder="Enter full name">
+                        <mat-error *ngIf="profileForm.get('fullName')?.hasError('required')">
+                            {{ 'profile.fullNameRequired' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="profileForm.get('fullName')?.hasError('maxlength')">
+                            {{ 'profile.fullNameMaxLength' | translate }}
+                        </mat-error>
+                    </mat-form-field>
                 </div>
-                <div class="col-lg-6 col-md-6 col-sm-6">
-                    <div class="tagus-form-group">
-                        <label class="d-block mb-12 fw-semibold gray-color">Email Address</label>
-                        <mat-form-field appearance="fill">
-                            <i class="ri-mail-line"></i>
-                            <input matInput formControlName="email">
-                            <mat-error *ngIf="profileForm.get('email')?.hasError('required')">Email is required</mat-error>
-                            <mat-error *ngIf="profileForm.get('email')?.hasError('email')">Invalid email format</mat-error>
-                            <mat-error *ngIf="profileForm.get('email')?.hasError('maxlength')">Email must be less than 255 characters</mat-error>
-                        </mat-form-field>
-                    </div>
+                <div class="col-md-6">
+                    <label class="d-block mb-12 fw-semibold">{{ 'profile.email' | translate }}</label>
+                    <mat-form-field appearance="outline" class="w-100 thin-select">
+                        <input matInput formControlName="email" placeholder="Enter email">
+                        <mat-error *ngIf="profileForm.get('email')?.hasError('required')">
+                            {{ 'profile.emailRequired' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="profileForm.get('email')?.hasError('email')">
+                            {{ 'profile.emailInvalid' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="profileForm.get('email')?.hasError('maxlength')">
+                            {{ 'profile.emailMaxLength' | translate }}
+                        </mat-error>
+                    </mat-form-field>   
                 </div>
-                <div class="col-lg-6 col-md-6 col-sm-6">
-                    <div class="tagus-form-group">
-                        <label class="d-block mb-12 fw-semibold gray-color">Phone</label>
-                        <mat-form-field appearance="fill">
-                            <i class="ri-phone-line"></i>
-                            <input matInput formControlName="phone">
-                            <mat-error *ngIf="profileForm.get('phone')?.hasError('required')">Phone is required</mat-error>
-                            <mat-error *ngIf="profileForm.get('phone')?.hasError('pattern')">Invalid phone number</mat-error>
-                        </mat-form-field>
-                    </div>
+                <div class="col-md-6">
+                    <label class="d-block mb-12 fw-semibold">{{ 'profile.phoneNumber' | translate }}</label>
+                    <mat-form-field appearance="outline" class="w-100 thin-select">
+                        <input matInput formControlName="phoneNumber" placeholder="Enter phone number">
+                        <mat-error *ngIf="profileForm.get('phoneNumber')?.hasError('required')">
+                            {{ 'profile.phoneNumberRequired' | translate }}
+                        </mat-error>
+                        <mat-error *ngIf="profileForm.get('phoneNumber')?.hasError('pattern')">
+                            {{ 'profile.phoneNumberInvalid' | translate }}
+                        </mat-error>
+                    </mat-form-field>
                 </div>
-                <div class="col-lg-6 col-md-6 col-sm-6">
-                    <div class="tagus-form-group">
-                        <label class="d-block mb-12 fw-semibold gray-color"> Address</label>
-                        <mat-form-field appearance="fill">
-                            <i class="ri-home-7-line"></i>
-                            <input matInput formControlName="location">
-                            <mat-error *ngIf="profileForm.get('location')?.hasError('required')">Address is required</mat-error>
-                            <mat-error *ngIf="profileForm.get('location')?.hasError('maxlength')">Address must be less than 255 characters</mat-error>
-                        </mat-form-field>
-                    </div>
-                </div>
-                <div class="col-lg-6 col-md-6 col-sm-6">
-                    <div class="tagus-form-group">
-                        <label class="d-block mb-12 fw-semibold gray-color">Date Of Birth</label>
-                        <mat-form-field appearance="fill">
-                            <i class="ri-cake-2-line"></i>
-                            <input matInput [matDatepicker]="startedDatePicker" formControlName="dateOfBirth" placeholder="Select date of birth" readonly>
-                            <mat-datepicker-toggle matSuffix [for]="startedDatePicker"></mat-datepicker-toggle>
-                            <mat-datepicker #startedDatePicker></mat-datepicker>
-                            <mat-error *ngIf="profileForm.get('dateOfBirth')?.hasError('required')">
-                                Date Of Birth is required
-                            </mat-error>
-                            <mat-error *ngIf="profileForm.get('dateOfBirth')?.hasError('matDatepickerParse')">Invalid date of birth</mat-error>
-                            <mat-error *ngIf="profileForm.get('dateOfBirth')?.hasError('minAge')">You must be at least 18 years old</mat-error>
-                        </mat-form-field>
-                    </div>
-                </div>
-                <div class="col-lg-6 col-md-6 col-sm-6">
-                    <div class="tagus-form-group">
-                        <label class="d-block mb-12 fw-semibold gray-color">Gender</label>
-                        <mat-form-field appearance="fill">
-                            <i class="ri-men-line"></i>
-                            <mat-select formControlName="gender">
-                                <mat-option *ngFor="let gender of genderList" [value]="gender.value">
-                                    {{ gender.label }}
-                                </mat-option>
-                            </mat-select>
-                            <mat-error *ngIf="profileForm.get('gender')?.hasError('required')">Gender is required</mat-error>
-                        </mat-form-field>
-                    </div>
+                <div class="col-md-6">
+                    <label class="d-block mb-12 fw-semibold">{{ 'profile.language' | translate }}</label>
+                    <mat-form-field appearance="outline" class="w-100 thin-select">
+                        <mat-select [formControlName]="'language'" [placeholder]="'profile.languagePlaceholder' | translate">
+                            <mat-option *ngFor="let language of languageOptions" [value]="language.value">
+                                {{ language.label }}
+                            </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="profileForm.get('language')?.hasError('required')">
+                            {{ 'profile.languageRequired' | translate }}
+                        </mat-error>
+                    </mat-form-field>
                 </div>
             </div>
-            <div class="d-flex justify-content-end">
-                <button mat-raised-button type="submit" class="tagus fw-semibold">Update</button>
             </div>
-        </form>
-    </mat-card-content>
-</mat-card>
+        </div>
+    </div>
+</div>

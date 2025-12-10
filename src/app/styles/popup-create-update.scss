@@ -1,0 +1,190 @@
+.create-update-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-width: 600px;
+    position: relative;
+    overflow: hidden;
+    
+    mat-progress-bar {
+      position: sticky;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+    
+    .header {
+      position: sticky;
+      top: 0;
+      background-color: #fff;
+      padding: 24px;
+      z-index: 999;
+      border-bottom: 1px solid #e0e0e0;
+      // box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      flex-shrink: 0;
+      
+      .close-button {
+        color: #666;
+        
+        &:hover {
+          color: #333;
+          background-color: rgba(0, 0, 0, 0.04);
+        }
+      }
+    }
+  
+    .justify-content-between {
+      justify-content: space-between !important;
+    }
+    
+    .title {
+      margin: 0;
+    }
+    
+    // Form container - scrollable body
+    form {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+      min-height: 0;
+      
+      .body {
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 0 24px;
+        background-color: #fff;
+        
+        &::-webkit-scrollbar {
+          width: 8px;
+        }
+        
+        &::-webkit-scrollbar-track {
+          background: #f1f1f1;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+          background: #888;
+          border-radius: 4px;
+          
+          &:hover {
+            background: #555;
+          }
+        }
+      }
+    }
+    
+    // Form styling
+    .app-form {
+      padding: 20px 0 10px;
+  
+      .text-danger {
+        color: red;
+      }
+      
+      .row {
+        margin-bottom: 0;
+      }
+    }
+  
+    .gap-3 {
+      gap: 12px;
+    }
+    
+    .value-display {
+      // font-size: 14px;
+      // color: #666;
+      margin-top: 20px;
+      // margin-bottom: 16px;
+    }
+    
+    // Footer - fixed at bottom of container
+    .footer {
+      position: sticky;
+      bottom: 0;
+      background-color: #fff;
+      padding: 16px 24px;
+      z-index: 999;
+      border-top: 1px solid #e0e0e0;
+      // box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+      flex-shrink: 0;
+    }
+    
+    // Action buttons styling
+    .btn-cancel {
+      background-color: #e4e4e4 !important;
+      color: #333 !important;
+    }
+    
+    .btn-primary-flat {
+      width: 140px;
+      // min-width: 120px;
+      cursor: pointer;
+      
+      mat-icon {
+        margin-right: 8px;
+        font-size: 18px;
+        
+        &.spin {
+          animation: spin 1s linear infinite;
+        }
+      }
+      
+      &.loading {
+        opacity: 0.7;
+        pointer-events: none;
+      }
+    }
+  }
+  
+  // Loading animation
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  // Responsive design for mobile
+  @media (max-width: 768px) {
+    .create-update-container {
+      min-width: 90vw;
+      
+      .header {
+        padding: 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+        
+        .close-button {
+          position: absolute;
+          top: 16px;
+          right: 16px;
+        }
+      }
+      
+      form {
+        .body {
+          padding: 0 16px;
+        }
+      }
+      
+      .footer {
+        padding: 12px 16px;
+      }
+      
+      .app-form {
+        padding: 16px 0;
+      }
+      
+      .d-flex {
+        flex-direction: column;
+        gap: 12px;
+        
+        button {
+          width: 100%;
+        }
+      }
+    }
+  }
+  

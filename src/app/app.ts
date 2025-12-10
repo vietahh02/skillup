@@ -1,31 +1,32 @@
 import { Component, signal } from '@angular/core';
+import { ToggleService } from './common/header/toggle.service';
 import { CommonModule, ViewportScroller } from '@angular/common';
+import { HeaderComponent } from './common/header/header.component';
+import { FooterComponent } from './common/footer/footer.component';
+import { SidebarComponent } from './common/sidebar/sidebar.component';
 import { RouterOutlet, Router, Event, NavigationEnd } from '@angular/router';
-import { MatProgressBar } from "@angular/material/progress-bar";
-import { ChatBoxComponent } from './shared/chat-box/chat-box.component';
-import { ToggleService } from './context/toggle.service';
-import { LoadingService } from './context/loading.service';
+import { CustomizerSettingsService } from './customizer-settings/customizer-settings.service';
+// import { CustomizerSettingsComponent } from './customizer-settings/customizer-settings.component';
 
 @Component({
     selector: 'app-root',
-    imports: [RouterOutlet, CommonModule, MatProgressBar, ChatBoxComponent],
+    imports: [RouterOutlet, CommonModule, SidebarComponent, HeaderComponent, FooterComponent],
     templateUrl: './app.html',
-    styleUrl: './app.scss'
+    styleUrls: ['./app.scss']
 })
 export class App {
 
     private previousUrl: string | null = null;
 
-    protected readonly title = signal('Skill Up');
+    protected readonly title = signal('IT Management System');
 
     isToggled = false;
-    loading = false;
 
     constructor(
         public router: Router,
         private toggleService: ToggleService,
-        private loadingService: LoadingService,
-        private viewportScroller: ViewportScroller
+        private viewportScroller: ViewportScroller,
+        public themeService: CustomizerSettingsService
     ) {
         this.router.events.subscribe((event: Event) => {
             if (event instanceof NavigationEnd) {
@@ -40,28 +41,6 @@ export class App {
         this.toggleService.isToggled$.subscribe(isToggled => {
             this.isToggled = isToggled;
         });
-        this.loadingService.isLoading$.subscribe(loading => {
-            // Defer the change to the next change detection cycle to avoid ExpressionChangedAfterItHasBeenCheckedError
-            setTimeout(() => {
-                this.loading = loading;
-            }, 0);
-        });
-    }
-
-    isBlankPage(): boolean {
-        const blankPages = [
-            '/error-500',
-            '/authentication/reset-password',
-            '/authentication/forgot-password',
-            '/authentication',
-            '/authentication/register',
-            '/authentication/signin-signup',
-            '/authentication/logout',
-            '/authentication/confirm-mail',
-            '/authentication/lock-screen',
-            '/coming-soon'
-        ];
-        return blankPages.includes(this.router.url);
     }
 
 }

@@ -1,0 +1,30 @@
+<mat-progress-bar *ngIf="loading" mode="indeterminate" class="loading-bar"></mat-progress-bar>
+<div class="drawer-header">
+    <h3>{{ title | translate }}</h3>
+</div>
+<div class="drawer-body">
+    <ng-content></ng-content>
+</div>
+<div class="drawer-footer">
+    <button 
+        *ngIf="showSaveButton"
+        mat-flat-button 
+        color="primary" 
+        class="btn-primary-flat" 
+        (click)="handleSave()"
+        [disabled]="isSubmit || saveButtonDisabled" 
+        [ngClass]="{'btn-disabled': isSubmit || saveButtonDisabled}">
+        <mat-icon>save</mat-icon>
+        {{ saveButtonText | translate }}
+    </button>
+    <button 
+        *ngIf="showCloseButton"
+        mat-flat-button 
+        color="primary" 
+        class="btn-primary-flat" 
+        (click)="handleClose()">
+        <mat-icon>close</mat-icon>
+        {{ closeButtonText | translate }}
+    </button>
+</div>
+

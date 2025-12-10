@@ -1,0 +1,155 @@
+<div class="container">
+    <!-- Header Section -->
+    <div class="header mb-2">
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <h1 class="title mb-2">{{ 'system.balance.title' | translate }}</h1>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Cards Section -->
+    <div class="summary-cards">
+        <div class="row g-3">
+            <div class="col-md-3">
+                <div class="summary-card positive">
+                    <div class="card-icon">
+                        <mat-icon>trending_up</mat-icon>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-label">{{ 'system.balance.totalDeposit' | translate }}</div>
+                        <div class="card-value positive">{{
+                                balanceSummary.totalDeposit.toLocaleString('en-US', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })
+                            }} KS
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="summary-card negative">
+                    <div class="card-icon">
+                        <mat-icon>trending_down</mat-icon>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-label">{{ 'system.balance.totalConsumption' | translate }}</div>
+                        <div class="card-value negative">{{
+                                balanceSummary.totalConsumption.toLocaleString('en-US', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })
+                            }} KS
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="summary-card negative">
+                    <div class="card-icon">
+                        <mat-icon>remove_circle</mat-icon>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-label">{{ 'system.balance.totalWithdraw' | translate }}</div>
+                        <div class="card-value negative">{{
+                                balanceSummary.totalWithdraw.toLocaleString('en-US', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })
+                            }} KS
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="summary-card positive">
+                    <div class="card-icon">
+                        <mat-icon>add_circle</mat-icon>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-label">{{ 'system.balance.totalRefund' | translate }}</div>
+                        <div class="card-value positive">{{
+                                balanceSummary.totalRefund.toLocaleString('en-US', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })
+                            }} KS
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row g-3 mt-2">
+            <div class="col-md-12">
+                <div class="summary-card balance-change"
+                     [class.negative-change]="balanceSummary.overallBalanceChange < 0">
+                    <div class="card-icon">
+                        <mat-icon>{{ balanceSummary.overallBalanceChange >= 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-label">{{ 'system.balance.overallBalanceChange' | translate }}</div>
+                        <div class="card-value" [class.positive]="balanceSummary.overallBalanceChange >= 0"
+                             [class.negative]="balanceSummary.overallBalanceChange < 0">
+                            {{ balanceSummary.overallBalanceChange >= 0 ? '+' : '' }}{{
+                                balanceSummary.overallBalanceChange.toLocaleString('en-US', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                })
+                            }} KS
+                        </div>
+                        @if (balanceSummary.startBalance && balanceSummary.endBalance) {
+                            <div class="card-note">
+                                {{ 'system.balance.from' | translate }} {{
+                                    balanceSummary.startBalance.toLocaleString('en-US', {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    })
+                                }} KS
+                                {{ 'system.balance.to' | translate }} {{
+                                    balanceSummary.endBalance.toLocaleString('en-US', {
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2
+                                    })
+                                }} KS
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filters Section -->
+    <div class="wrapper-card">
+        <div class="row mb-3">
+            <div class="col-12">
+                <h4 class="title">{{ 'system.balance.list' | translate }}</h4>
+                <generic-filter
+                    [config]="balanceFilterConfig"
+                    [isSearchLoading]="isLoadingFilter"
+                    [initialValues]="initialFilterValues"
+                    (applyFilters)="onApplyFilters($event)"
+                    (clearFilters)="onClearFilters()">
+                </generic-filter>
+            </div>
+        </div>
+
+        <div class="row mb-4">
+            <div class="col-12">
+                <generic-table
+                    [dataSource]="balances"
+                    [config]="balanceTableConfig"
+                    [loading]="loading"
+                    [totalItems]="total"
+                    [currentPage]="page"
+                    [totalPages]="totalPages"
+                    [pageSize]="size"
+                    (pageChange)="onPageChange($event)"
+                    (pageSizeChange)="onPageSizeChange($event)">
+                </generic-table>
+            </div>
+        </div>
+    </div>
+</div>
+

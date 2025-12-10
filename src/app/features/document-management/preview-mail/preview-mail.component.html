@@ -1,0 +1,19 @@
+<div class="create-update-container">
+    <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+    <!-- Header -->
+    <div class="header mb-2 d-flex align-items-center justify-content-between">
+      <div class="d-flex align-items-center">
+        <div>
+          <h2 class="title">{{ 'system.document.preview' | translate }}</h2>
+        </div>
+      </div>
+      <button mat-icon-button (click)="onCancel()" class="close-button">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <div class="mail-content body" >
+        <div [innerHTML]="mailContent" class="ql-editor ql-snow"></div>
+    </div>
+</div>
+  

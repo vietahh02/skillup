@@ -1,0 +1,220 @@
+.contact-popup {
+  width: 100%;
+  max-width: 500px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+
+  .popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    background: linear-gradient(135deg, #ecca97 0%, #F97316 100%);
+    color: white;
+
+    h3 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 600;
+        color: white !important;
+    }
+
+    .close-btn {
+      color: white;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+    }
+  }
+
+  .popup-content {
+    padding: 24px;
+
+    .contact-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding: 20px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border: 1px solid #e9ecef;
+
+      .contact-avatar {
+        width: 60px;
+        height: 60px;
+          background: linear-gradient(135deg, #ecca97 0%, #F97316 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        flex-shrink: 0;
+
+        mat-icon {
+          font-size: 28px;
+          width: 28px;
+          height: 28px;
+        }
+      }
+
+      .contact-details {
+        flex: 1;
+
+        h4 {
+          margin: 0 0 4px 0;
+          font-size: 18px;
+          font-weight: 600;
+          color: #2c3e50;
+        }
+
+        .department {
+          margin: 0 0 16px 0;
+          color: #6c757d;
+          font-size: 14px;
+          font-style: italic;
+        }
+
+        .contact-methods {
+          .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+
+            mat-icon {
+              color: #6c757d;
+              font-size: 18px;
+              width: 18px;
+              height: 18px;
+            }
+
+            span {
+              flex: 1;
+              color: #495057;
+              font-weight: 500;
+            }
+
+             .action-btn {
+               width: 32px;
+               height: 32px;
+               min-width: 32px;
+
+               &.copy-btn {
+                 color: #6c757d;
+
+                 &:hover {
+                   background-color: rgba(108, 117, 125, 0.1);
+                   color: #495057;
+                 }
+               }
+
+               &.call-btn {
+                 color: #28a745;
+
+                 &:hover {
+                   background-color: rgba(40, 167, 69, 0.1);
+                 }
+               }
+
+               &.email-btn {
+                 color: #007bff;
+
+                 &:hover {
+                   background-color: rgba(0, 123, 255, 0.1);
+                 }
+               }
+             }
+          }
+        }
+      }
+    }
+
+    .message-section {
+      background: #e3f2fd;
+      border: 1px solid #bbdefb;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 24px;
+
+      .contact-message {
+        margin: 0;
+        color: #1565c0;
+        font-size: 14px;
+        line-height: 1.5;
+
+        strong {
+          color: #0d47a1;
+        }
+      }
+    }
+  }
+
+  .popup-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 20px 24px;
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+
+    .cancel-btn {
+      color: #6c757d;
+      border-color: #dee2e6;
+
+      &:hover {
+        background-color: #e9ecef;
+      }
+    }
+
+    .call-btn {
+      background-color: #28a745;
+      color: white;
+
+      &:hover {
+        background-color: #218838;
+      }
+
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 600px) {
+  .contact-popup {
+    max-width: 100%;
+    margin: 0;
+    border-radius: 0;
+
+    .popup-content {
+      padding: 16px;
+
+      .contact-card {
+        flex-direction: column;
+        text-align: center;
+
+        .contact-avatar {
+          align-self: center;
+        }
+      }
+    }
+
+    .popup-actions {
+      flex-direction: column;
+
+      button {
+        width: 100%;
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+@import url('../../../styles/management.scss');
+
+.drawer-container {
+    width: 550px;
+    max-width: 90vw;
+    padding: 16px 18px;
+    box-sizing: border-box;
+    background: #fff;
+    border-radius: 0; 
+    box-shadow: -4px 0 20px rgba(0,0,0,0.08);
+    overflow-x: hidden;
+}
+
+

@@ -1,0 +1,116 @@
+<div class="page-create-update-container">
+  <!-- Header Section -->
+  <div class="header mb-2 d-flex align-items-center justify-content-space-between">
+      <div class="d-flex align-items-center justify-content-space-between">
+          <div class="d-grid align-items-center mb-2">
+
+              <div class="d-flex">
+                  <a class="d-flex align-items-center btn-back" (click)="onBack()">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                          class="lucide lucide-arrow-left h-4 w-4">
+                          <path d="m12 19-7-7 7-7"></path>
+                          <path d="M19 12H5"></path>
+                      </svg>
+                      {{ 'system.help.backToHelps' | translate }}
+                  </a>
+              </div>
+
+              <div>
+                  <h1 class="title">{{ getTileName() }}</h1>
+              </div>
+
+          </div>
+      </div>
+      <div class="action-buttons">
+          <button mat-flat-button color="primary" class="btn-primary-flat" (click)="onSubmit()"
+               [ngClass]="{
+                  'btn-disabled': isSubmitting,
+              }"
+              [disabled]="isSubmitting"
+              >
+              <mat-icon>save</mat-icon>
+              {{ submitButtonText() }}
+          </button>
+      </div>
+  </div>
+
+  <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+  <div [formGroup]="helpForm">
+  <div class="stats-card bg-white border-radius-size-main h-100 mb-4">
+      <h5>{{ 'system.partner.basicInformation' | translate }}</h5>
+      <div class="app-form">
+        <!-- Row 1: Project Name / Project Type -->
+        <div class="row position-relative">
+          <div class="col-md-6">
+            <label class="d-block mb-12 fw-semibold">
+              {{ 'system.help.code' | translate }} <span class="text-danger">*</span>
+            </label>
+            <mat-form-field appearance="outline" class="w-100 thin-select">
+              <input matInput formControlName="code" placeholder="Enter code" />
+              <mat-error *ngIf="helpForm.get('code')?.hasError('required')">
+                {{ 'system.help.codeRequired' | translate }}
+              </mat-error>
+              <mat-error *ngIf="helpForm.get('code')?.hasError('maxlength')">
+                {{ 'system.help.codeMaxLength' | translate }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Type -->
+          <div class="col-md-6">
+            <label class="d-block mb-12 fw-semibold">
+              {{ 'system.help.title' | translate }} <span class="text-danger">*</span>
+            </label>
+            <mat-form-field appearance="outline" class="w-100 thin-select">
+              <input matInput formControlName="title" placeholder="Enter title" />
+              <mat-error *ngIf="helpForm.get('title')?.hasError('required')">
+                {{ 'system.help.titleRequired' | translate }}
+              </mat-error>
+              <mat-error *ngIf="helpForm.get('title')?.hasError('maxlength')">
+                {{ 'system.help.titleMaxLength' | translate }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Content MD -->
+          <div class="col-md-12">
+            <label class="d-block mb-12 fw-semibold">
+              {{ 'system.help.content' | translate }} <span class="text-danger">*</span>
+            </label>
+            <mat-form-field appearance="outline" class="w-100 thin-select">
+              <input matInput formControlName="contentMd" [placeholder]="'system.help.contentMdPlaceholder' | translate" />
+              <mat-error *ngIf="helpForm.get('contentMd')?.hasError('required')">
+                {{ 'system.help.contentMdRequired' | translate }}
+              </mat-error>
+              <mat-error *ngIf="helpForm.get('contentMd')?.hasError('maxlength')">
+                {{ 'system.help.contentMdMaxLength' | translate }}
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Content HTML -->
+          <div class="col-md-12">
+            <label class="d-block mb-12 fw-semibold">
+              {{ 'system.help.contentHtml' | translate }} <span class="text-danger">*</span>
+            </label>
+          
+            <quill-editor
+              class="content-editor"
+              formControlName="contentHtml"
+              (onFocus)="focus($event)"
+              (onEditorChanged)="changedEditor($event)"
+              (onBlur)="blur($event)"
+              (onEditorCreated)="created($event)">
+            </quill-editor>
+          
+            <div class="form-field-error-message" [ngClass]="{'visible': helpForm.get('contentHtml')?.errors?.['required'] && helpForm.get('contentHtml')?.touched}">
+              {{ 'system.help.contentHtmlRequired' | translate }}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
