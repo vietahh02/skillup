@@ -1,6 +1,7 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { API_URLS } from '../constants';
 import {
   LearningPath,
@@ -199,5 +200,97 @@ export class LearningPathService {
     }
 
     return this.http.get<DetailedEnrollmentsResponse>(API_URLS.GET_ALL_ENROLLMENTS, { params });
+  }
+
+  // ========== LEARNING PATH ASSIGNMENTS (Manager) ==========
+
+  /**
+   * Manager assign Learning Path to Employee
+   * POST /api/learning-path-enrollments
+   * BE sẽ tự động set enrollmentType = "assigned" khi Manager enroll user khác
+   */
+  assignLearningPath(userId: number, learningPathId: number, notes?: string): Observable<LearningPathEnrollment> {
+    const body: EnrollLearningPathRequest = {
+      userId,
+      learningPathId,
+      enrollmentType: 'assigned' // Explicitly set for clarity
+    };
+    return this.http.post<LearningPathEnrollment>(API_URLS.CREATE_LEARNING_PATH_ENROLLMENT, body);
+  }
+
+  /**
+   * Get assignments for a specific user
+   * Filter từ GET_ALL_ENROLLMENTS với userId và enrollmentType = 'assigned'
+   */
+  getUserAssignments(userId: number, status?: string): Observable<LearningPathEnrollment[]> {
+    // Use GET_ALL_ENROLLMENTS and filter by userId and enrollmentType
+    let params = new HttpParams()
+      .set('page', '1')
+      .set('pageSize', '100'); // Get all to filter on frontend
+    
+    // Try to add userId filter if BE supports it
+    params = params.set('userId', userId.toString());
+    
+    if (status) {
+      params = params.set('status', status);
+    }
+
+    return this.http.get<DetailedEnrollmentsResponse>(API_URLS.GET_ALL_ENROLLMENTS, { params }).pipe(
+      map(response => {
+        // Filter by userId first
+        let userEnrollments = response.items.filter(item => item.userId === userId);
+        
+        // Check if any item has enrollmentType field
+        const hasEnrollmentType = userEnrollments.some(item => item.enrollmentType !== undefined);
+        
+        let filtered: typeof userEnrollments;
+        
+        if (hasEnrollmentType) {
+          // If enrollmentType exists, filter by 'assigned'
+          filtered = userEnrollments.filter(item => item.enrollmentType === 'assigned');
+        } else {
+          // If enrollmentType is missing from response, return all user enrollments
+          // This is a workaround - BE should add enrollmentType to GET_ALL_ENROLLMENTS response
+          filtered = userEnrollments;
+        }
+        
+        // Map DetailedEnrollment to LearningPathEnrollment format
+        return filtered.map(item => ({
+          learningPathEnrollmentId: item.learningPathEnrollmentId,
+          userId: item.userId,
+          learningPathId: item.learningPathId,
+          learningPathName: item.learningPathName,
+          userName: item.userName,
+          status: item.status,
+          progressPct: item.progressPct,
+          startedAt: item.startedAt,
+          completedAt: item.completedAt,
+          createdAt: item.startedAt,
+          updatedAt: item.completedAt || item.startedAt,
+          enrollmentType: (item.enrollmentType || 'assigned') as 'assigned' | 'self-enrolled'
+        }));
+      })
+    );
+  }
+
+  /**
+   * Export User Progress Tracking to Excel
+   * GET /api/learning-path-enrollments/export-excel
+   */
+  exportUserProgressExcel(searchTerm?: string, enrollmentType?: 'all' | 'assigned' | 'self-enrolled'): Observable<Blob> {
+    let params = new HttpParams();
+    
+    if (searchTerm && searchTerm.trim()) {
+      params = params.set('search', searchTerm.trim());
+    }
+    
+    if (enrollmentType && enrollmentType !== 'all') {
+      params = params.set('enrollmentType', enrollmentType);
+    }
+
+    return this.http.get(API_URLS.EXPORT_USER_PROGRESS_EXCEL, {
+      params,
+      responseType: 'blob'
+    });
   }
 }

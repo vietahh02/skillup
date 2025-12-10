@@ -48,7 +48,8 @@ import { SettingsComponent } from './aproject/admin/settings/settings';
 import { authGuard } from './guards/auth.guard';
 import { roleGuard } from './guards/role.guard';
 import { ManagerReportUserComponent } from './aproject/manager/manager-report-user/manager-report-user.component';
-import { ManagerReportLearningComponent } from './aproject/manager/manager-report-learning/manager-report-learning.component';
+import { ManagerCourseTypeComponent } from './aproject/manager/manager-setting/manager-course-type/manager-course-type.component';
+import { ManagerUserLevelComponent } from './aproject/manager/manager-setting/manager-user-level/manager-user-level.component';
 
 export const routes: Routes = [
     //project
@@ -129,7 +130,8 @@ export const routes: Routes = [
             {path: 'learning-paths/edit/:id', component: LearningPathFormComponent},
             {path: 'learning-paths/detail/:id', component: ManagerLearningPathDetailComponent},
             {path: 'report-user', component: ManagerReportUserComponent},
-            {path: 'report-learning', component: ManagerReportLearningComponent},
+            {path: 'course-type', component: ManagerCourseTypeComponent},
+            {path: 'user-level', component: ManagerUserLevelComponent},
         ]
     },
     {

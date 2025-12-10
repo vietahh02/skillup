@@ -1,0 +1,47 @@
+<div class="assign-learning-path-dialog">
+  <h2 mat-dialog-title>Assign Learning Path</h2>
+  
+  <mat-dialog-content>
+    <div class="mb-3">
+      <p class="mb-2">
+        <strong>Employee:</strong> {{ data.userName }}
+      </p>
+    </div>
+
+    <mat-form-field appearance="outline" class="w-100 mb-3">
+      <mat-label>Search Learning Path</mat-label>
+      <input matInput [(ngModel)]="searchTerm" (keyup.enter)="onSearch()" placeholder="Type to search...">
+      <button mat-icon-button matSuffix (click)="onSearch()" type="button" matTooltip="Search">
+        <mat-icon>search</mat-icon>
+      </button>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100 mb-3">
+      <mat-label>Select Learning Path</mat-label>
+      <mat-select [(ngModel)]="selectedLearningPathId" [disabled]="isLoadingPaths">
+        <mat-option *ngFor="let path of learningPaths" [value]="path.learningPathId">
+          {{ path.name }}
+          <span class="text-muted ms-2" *ngIf="path.level">({{ path.level }})</span>
+        </mat-option>
+      </mat-select>
+      <mat-spinner *ngIf="isLoadingPaths" matSuffix diameter="20"></mat-spinner>
+      <mat-hint *ngIf="learningPaths.length === 0 && !isLoadingPaths">
+        No active learning paths found
+      </mat-hint>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="w-100">
+      <mat-label>Notes (Optional)</mat-label>
+      <textarea matInput [(ngModel)]="notes" rows="3" placeholder="Add notes about this assignment..."></textarea>
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="cancel()" [disabled]="isLoading">Cancel</button>
+    <button mat-flat-button color="primary" (click)="assign()" [disabled]="isLoading || !selectedLearningPathId">
+      <mat-spinner *ngIf="isLoading" diameter="20" class="me-2"></mat-spinner>
+      Assign
+    </button>
+  </mat-dialog-actions>
+</div>
+

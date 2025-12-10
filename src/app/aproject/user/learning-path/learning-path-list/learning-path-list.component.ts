@@ -37,6 +37,7 @@ export class LearningPathListComponent implements OnInit {
   // Enrollment status loaded from API
   enrolledPathIds: number[] = [];
   pathProgress: { [pathId: number]: number } = {};
+  enrollmentTypes: { [pathId: number]: 'assigned' | 'self-enrolled' } = {}; // Track enrollment type
 
   constructor(
     private router: Router,
@@ -77,11 +78,14 @@ export class LearningPathListComponent implements OnInit {
       // Clear existing data
       this.enrolledPathIds = [];
       this.pathProgress = {};
+      this.enrollmentTypes = {};
 
       // Populate from API response
       enrollments.forEach(enrollment => {
         this.enrolledPathIds.push(enrollment.learningPathId);
         this.pathProgress[enrollment.learningPathId] = enrollment.progressPct || 0;
+        // Store enrollment type (default to 'self-enrolled' if not provided)
+        this.enrollmentTypes[enrollment.learningPathId] = enrollment.enrollmentType || 'self-enrolled';
       });
     } catch (error) {
       console.error('Error loading enrollment status:', error);
@@ -89,15 +93,18 @@ export class LearningPathListComponent implements OnInit {
   }
 
   get filteredPaths(): LearningPath[] {
-    if (!this.searchTerm.trim()) {
-      return this.learningPaths;
+    // Filter by search term
+    let filtered = this.learningPaths;
+    
+    if (this.searchTerm.trim()) {
+      const searchLower = this.searchTerm.toLowerCase();
+      filtered = this.learningPaths.filter(path =>
+        path.name.toLowerCase().includes(searchLower) ||
+        path.description.toLowerCase().includes(searchLower)
+      );
     }
-
-    const searchLower = this.searchTerm.toLowerCase();
-    return this.learningPaths.filter(path =>
-      path.name.toLowerCase().includes(searchLower) ||
-      path.description.toLowerCase().includes(searchLower)
-    );
+    
+    return filtered;
   }
 
   get enrolledPaths(): LearningPath[] {
@@ -106,10 +113,57 @@ export class LearningPathListComponent implements OnInit {
     );
   }
 
+  get assignedPaths(): LearningPath[] {
+    let paths = this.learningPaths.filter(path =>
+      this.enrolledPathIds.includes(path.learningPathId) &&
+      this.enrollmentTypes[path.learningPathId] === 'assigned'
+    );
+    
+    // Apply search filter if exists
+    if (this.searchTerm.trim()) {
+      const searchLower = this.searchTerm.toLowerCase();
+      paths = paths.filter(path =>
+        path.name.toLowerCase().includes(searchLower) ||
+        path.description.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    return paths;
+  }
+
+  get selfEnrolledPaths(): LearningPath[] {
+    let paths = this.learningPaths.filter(path =>
+      this.enrolledPathIds.includes(path.learningPathId) &&
+      this.enrollmentTypes[path.learningPathId] === 'self-enrolled'
+    );
+    
+    // Apply search filter if exists
+    if (this.searchTerm.trim()) {
+      const searchLower = this.searchTerm.toLowerCase();
+      paths = paths.filter(path =>
+        path.name.toLowerCase().includes(searchLower) ||
+        path.description.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    return paths;
+  }
+
   get availablePaths(): LearningPath[] {
-    return this.learningPaths.filter(path =>
+    let paths = this.learningPaths.filter(path =>
       !this.enrolledPathIds.includes(path.learningPathId)
     );
+    
+    // Apply search filter if exists
+    if (this.searchTerm.trim()) {
+      const searchLower = this.searchTerm.toLowerCase();
+      paths = paths.filter(path =>
+        path.name.toLowerCase().includes(searchLower) ||
+        path.description.toLowerCase().includes(searchLower)
+      );
+    }
+    
+    return paths;
   }
 
   isEnrolled(pathId: number): boolean {
@@ -137,11 +191,11 @@ export class LearningPathListComponent implements OnInit {
         this.learningPathService.enrollInLearningPath(path.learningPathId)
       );
 
-      console.log('Successfully enrolled in path:', path.name);
-
       // Update local state
       this.enrolledPathIds.push(path.learningPathId);
       this.pathProgress[path.learningPathId] = enrollment.progressPct || 0;
+      // Set enrollment type (should be 'self-enrolled' when user enrolls themselves)
+      this.enrollmentTypes[path.learningPathId] = enrollment.enrollmentType || 'self-enrolled';
 
       // Show success notification
       this.snackBar.open(`Successfully enrolled in "${path.name}"`, 'Close', {
@@ -207,10 +261,21 @@ export class LearningPathListComponent implements OnInit {
     if (!level) return 'level-default';
 
     switch (level.toLowerCase()) {
+      case 'intern':
+        return 'level-intern';
+      case 'fresher':
+        return 'level-fresher';
+      case 'junior':
+        return 'level-junior';
+      case 'middle':
+      case 'intermediate':
+        return 'level-middle';
+      case 'senior':
+        return 'level-senior';
+      case 'leader':
+        return 'level-leader';
       case 'beginner':
         return 'level-beginner';
-      case 'intermediate':
-        return 'level-intermediate';
       case 'advanced':
         return 'level-advanced';
       default:

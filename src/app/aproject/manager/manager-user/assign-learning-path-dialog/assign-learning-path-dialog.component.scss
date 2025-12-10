@@ -1,0 +1,41 @@
+.assign-learning-path-dialog {
+  min-width: 500px;
+  
+  h2 {
+    margin-bottom: 20px;
+  }
+
+  mat-dialog-content {
+    min-height: 200px;
+  }
+
+  .w-100 {
+    width: 100%;
+  }
+
+  .mb-2 {
+    margin-bottom: 8px;
+  }
+
+  .mb-3 {
+    margin-bottom: 16px;
+  }
+
+  .ms-2 {
+    margin-left: 8px;
+  }
+
+  .me-2 {
+    margin-right: 8px;
+  }
+
+  .text-muted {
+    color: #6c757d;
+    font-size: 0.875rem;
+  }
+
+  mat-spinner {
+    display: inline-block;
+  }
+}
+

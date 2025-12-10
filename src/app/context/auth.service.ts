@@ -8,7 +8,6 @@ import { UserInfo } from '../models/user.models';
 export class AuthService {
   private currentUserSubject = new BehaviorSubject<UserInfo | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
-  private role = '';
 
   constructor(private apiAuthService: ApiAuthServices, private tokenService: TokenService) {}
 
@@ -55,7 +54,6 @@ export class AuthService {
       (userInfo: UserInfo) => {
         console.log('userInfo', userInfo);
         this.currentUserSubject.next(userInfo);
-        this.role = userInfo.roles[0];
       },
       error => {
         console.error('Error loading user info:', error);

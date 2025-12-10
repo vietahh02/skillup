@@ -87,12 +87,14 @@ export interface LearningPathEnrollment {
   completedAt?: string;
   createdAt: string;
   updatedAt: string;
+  enrollmentType?: 'assigned' | 'self-enrolled'; // Added from BE
   items?: LearningPathItem[];
 }
 
 export interface EnrollLearningPathRequest {
   learningPathId: number;
   userId?: number;  // Optional, backend can get from token
+  enrollmentType?: 'assigned' | 'self-enrolled'; // Optional, BE auto-sets based on who enrolls
 }
 
 export interface LearningPathProgressSummary {
@@ -133,6 +135,7 @@ export interface DetailedEnrollment {
   completedAt?: string;
   totalCourses: number;
   completedCourses: number;
+  enrollmentType?: 'assigned' | 'self-enrolled'; // Added from BE
 }
 
 // Paginated Response for Detailed Enrollments

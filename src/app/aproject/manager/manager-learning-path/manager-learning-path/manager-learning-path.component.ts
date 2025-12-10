@@ -13,6 +13,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
 import { LearningPathService } from '../../../../services/learning-path.service';
 import { LearningPath, DetailedEnrollment } from '../../../../models/learning-path.models';
 import { firstValueFrom } from 'rxjs';
@@ -33,7 +35,9 @@ import { firstValueFrom } from 'rxjs';
     MatSnackBarModule,
     MatTooltipModule,
     MatMenuModule,
-    MatDividerModule
+    MatDividerModule,
+    MatFormFieldModule,
+    MatSelectModule
   ],
   templateUrl: './manager-learning-path.component.html',
   styleUrls: ['./manager-learning-path.component.scss']
@@ -63,12 +67,13 @@ export class ManagerLearningPathComponent implements OnInit {
   isLoading = false;
 
   // User Progress table data
-  progressDisplayedColumns: string[] = ['user', 'learningPath', 'progress', 'status', 'startDate', 'actions'];
+  progressDisplayedColumns: string[] = ['user', 'learningPath', 'enrollmentType', 'progress', 'status', 'startDate', 'actions'];
   progressDataSource: DetailedEnrollment[] = [];
   progressTotal = 0;
   progressCurrentPage = 1;
   progressPageSize = 10;
   progressSearchTerm = '';
+  progressFilterType: 'all' | 'assigned' | 'self-enrolled' = 'all';
   isLoadingProgress = false;
 
   constructor(
@@ -86,11 +91,59 @@ export class ManagerLearningPathComponent implements OnInit {
   
   maxLengthText(text: string) : boolean {
     return text.length > 20;
-}
+  }
 
-formatText(text: string) : string {
-    return this.maxLengthText(text) ? text.substring(0, 20) + '...' : text;
-}
+  formatText(text: string) : string {
+      return this.maxLengthText(text) ? text.substring(0, 20) + '...' : text;
+  }
+
+  exportToExcel(): void {
+    this.isLoadingProgress = true;
+    
+    this.learningPathService.exportUserProgressExcel(
+      this.progressSearchTerm,
+      this.progressFilterType
+    ).subscribe({
+      next: (blob: Blob) => {
+        // Create download link
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        
+        // Generate filename with current date
+        const date = new Date();
+        const dateStr = date.toISOString().split('T')[0];
+        const filterStr = this.progressFilterType !== 'all' ? `-${this.progressFilterType}` : '';
+        link.download = `user-progress-tracking${filterStr}-${dateStr}.xlsx`;
+        
+        // Trigger download
+        document.body.appendChild(link);
+        link.click();
+        
+        // Cleanup
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+        
+        this.isLoadingProgress = false;
+        this.snackBar.open('Export to Excel completed successfully', 'Close', {
+          duration: 3000,
+          panelClass: ['success-snackbar', 'custom-snackbar'],
+          horizontalPosition: 'right',
+          verticalPosition: 'top'
+        });
+      },
+      error: (error) => {
+        console.error('Error exporting to Excel:', error);
+        this.isLoadingProgress = false;
+        this.snackBar.open('Failed to export Excel file', 'Close', {
+          duration: 3000,
+          panelClass: ['error-snackbar', 'custom-snackbar'],
+          horizontalPosition: 'right',
+          verticalPosition: 'top'
+        });
+      }
+    });
+  }
 
   loadLearningPaths(): void {
     this.isLoading = true;
@@ -128,12 +181,26 @@ formatText(text: string) : string {
 
   loadUserProgress(): void {
     this.isLoadingProgress = true;
-    this.learningPathService.getAllEnrollments(this.progressCurrentPage, this.progressPageSize, this.progressSearchTerm).subscribe({
+    // Load with larger pageSize to get all data for filtering
+    this.learningPathService.getAllEnrollments(1, 1000, this.progressSearchTerm).subscribe({
       next: (response) => {
-        this.progressDataSource = response.items;
-        this.progressTotal = response.total;
-        this.progressCurrentPage = response.page;
-        this.progressPageSize = response.pageSize;
+        // Filter by enrollment type if needed
+        let filteredItems = response.items;
+        if (this.progressFilterType === 'assigned') {
+          filteredItems = response.items.filter(item => item.enrollmentType === 'assigned');
+        } else if (this.progressFilterType === 'self-enrolled') {
+          filteredItems = response.items.filter(item => item.enrollmentType === 'self-enrolled');
+        }
+        
+        // Apply pagination to filtered results
+        const startIndex = (this.progressCurrentPage - 1) * this.progressPageSize;
+        const endIndex = startIndex + this.progressPageSize;
+        const paginatedItems = filteredItems.slice(startIndex, endIndex);
+        
+        this.progressDataSource = paginatedItems;
+        this.progressTotal = filteredItems.length; // Use filtered count
+        this.progressCurrentPage = this.progressCurrentPage;
+        this.progressPageSize = this.progressPageSize;
         this.isLoadingProgress = false;
       },
       error: (error) => {
@@ -142,6 +209,11 @@ formatText(text: string) : string {
         this.isLoadingProgress = false;
       }
     });
+  }
+
+  onFilterTypeChange(): void {
+    this.progressCurrentPage = 1;
+    this.loadUserProgress();
   }
 
   searchPaths(): void {

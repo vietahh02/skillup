@@ -25,7 +25,15 @@ import { ActivatedRoute, RouterLink } from "@angular/router";
 import { ApiUserServices } from '../../../../services/user.service';
 import { UserDetail } from '../../../../models/user.models';
 import { CommonModule } from '@angular/common';
-import { MatTooltip } from "@angular/material/tooltip";
+import { MatTooltip, MatTooltipModule } from "@angular/material/tooltip";
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { AssignLearningPathDialogComponent } from '../assign-learning-path-dialog/assign-learning-path-dialog.component';
+import { LearningPathService } from '../../../../services/learning-path.service';
+import { LearningPathEnrollment, DetailedEnrollment } from '../../../../models/learning-path.models';
+import { HttpParams } from '@angular/common/http';
 
 export type ChartOptions = {
     series: ApexAxisChartSeries;
@@ -44,7 +52,23 @@ export type ChartOptions = {
 
 @Component({
     selector: 'app-manager-user-detail',
-    imports: [CommonModule, MatCardModule, MatButtonModule, MatMenuModule, ChartComponent, MatCheckboxModule, MatTableModule, MatProgressBar, MatPaginatorModule, RouterLink, MatTabsModule, MatTooltip],
+    imports: [
+        CommonModule, 
+        MatCardModule, 
+        MatButtonModule, 
+        MatMenuModule, 
+        MatCheckboxModule, 
+        MatTableModule, 
+        MatProgressBar, 
+        MatPaginatorModule, 
+        RouterLink, 
+        MatTabsModule, 
+        MatTooltipModule,
+        MatIconModule,
+        MatSnackBarModule,
+        MatProgressSpinnerModule,
+        MatDialogModule
+    ],
     templateUrl: './user-detail.component.html',
     styleUrls: ['./user-detail.component.scss']
 })
@@ -66,6 +90,9 @@ export class ManagerUserDetail {
 
     enrolledCourse: any[] = [];
     createdCourse: any[] = [];
+    assignedLearningPaths: LearningPathEnrollment[] = [];
+    selfEnrolledLearningPaths: LearningPathEnrollment[] = [];
+    isLoadingAssignments = false;
 
     maxLengthText(text: string) : boolean {
         return text.length > 20;
@@ -75,7 +102,13 @@ export class ManagerUserDetail {
         return this.maxLengthText(text) ? text.substring(0, 20) + '...' : text;
     }
 
-    constructor(private api: ApiUserServices, private apiUser: ApiUserServices) {
+    constructor(
+        private api: ApiUserServices, 
+        private apiUser: ApiUserServices,
+        private dialog: MatDialog,
+        private learningPathService: LearningPathService,
+        private snackBar: MatSnackBar
+    ) {
         this.chartOptions = {
             series: [
                 {
@@ -180,6 +213,7 @@ export class ManagerUserDetail {
                 this.detail = res;
                 if (res.roles?.includes('Employee')) {
                     this.fetchEnrolledCourse();
+                    this.fetchAssignedLearningPaths();
                 }
                 if (res.roles?.includes('Lecturer')) {
                     this.fetchCreatedCourse();
@@ -204,7 +238,92 @@ export class ManagerUserDetail {
         })
     }
 
+    private fetchAssignedLearningPaths() {
+        this.isLoadingAssignments = true;
+        
+        // Get all enrollments for this user
+        this.learningPathService.getAllEnrollments(1, 100, '').subscribe({
+            next: (response) => {
+                // Filter by userId
+                const userEnrollments = response.items.filter(item => item.userId === Number(this.id));
+                
+                // Separate assigned and self-enrolled
+                // If enrollmentType is missing, treat all as assigned (workaround)
+                const hasEnrollmentType = userEnrollments.some(item => item.enrollmentType !== undefined);
+                
+                if (hasEnrollmentType) {
+                    this.assignedLearningPaths = userEnrollments
+                        .filter(item => item.enrollmentType === 'assigned')
+                        .map(item => this.mapToLearningPathEnrollment(item));
+                    
+                    this.selfEnrolledLearningPaths = userEnrollments
+                        .filter(item => item.enrollmentType === 'self-enrolled')
+                        .map(item => this.mapToLearningPathEnrollment(item));
+                } else {
+                    // If enrollmentType is missing, show all as assigned (temporary workaround)
+                    this.assignedLearningPaths = userEnrollments
+                        .map(item => this.mapToLearningPathEnrollment(item));
+                    this.selfEnrolledLearningPaths = [];
+                }
+            },
+            error: (error) => {
+                console.error('Error loading learning paths:', error);
+            },
+            complete: () => {
+                this.isLoadingAssignments = false;
+            }
+        });
+    }
 
+    private mapToLearningPathEnrollment(item: any): LearningPathEnrollment {
+        return {
+            learningPathEnrollmentId: item.learningPathEnrollmentId,
+            userId: item.userId,
+            learningPathId: item.learningPathId,
+            learningPathName: item.learningPathName,
+            userName: item.userName,
+            status: item.status,
+            progressPct: item.progressPct,
+            startedAt: item.startedAt,
+            completedAt: item.completedAt,
+            createdAt: item.startedAt,
+            updatedAt: item.completedAt || item.startedAt,
+            enrollmentType: item.enrollmentType || 'assigned'
+        };
+    }
+
+    openAssignLearningPathDialog() {
+        if (!this.detail) return;
+
+        const dialogRef = this.dialog.open(AssignLearningPathDialogComponent, {
+            width: '600px',
+            data: {
+                userId: Number(this.id),
+                userName: this.detail.fullName,
+                onAssigned: () => {
+                    this.fetchAssignedLearningPaths();
+                    this.fetchEnrolledCourse(); // Refresh enrolled courses
+                }
+            }
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+                // Assignment successful, data already refreshed in onAssigned callback
+            }
+        });
+    }
+
+    getStatusClass(status: string): string {
+        if (status === 'Completed') return 'text-soft-success';
+        if (status === 'InProgress') return 'text-soft-primary';
+        return 'text-soft-secondary';
+    }
+
+    formatDate(dateString: string): string {
+        if (!dateString) return '-';
+        return new Date(dateString).toLocaleDateString('vi-VN');
+    }
 
 }
 

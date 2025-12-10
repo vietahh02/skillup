@@ -46,6 +46,15 @@
   }
 }
 
+.ms-auto {
+  display: flex;
+  align-items: start;
+  gap: 10px;
+  button {
+    padding: 18px 20px !important;
+  }
+}
+
 // Navigation Tabs
 .nav-tabs-container {
   .nav-tabs {

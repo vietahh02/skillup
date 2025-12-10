@@ -17,6 +17,7 @@ import { FormBuilder, FormsModule, ReactiveFormsModule, Validators } from '@angu
 import { Level } from '../../../../models/lookup.model';
 import { ApiCourseServices } from '../../../../services/course.service';
 import { MatTooltip } from "@angular/material/tooltip";
+import { ChatBoxComponent } from '../../../../shared/chat-box/chat-box.component';
 
 @Component({
     selector: 'app-manager-employee',
@@ -26,7 +27,8 @@ import { MatTooltip } from "@angular/material/tooltip";
 })
 export class ManagerEmployee {
   constructor(private router: Router,public dialog: MatDialog, private apiUserServices: ApiUserServices,
-     private snack: MatSnackBar, private apiCourseServices: ApiCourseServices) {}
+     private snack: MatSnackBar, private apiCourseServices: ApiCourseServices) {
+     }
 
   displayedColumns: string[] = ['user','progress', 'email', 'level','courses', 'role', 'status', 'action'];
   dataSource = new MatTableDataSource<UserManager>([]);
@@ -367,7 +369,7 @@ export class CreateEmployeeDialog {
 
       this.apiUserServices.createEmployee(this.employeeForm.value).subscribe(
         (res: any) => {
-          this.snack.open('Employee created successfully', '', { duration: 2200, panelClass: ['success-snackbar', 'custom-snackbar'], horizontalPosition: 'right', verticalPosition: 'top' });
+          this.snack.open('Employee created successfully. Password has been sent to their email.', '', { duration: 4000, panelClass: ['success-snackbar', 'custom-snackbar'], horizontalPosition: 'right', verticalPosition: 'top' });
           if (this.data?.loadUsers) {
             this.data.loadUsers();
           }
@@ -375,7 +377,14 @@ export class CreateEmployeeDialog {
         },
         (error: any) => {
           console.error('Error creating employee:', error);
-          this.snack.open('Failed to create employee. Please try again.', '', { duration: 3000, panelClass: ['error-snackbar', 'custom-snackbar'], horizontalPosition: 'right', verticalPosition: 'top' });
+          let errorMessage = 'Failed to create employee. Please try again.';
+          
+          // Handle email domain validation error from backend
+          if (error?.error?.error === 'InvalidEmailDomain') {
+            errorMessage = error.error.message || 'Email must be from @skillup.com domain';
+          }
+          
+          this.snack.open(errorMessage, '', { duration: 3000, panelClass: ['error-snackbar', 'custom-snackbar'], horizontalPosition: 'right', verticalPosition: 'top' });
         }
       );
     }

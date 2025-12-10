@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked, inject } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewChecked, inject, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,6 +11,7 @@ import { ChatMessage, ConversationModel } from '../../models/ai.models';
 import { ApiAiServices } from '../../services/ai.service';
 import { UserInfo } from '../../models/user.models';
 import { AuthService } from '../../context/auth.service';
+import { Observable, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-chat-box',
@@ -28,9 +29,10 @@ import { AuthService } from '../../context/auth.service';
   templateUrl: './chat-box.component.html',
   styleUrls: ['./chat-box.component.scss']
 })
-export class ChatBoxComponent implements OnInit, AfterViewChecked {
+export class ChatBoxComponent implements OnInit, AfterViewChecked, OnDestroy {
   private apiAiServices = inject(ApiAiServices);
   private authService = inject(AuthService);
+  private currentUserSubscription?: Subscription;
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef;
 
   isExpanded = false;
@@ -40,11 +42,24 @@ export class ChatBoxComponent implements OnInit, AfterViewChecked {
   isTyping = false;
   unreadCount = 0;
   currentUser: UserInfo | null = null;
+  public shouldShowChat = false;
+  currentUser$: Observable<UserInfo | null> = this.authService.currentUser$;
 
   ngOnInit(): void {
-    // Initialize with welcome message
-    this.currentUser = this.authService.getCurrentUser();
-    this.addBotMessage('Xin chào! Tôi là trợ lý ảo của SkillUp. Tôi có thể giúp gì cho bạn hôm nay?');
+    this.currentUserSubscription = this.currentUser$.subscribe(user => {
+      this.currentUser = user;
+      this.shouldShowChat = user !== null;
+      
+      if (user !== null && this.messages.length === 0) {
+        this.addBotMessage('Xin chào! Tôi là trợ lý ảo của SkillUp. Tôi có thể giúp gì cho bạn hôm nay?');
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.currentUserSubscription) {
+      this.currentUserSubscription.unsubscribe();
+    }
   }
 
   ngAfterViewChecked(): void {

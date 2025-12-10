@@ -1,5 +1,5 @@
 <!-- Chat Box Container -->
-<div class="chat-box-container" [class.expanded]="isExpanded" [class.minimized]="isMinimized">
+<div *ngIf="shouldShowChat" class="chat-box-container" [class.expanded]="isExpanded" [class.minimized]="isMinimized">
   
   <!-- Minimized Chat Button -->
   <button 

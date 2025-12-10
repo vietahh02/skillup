@@ -82,7 +82,7 @@ export class ManagerReportUserComponent implements AfterViewInit {
         });
     }
 
-    search() {
+    search(): void {
         this.currentPage = 1;
         if (this.paginator) {
             this.paginator.pageIndex = 0;

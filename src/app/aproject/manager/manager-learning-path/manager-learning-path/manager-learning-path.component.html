@@ -107,7 +107,7 @@
       class="input-search border-radius"
       placeholder="Search learning paths..."
       [(ngModel)]="searchTerm"
-      (input)="searchPaths()">
+      (keyup.enter)="searchPaths()">
     <button mat-flat-button class="tagus" (click)="searchPaths()">
       <i class="ri-search-line"></i>
     </button>
@@ -249,7 +249,23 @@
 <!-- User Progress Table -->
 <mat-card class="mb-25 tagus-card" *ngIf="currentView === 'progress'">
   <mat-card-header>
-    <h5 class="mb-0">User Progress Tracking</h5>
+    <div class="d-flex align-items-center justify-content-between w-100">
+      <h5 class="mb-0">User Progress Tracking</h5>
+      <div class="ms-auto">
+        <mat-form-field appearance="outline" class="filter-field mb-0" style="min-width: 200px;">
+          <mat-label>Filter by Type</mat-label>
+          <mat-select [(ngModel)]="progressFilterType" (selectionChange)="onFilterTypeChange()">
+            <mat-option value="all">All Enrollments</mat-option>
+            <mat-option value="assigned">Assigned Only</mat-option>
+            <mat-option value="self-enrolled">Self-Enrolled Only</mat-option>
+          </mat-select>
+        </mat-form-field>
+        <button mat-flat-button class="tagus" (click)="exportToExcel()">
+          <i class="ri-file-excel-line"></i>
+          Export to Excel
+        </button>
+      </div>
+    </div>
   </mat-card-header>
 
   <div class="tagus-search-box mb-15 mt-20">
@@ -258,7 +274,7 @@
       class="input-search border-radius"
       placeholder="Search users or learning paths..."
       [(ngModel)]="progressSearchTerm"
-      (input)="searchProgress()">
+      (keyup.enter)="searchProgress()">
     <button mat-flat-button class="tagus" (click)="searchProgress()">
       <i class="ri-search-line"></i>
     </button>
@@ -296,6 +312,19 @@
               <strong class="d-block">{{element.learningPathName}}</strong>
               <small class="muted-color">{{element.completedCourses}} / {{element.totalCourses}} courses</small>
             </div>
+          </td>
+        </ng-container>
+
+        <!-- Enrollment Type Column -->
+        <ng-container matColumnDef="enrollmentType">
+          <th mat-header-cell *matHeaderCellDef>Enrollment Type</th>
+          <td mat-cell *matCellDef="let element">
+            <span class="badge" [ngClass]="{
+              'text-soft-danger': element.enrollmentType === 'assigned',
+              'text-soft-tagus': element.enrollmentType === 'self-enrolled'
+            }">
+              {{ element.enrollmentType === 'assigned' ? 'Assigned' : 'Self-Enrolled' }}
+            </span>
           </td>
         </ng-container>
 

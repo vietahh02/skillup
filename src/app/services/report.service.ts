@@ -16,7 +16,7 @@ export class ReportService {
       .set('pageSize', pageSize.toString());
 
     if (searchTerm && searchTerm.trim()) {
-      params = params.set('search', searchTerm.trim());
+      params = params.set('searchTerm', searchTerm.trim());
     }
 
     return this.http.get<any>(API_URLS.GET_USER_REPORT, { params });
@@ -26,7 +26,7 @@ export class ReportService {
     let params = new HttpParams();
     
     if (searchTerm && searchTerm.trim()) {
-      params = params.set('search', searchTerm.trim());
+      params = params.set('searchTerm', searchTerm.trim());
     }
 
     return this.http.get(API_URLS.EXPORT_USER_REPORT_EXCEL, { 

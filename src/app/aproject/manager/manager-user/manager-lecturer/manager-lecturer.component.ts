@@ -339,8 +339,8 @@ export class CreateLecturerDialog {
       this.apiUserServices.createLecturer(this.lecturerForm.value).subscribe({
         next: (res: any) => {
           
-          this.snack.open('Lecturer created successfully', '', { 
-            duration: 2200, 
+          this.snack.open('Lecturer created successfully. Password has been sent to their email.', '', { 
+            duration: 4000, 
             panelClass: ['success-snackbar', 'custom-snackbar'], 
             horizontalPosition: 'right', 
             verticalPosition: 'top' 
@@ -356,7 +356,14 @@ export class CreateLecturerDialog {
         },
         error: (error: any) => {
           console.error('Error creating lecturer:', error);
-          this.snack.open('Failed to create lecturer. Please try again.', '', { 
+          let errorMessage = 'Failed to create lecturer. Please try again.';
+          
+          // Handle email domain validation error from backend
+          if (error?.error?.error === 'InvalidEmailDomain') {
+            errorMessage = error.error.message || 'Email must be from @skillup.com domain';
+          }
+          
+          this.snack.open(errorMessage, '', { 
             duration: 3000, 
             panelClass: ['error-snackbar', 'custom-snackbar'], 
             horizontalPosition: 'right', 

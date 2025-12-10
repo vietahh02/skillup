@@ -20,8 +20,12 @@
             <div class="stat-label">Available Paths</div>
           </div>
           <div class="stat-box">
-            <div class="stat-value">{{enrolledPaths.length}}</div>
-            <div class="stat-label">Your Active Paths</div>
+            <div class="stat-value">{{assignedPaths.length}}</div>
+            <div class="stat-label">Assigned Paths</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-value">{{selfEnrolledPaths.length}}</div>
+            <div class="stat-label">Self-Enrolled Paths</div>
           </div>
         </div>
       </div>
@@ -51,16 +55,74 @@
       </mat-card>
     </div>
 
-    <!-- My Active Learning Paths -->
-    <div class="active-paths-section" *ngIf="enrolledPaths.length > 0">
+    <!-- Assigned Learning Paths -->
+    <div class="active-paths-section" *ngIf="assignedPaths.length > 0">
       <h2 class="section-title">
-        Your Active Learning Paths
+        <mat-icon>assignment</mat-icon>
+        Assigned Learning Paths
       </h2>
 
       <div class="paths-grid active-grid">
         <mat-card
           class="tagus-card path-card active-path"
-          *ngFor="let path of enrolledPaths"
+          *ngFor="let path of assignedPaths"
+          (click)="viewDetail(path)">
+          <mat-card-content>
+            <div class="path-header">
+              <div class="path-meta">
+                <span class="level-badge" [ngClass]="getLevelClass(path.level)">{{path.level || 'N/A'}}</span>
+              </div>
+              <span class="enrolled-badge assigned-badge">Assigned</span>
+            </div>
+
+            <h3 class="path-title">{{path.name}}</h3>
+            <p class="path-description">{{path.description}}</p>
+
+            <div class="progress-section">
+              <div class="progress-info">
+                <span class="progress-label">Progress</span>
+                <span class="progress-value">{{getProgress(path.learningPathId)}}%</span>
+              </div>
+              <mat-progress-bar mode="determinate" [value]="getProgress(path.learningPathId)"></mat-progress-bar>
+            </div>
+
+            <div class="path-stats">
+              <div class="stat-item">
+                <mat-icon>person</mat-icon>
+                <span>{{path.createdByName}}</span>
+              </div>
+              <div class="stat-item">
+                <mat-icon>schedule</mat-icon>
+                <span>{{path.duration ? path.duration + ' days' : 'N/A'}}</span>
+              </div>
+              <div class="stat-item">
+                <mat-icon>event</mat-icon>
+                <span>{{path.createdAt | date:'MMM d, y'}}</span>
+              </div>
+            </div>
+
+            <div class="path-actions">
+              <button mat-flat-button color="primary" (click)="continuePath(path, $event)" class="action-btn">
+                <mat-icon>play_arrow</mat-icon>
+                Continue Learning
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Self-Enrolled Learning Paths -->
+    <div class="active-paths-section" *ngIf="selfEnrolledPaths.length > 0">
+      <h2 class="section-title">
+        <mat-icon>bookmark</mat-icon>
+        Self-Enrolled Learning Paths
+      </h2>
+
+      <div class="paths-grid active-grid">
+        <mat-card
+          class="tagus-card path-card active-path"
+          *ngFor="let path of selfEnrolledPaths"
           (click)="viewDetail(path)">
           <mat-card-content>
             <div class="path-header">
@@ -110,22 +172,24 @@
     <!-- All Available Learning Paths -->
     <div class="available-paths-section">
       <h2 class="section-title">
+        <mat-icon>explore</mat-icon>
         <span *ngIf="enrolledPaths.length > 0">More Learning Paths</span>
         <span *ngIf="enrolledPaths.length === 0">All Learning Paths</span>
       </h2>
 
       <!-- Empty State -->
-      <div *ngIf="filteredPaths.length === 0" class="empty-state">
+      <div *ngIf="availablePaths.length === 0 && !isLoading" class="empty-state">
         <mat-icon>school</mat-icon>
-        <h3>No Learning Paths Found</h3>
-        <p>Try adjusting your search to find what you're looking for.</p>
+        <h3>No Learning Paths Available</h3>
+        <p *ngIf="searchTerm">Try adjusting your search to find what you're looking for.</p>
+        <p *ngIf="!searchTerm">All learning paths have been enrolled.</p>
       </div>
 
       <!-- Paths Grid -->
-      <div class="paths-grid" *ngIf="filteredPaths.length > 0">
+      <div class="paths-grid" *ngIf="availablePaths.length > 0">
         <mat-card
           class="tagus-card path-card"
-          *ngFor="let path of filteredPaths"
+          *ngFor="let path of availablePaths"
           (click)="viewDetail(path)">
           <mat-card-content>
             <div class="path-header">

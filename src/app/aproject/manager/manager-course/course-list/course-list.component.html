@@ -5,7 +5,7 @@
             
             <div >
                 <div class="tagus-search-box">
-                    <input type="text" class="input-search border-radius" placeholder="Search here" [(ngModel)]="searchTerm" (input)="search()">
+                    <input type="text" class="input-search border-radius" placeholder="Search here" [(ngModel)]="searchTerm" (keyup.enter)="search()">
                     <button  mat-flat-button class="tagus" (click)="search()"><i class="ri-search-line"></i></button>
                 </div>
             </div>

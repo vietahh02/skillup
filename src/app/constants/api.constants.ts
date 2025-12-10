@@ -117,6 +117,8 @@ export const API_URLS = {
   //API Lookup
   GET_COURSE_TYPES: BASE_POINTS.LOOKUP + "/course-types",
   GET_LEVELS: BASE_POINTS.LOOKUP + "/user-levels",
+  ACTIVATE_COURSE_TYPE: BASE_POINTS.LOOKUP + "/course-types", // PATCH /api/lookups/course-types/{id}/activate
+  ACTIVATE_USER_LEVEL: BASE_POINTS.LOOKUP + "/user-levels", // PATCH /api/lookups/user-levels/{id}/activate
 
   //API Feedback
   FEEDBACKS: BASE_POINTS.FEEDBACK,
@@ -151,6 +153,7 @@ export const API_URLS = {
   // Learning Path Enrollment Management (for Manager)
   GET_ENROLLMENT_STATISTICS: BASE_POINTS.LEARNING_PATH_ENROLLMENT + "/statistics", // GET /api/learning-path-enrollments/statistics
   GET_ALL_ENROLLMENTS: BASE_POINTS.LEARNING_PATH_ENROLLMENT + "/all", // GET /api/learning-path-enrollments/all
+  EXPORT_USER_PROGRESS_EXCEL: BASE_POINTS.LEARNING_PATH_ENROLLMENT + "/export-excel", // GET /api/learning-path-enrollments/export-excel
 
   // Manager Dashboard
   GET_MANAGER_DASHBOARD_STATS: BASE_POINTS.DASHBOARD + "/statistics", // GET /api/Dashboard/statistics
@@ -163,6 +166,10 @@ export const API_URLS = {
   GET_AI_KEY: BASE_POINTS.SETTINGS + "/ai-key", // GET /api/settings/ai-key
   UPDATE_AI_KEY: BASE_POINTS.SETTINGS + "/ai-key", // PUT /api/settings/ai-key
   DASHBOARD_ADMIN: BASE_POINTS.DASHBOARD + "/admin",
+
+  // Settings Management (Manager only)
+  GET_COURSE_MANAGER_TYPES: BASE_POINTS.SETTINGS + "/course-types", // GET /api/settings/course-types
+  GET_USER_MANAGER_LEVELS: BASE_POINTS.SETTINGS + "/user-levels", // GET /api/settings/user-levels
 
   //API Report
   GET_USER_REPORT: BASE_POINTS.USER + "/employees/detail-statistics", // GET /api/Users/employees/detail-statistics
