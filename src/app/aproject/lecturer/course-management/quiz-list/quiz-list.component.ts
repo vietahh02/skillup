@@ -310,7 +310,7 @@ export class DeleteQuizDialog {
               <mat-icon>school</mat-icon>
               <div class="info-content">
                 <span class="label">Course</span>
-                <span class="value" [matTooltip]="maxLengthText(data.courseName) ? data.courseName : ''">{{formatText(data.courseName)}}</span>
+                <span class="value word-break-all" [matTooltip]="maxLengthText(data.courseName) ? data.courseName : ''">{{formatText(data.courseName)}}</span>
               </div>
             </div>
 
@@ -318,7 +318,7 @@ export class DeleteQuizDialog {
               <mat-icon>percent</mat-icon>
               <div class="info-content">
                 <span class="label">Pass Score</span>
-                <span class="value">{{ data.passScore }}%</span>
+                <span class="value word-break-all">{{ data.passScore }}%</span>
               </div>
             </div>
 
@@ -326,7 +326,7 @@ export class DeleteQuizDialog {
               <mat-icon>repeat</mat-icon>
               <div class="info-content">
                 <span class="label">Attempt Limit</span>
-                <span class="value">{{ data.attemptLimit === 0 ? 'Unlimited' : data.attemptLimit }}</span>
+                <span class="value word-break-all">{{ data.attemptLimit === 0 ? 'Unlimited' : data.attemptLimit }}</span>
               </div>
             </div>
 
@@ -334,7 +334,7 @@ export class DeleteQuizDialog {
               <mat-icon>quiz</mat-icon>
               <div class="info-content">
                 <span class="label">Questions</span>
-                <span class="value">{{ data.questions.length || 0 }}</span>
+                <span class="value word-break-all">{{ data.questions.length || 0 }}</span>
               </div>
             </div>
           </div>
@@ -363,7 +363,7 @@ export class DeleteQuizDialog {
             </div>
 
             <div class="question-body">
-              <p class="question-title">{{ question.title }}</p>
+              <p class="question-title word-break-all">{{ question.title }}</p>
               <div class="question-details">
                 <span class="points">
                   <mat-icon>star</mat-icon>
@@ -377,7 +377,7 @@ export class DeleteQuizDialog {
                      class="answer-option"
                      [class.correct]="option.isCorrect">
                   <span class="option-label">{{ getLetter(j) }}</span>
-                  <span class="option-content">{{ option.content }}</span>
+                  <span class="option-content word-break-all">{{ option.content }}</span>
                   <mat-icon *ngIf="option.isCorrect" class="correct-icon">check_circle</mat-icon>
                 </div>
               </div>
@@ -395,6 +395,19 @@ export class DeleteQuizDialog {
     </div>
   `,
   styles: [`
+  .value {
+    word-break: break-word;
+                    overflow-wrap: break-word;
+                    word-wrap: break-word;
+  }
+  .word-break-all {
+    word-break: break-all;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+  }
+  ::ng-deep .mat-mdc-dialog-surface {
+    overflow-y: hidden !important;
+  }
     .view-quiz-dialog {
       .dialog-title {
         display: flex;

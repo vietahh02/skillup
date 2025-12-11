@@ -31,9 +31,6 @@ export class ApiAuthServices {
     return this.http.put<any>(API_URLS.UPDATE_USER_INFO, formData, { withCredentials: true });
   }
 
-  // refreshToken(refreshToken: string) {
-  //   return this.http.post<any>(API_URLS.REFRESH_TOKEN_ONLY, { refreshToken: refreshToken });
-  // }
   refreshToken() {
     return this.http.post<any>(API_URLS.REFRESH_TOKEN_ONLY, {}, { withCredentials: true });
   }

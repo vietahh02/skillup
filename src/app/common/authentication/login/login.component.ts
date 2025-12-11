@@ -151,12 +151,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
         // Save access token
         if (result.accessToken) {
-          this.tokenService.setToken(result.accessToken);
-        }
-
-        // Save refresh token
-        if (result.refreshToken) {
-          this.tokenService.setRefreshToken(result.refreshToken);
+          this.tokenService.setToken(result.accessToken, result.accessTokenExpiry);
         }
 
         // Load user info
@@ -237,12 +232,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         
         // Lưu access token 
         if (result.accessToken) {
-          this.tokenService.setToken(result.accessToken);
-        }
-        
-        // Lưu refresh token nếu rememberMe = true
-        if (rememberMe && result.refreshToken) {
-          this.tokenService.setRefreshToken(result.refreshToken);
+          this.tokenService.setToken(result.accessToken, result.accessTokenExpiry);
         }
         
         // Load thông tin user

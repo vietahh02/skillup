@@ -95,8 +95,8 @@
                         <i class="flaticon-user"></i>
                     </div>
                     <div class="title">
-                        <h3 class="mb-0">{{ topEmployeesCount }}</h3>
-                        <span class="d-block gray-color">Total courses</span>
+                        <h3 class="mb-0">{{ (topEmployeesCount/3).toFixed(2) }}%</h3>
+                        <span class="d-block gray-color">Average Course Progress</span>
                     </div>
                 </div>
                 <div class="kanban-item bg-gray border-radius p-20" *ngFor="let employee of topEmployees">

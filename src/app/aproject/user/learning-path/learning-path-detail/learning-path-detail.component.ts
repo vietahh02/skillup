@@ -38,7 +38,6 @@ interface CourseWithStatus extends LearningPathItem {
     MatChipsModule,
     MatSnackBarModule,
     MatProgressSpinnerModule,
-    MatTooltip
 ],
   templateUrl: './learning-path-detail.component.html',
   styleUrl: './learning-path-detail.component.scss'
