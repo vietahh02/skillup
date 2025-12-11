@@ -1,0 +1,12 @@
+{
+  "/api": {
+    "target": "https://m611zlpk-7128.asse.devtunnels.ms",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "pathRewrite": {
+      "^/api": "/api"
+    }
+  }
+}
+  

@@ -3,6 +3,7 @@ import { BehaviorSubject, timer, Observable, throwError } from 'rxjs';
 import { ApiAuthServices } from '../services/auth.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { tap, catchError, share } from 'rxjs/operators';
+// import { CookieService } from 'ngx-cookie-service';
 
 @Injectable({ providedIn: 'root' })
 export class TokenService {
@@ -48,10 +49,10 @@ export class TokenService {
    */
   refreshTokenObservable$(): Observable<any> {
     // Nếu không có refresh token, throw error
-    const refreshToken = this.getRefreshToken();
-    if (!refreshToken) {
-      return throwError(() => new Error('No refresh token available'));
-    }
+    // const refreshToken = this.getRefreshToken() || "";
+    // if (!refreshToken) {
+    //   return throwError(() => new Error('No refresh token available'));
+    // }
 
     // Nếu đang refresh, trả về observable hiện tại
     if (this.refreshTokenObservable) {
@@ -59,7 +60,7 @@ export class TokenService {
     }
 
     // Tạo observable mới cho việc refresh
-    this.refreshTokenObservable = this.apiAuthService.refreshToken(refreshToken).pipe(
+    this.refreshTokenObservable = this.apiAuthService.refreshToken().pipe(
       tap((response: any) => {
         this.setToken(response.accessToken);
         
@@ -120,8 +121,9 @@ export class TokenService {
       const now = Date.now();
       
       // Refresh token 5 phút trước khi hết hạn
-      const refreshTime = expiry - now - (1.5 * 60 * 1000);
-      console.log('refreshTime', refreshTime);
+      const refreshTime = expiry - now - (1.7 * 60 * 1000);
+      const refreshTimeInSeconds = refreshTime / 1000;
+      console.log('refreshTime', refreshTimeInSeconds, 'seconds');
       
       if (refreshTime > 0) {
         timer(refreshTime).subscribe(() => {
@@ -135,8 +137,18 @@ export class TokenService {
     } 
   }
 
-  setToken(token: string) {
+  setToken(token: string, accessTokenExpiry?: string) {
     localStorage.setItem('access_token', token);
+    // this.cookieService.set(
+    //   'accessToken',
+    //   token,
+    //   { 
+    //     path: '/',
+    //     secure: true,
+    //     sameSite: 'None',
+    //     expires: 7 // ngày
+    //   }
+    // );
   }
 
   getToken(): string | null {

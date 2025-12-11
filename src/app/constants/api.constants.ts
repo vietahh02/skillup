@@ -30,6 +30,7 @@ export const API_URLS = {
   LOGIN_GOOGLE: BASE_POINTS.AUTH + "/google",
   LOGOUT: BASE_POINTS.AUTH + "/logout-all",
   REFRESH_TOKEN: BASE_POINTS.AUTH + "/refresh-token",
+  REFRESH_TOKEN_ONLY: BASE_POINTS.AUTH + "/refresh-token-only",
   REVOKE_TOKEN: BASE_POINTS.AUTH + "/revoke-token",
   CHANGE_PASSWORD: BASE_POINTS.AUTH + "/me/change-password",
   FORGOT_PASSWORD: BASE_POINTS.AUTH + "/forgot-password",
