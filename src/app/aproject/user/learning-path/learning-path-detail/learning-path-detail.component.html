@@ -14,10 +14,8 @@
             <span>Your Learning Journey</span>
           </div>
 
-          <h1 class="hero-title" [matTooltip]="maxLengthText(learningPath.name) ? learningPath.name : ''">{{formatText(learningPath.name)}}</h1>
-          <p class="hero-description" [matTooltip]="maxLengthText(learningPath.description) ? learningPath.description : ''">
-            {{formatText(learningPath.description)}}
-          </p>
+          <h1 class="hero-title word-break-all" >{{learningPath.name}}</h1>
+          <p class="hero-description word-break-all"  >{{learningPath.description}}</p>
 
           <div class="hero-stats">
             <div class="stat-box">
@@ -85,11 +83,11 @@
                   <div class="course-header">
                     <div class="course-info">
                       <h3 class="course-title">
-                        {{course.courseName}}
+                        <span class="word-break-all">{{course.courseName}}</span>
                         <mat-icon *ngIf="!isCourseUnlocked(course)" style="font-size: 18px; vertical-align: middle; margin-left: 8px; color: #999;">lock</mat-icon>
                       </h3>
                       <p class="course-description" *ngIf="course.description">
-                        {{course.description}}
+                        <span class="word-break-all">{{course.description}}</span>
                       </p>
                       <p class="course-description" *ngIf="!isCourseUnlocked(course)" style="color: #f44336; font-size: 12px; margin-top: 4px;">
                         <mat-icon style="font-size: 14px; vertical-align: middle;">info</mat-icon>

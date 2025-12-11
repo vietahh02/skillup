@@ -359,6 +359,10 @@
 
 }
 
+.word-break-all {
+    word-break: break-all;
+}
+
 // Feedback Section Styles
 .feedback-section {
     .feedback-header {
@@ -451,6 +455,9 @@
             color: #5A6C7D;
             line-height: 1.6;
             margin-bottom: 15px;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
         }
 
         .reply-btn {
@@ -580,6 +587,9 @@
                     font-size: 13px;
                     line-height: 1.5;
                     margin: 0;
+                    word-break: break-word;
+                    overflow-wrap: break-word;
+                    word-wrap: break-word;
                 }
             }
         }
