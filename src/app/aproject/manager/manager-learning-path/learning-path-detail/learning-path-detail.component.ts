@@ -62,7 +62,6 @@ export class LearningPathDetailComponent implements OnInit {
         this.learningPathService.getLearningPathById(this.pathId)
       );
     } catch (error) {
-      console.error('Error loading learning path:', error);
       this.snackBar.open('Failed to load learning path', 'Close', { duration: 3000 });
       this.router.navigate(['/manager/learning-paths']);
     } finally {
@@ -78,7 +77,6 @@ export class LearningPathDetailComponent implements OnInit {
         this.learningPathService.getLearningPathItems(this.pathId, 'asc')
       );
     } catch (error) {
-      console.error('Error loading path items:', error);
       this.snackBar.open('Failed to load courses in path', 'Close', { duration: 3000 });
     }
   }

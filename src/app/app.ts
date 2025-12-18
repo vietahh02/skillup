@@ -57,11 +57,13 @@ export class App {
             '/authentication/register',
             '/authentication/signin-signup',
             '/authentication/logout',
+            '/authentication/login',
             '/authentication/confirm-mail',
             '/authentication/lock-screen',
-            '/coming-soon'
+            '/coming-soon',
+            '/quiz/:id'
         ];
-        return blankPages.includes(this.router.url);
+        return blankPages.includes(this.router.url) || this.router.url.startsWith('/quiz/');
     }
 
 }

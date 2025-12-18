@@ -9,7 +9,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatIcon, MatIconModule } from "@angular/material/icon";
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { UserManager } from '../../../../models/user.models';
 import { ApiUserServices } from '../../../../services/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -64,7 +64,6 @@ formatText(text: string) : string {
     this.isLoading = true;
     this.apiUserServices.getLecturerManagerList(page, pageSize, searchTerm).subscribe(
       (res: any) => {
-        console.log(res);
         this.dataSource = res.items;
         this.totalItems = res.total;
         this.currentPage = res.page;
@@ -176,7 +175,6 @@ formatText(text: string) : string {
         this.isDownloading = false;
       },
       error: (error) => {
-        console.error('Download error:', error);
         this.snack.open('Failed to download template. Please try again.', '', {
           duration: 3000,
           panelClass: ['error-snackbar', 'custom-snackbar'],
@@ -252,23 +250,35 @@ formatText(text: string) : string {
 
     this.apiUserServices.importExcel(file).subscribe({
       next: (res: any) => {
-        console.log('Import response:', res);
-        
-        // Show success message
-        this.snack.open(
-          res.message || 'Excel file imported successfully!', 
-          '', 
-          { 
-            duration: 3000, 
-            panelClass: ['success-snackbar', 'custom-snackbar'], 
-            horizontalPosition: 'right', 
-            verticalPosition: 'top' 
-          }
-        );
-        
-        // Reload user list to show imported users
-        this.loadUsers(this.currentPage, this.pageSize, this.searchTerm);
         this.isImporting = false;
+        
+        // Check if there are errors (new logic: if any error, successCount = 0)
+        if (res.errorCount > 0 || res.successCount === 0) {
+          // Show error dialog with detailed error list
+          this.dialog.open(ImportErrorDialog, {
+            width: '600px',
+            data: {
+              totalRows: res.totalRows || 0,
+              errorCount: res.errorCount || 0,
+              errors: res.errors || []
+            }
+          });
+        } else {
+          // Success: show success message and reload
+          this.snack.open(
+            `Đã import thành công ${res.successCount} người dùng!`, 
+            '', 
+            { 
+              duration: 3000, 
+              panelClass: ['success-snackbar', 'custom-snackbar'], 
+              horizontalPosition: 'right', 
+              verticalPosition: 'top' 
+            }
+          );
+          
+          // Reload user list to show imported users
+          this.loadUsers(this.currentPage, this.pageSize, this.searchTerm);
+        }
         
         // Reset file input
         const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
@@ -277,19 +287,19 @@ formatText(text: string) : string {
         }
       },
       error: (error) => {
-        console.error('Import error:', error);
-        
-        let errorMessage = 'Failed to import Excel file. Please try again.';
+        let errorMessage = 'Không thể import file Excel. Vui lòng thử lại.';
         
         // Handle specific error messages from backend
         if (error.error?.message) {
           errorMessage = error.error.message;
+        } else if (typeof error.error === 'string') {
+          errorMessage = error.error;
         } else if (error.message) {
           errorMessage = error.message;
         }
         
         this.snack.open(errorMessage, '', {
-          duration: 4000,
+          duration: 5000,
           panelClass: ['error-snackbar', 'custom-snackbar'],
           horizontalPosition: 'right',
           verticalPosition: 'top'
@@ -355,7 +365,6 @@ export class CreateLecturerDialog {
           this.close();
         },
         error: (error: any) => {
-          console.error('Error creating lecturer:', error);
           let errorMessage = 'Failed to create lecturer. Please try again.';
           
           // Handle email domain validation error from backend
@@ -372,4 +381,51 @@ export class CreateLecturerDialog {
         }
       });
     }
+}
+
+@Component({
+    selector: 'import-error-dialog',
+    template: `
+        <h2 mat-dialog-title style="color: #f44336; margin-bottom: 16px;">
+            <mat-icon style="vertical-align: middle; margin-right: 8px;">error</mat-icon>
+            Import thất bại
+        </h2>
+        <mat-dialog-content>
+            <p style="margin-bottom: 16px; font-weight: 500;">
+                File Excel có lỗi. <strong>Toàn bộ file sẽ không được import.</strong> Vui lòng sửa file và thử lại.
+            </p>
+            <div style="margin-bottom: 8px;">
+                <strong>Tổng số dòng:</strong> {{ data.totalRows }}<br>
+                <strong>Số lỗi:</strong> {{ data.errorCount }}
+            </div>
+            <div style="max-height: 400px; overflow-y: auto; border: 1px solid #e0e0e0; border-radius: 4px; padding: 12px;">
+                <div *ngFor="let error of data.errors" style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0;">
+                    <div style="color: #f44336; font-weight: 500; margin-bottom: 4px;">
+                        Dòng {{ error.rowNumber }}:
+                    </div>
+                    <div style="color: #666;">
+                        {{ error.message }}
+                    </div>
+                </div>
+            </div>
+        </mat-dialog-content>
+        <mat-dialog-actions align="end">
+            <button mat-button mat-dialog-close>Đóng</button>
+        </mat-dialog-actions>
+    `,
+    imports: [CommonModule, MatIconModule, MatButtonModule, MatDialogModule],
+    styles: [`
+        ::ng-deep .mat-mdc-dialog-content {
+            max-height: 500px;
+        }
+    `]
+})
+export class ImportErrorDialog {
+    constructor(
+        @Inject(MAT_DIALOG_DATA) public data: {
+            totalRows: number;
+            errorCount: number;
+            errors: Array<{ rowNumber: number; message: string }>;
+        }
+    ) {}
 }

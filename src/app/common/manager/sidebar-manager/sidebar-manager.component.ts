@@ -4,6 +4,7 @@ import { NgClass } from '@angular/common';
 import { NgScrollbarModule } from 'ngx-scrollbar';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { ToggleService } from '../../../context/toggle.service';
+import { CourseCountService } from '../../../context/course-count.service';
 
 @Component({
     selector: 'app-sidebar-manager',
@@ -14,15 +15,20 @@ import { ToggleService } from '../../../context/toggle.service';
 export class SidebarManagerComponent {
 
     panelOpenState = false;
-
     isToggled = false;
+    courseCount = 0;
 
     constructor(
         private toggleService: ToggleService,
-        private router: Router
+        private router: Router,
+        private courseCountService: CourseCountService
     ) {
         this.toggleService.isToggled$.subscribe(isToggled => {
             this.isToggled = isToggled;
+        });
+
+        this.courseCountService.courseCount$.subscribe(count => {
+            this.courseCount = count;
         });
     }
 

@@ -251,7 +251,6 @@ export class RoadmapFormComponent implements OnInit {
 
       // Simulate API call
       setTimeout(() => {
-        console.log('Roadmap saved:', formData);
         this.router.navigate(['/manager/roadmaps']);
         this.isSubmitting = false;
       }, 1500);

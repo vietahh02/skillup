@@ -125,3 +125,7 @@
     </div>
   </mat-card-content>
 </mat-card>
+
+@if (!isDraftPending()){
+<app-feedbacks-course [courseId]="id" [status]="courseDetail?.status"></app-feedbacks-course>
+}

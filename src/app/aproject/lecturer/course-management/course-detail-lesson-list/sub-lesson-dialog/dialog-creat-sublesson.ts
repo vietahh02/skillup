@@ -45,7 +45,6 @@ export class CreateSubLesson implements OnDestroy {
     }
 
     ngOnInit() {
-        console.log(this.data);
         this.lessonId = this.data.lesson.lessonId;
         this.isEdit = this.data.subLesson ? true : false;
         if (this.isEdit) {

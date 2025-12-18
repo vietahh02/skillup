@@ -151,6 +151,14 @@ export interface reorder {
     }[]
 }
 
+export interface reorderSubLessons {
+    lessonId: number;
+    subLessons: {
+        subLessonId: number;
+        orderIndex: number;
+    }[]
+}
+
 export interface DocumentItem {
     documentId: number;
     courseId: number;

@@ -27,7 +27,7 @@
           </mat-form-field>
 
           <div class="row">
-            <mat-form-field appearance="outline" class="col-md-6">
+            <mat-form-field appearance="outline" class="col-md-4">
               <mat-label>Pass Score (%)</mat-label>
               <input matInput formControlName="passScore" type="number" min="0" max="100" placeholder="e.g. 70">
               <mat-hint>Minimum score needed to pass (0-100)</mat-hint>
@@ -39,7 +39,7 @@
               </mat-error>
             </mat-form-field>
 
-            <mat-form-field appearance="outline" class="col-md-6">
+            <mat-form-field appearance="outline" class="col-md-4">
               <mat-label>Attempt Limit</mat-label>
               <input matInput formControlName="attemptLimit" type="number" min="1" placeholder="e.g. 3">
               <mat-hint>How many times students can attempt this quiz</mat-hint>
@@ -48,6 +48,15 @@
               </mat-error>
               <mat-error *ngIf="quizForm.get('attemptLimit')?.hasError('min')">
                 Must be at least 1 attempt
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="col-md-4">
+              <mat-label>Time Limit (minutes)</mat-label>
+              <input matInput formControlName="timeLimit" type="number" min="1" placeholder="e.g. 30 (optional)">
+              <mat-hint>Leave empty for no time limit</mat-hint>
+              <mat-error *ngIf="quizForm.get('timeLimit')?.hasError('min')">
+                Time limit must be at least 1 minute
               </mat-error>
             </mat-form-field>
           </div>

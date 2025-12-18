@@ -46,9 +46,9 @@ export class SecurityComponent {
         private tokenService: TokenService
     ) {
         this.changePasswordForm = this.fb.group({
-            oldPassword: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(25)]],
-            newPassword: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(25)]],
-            confirmPassword: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(25)]]
+            oldPassword: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(25), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/)]],
+            newPassword: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(25), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/)]],
+            confirmPassword: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(25), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/)]]
         });
     }
 

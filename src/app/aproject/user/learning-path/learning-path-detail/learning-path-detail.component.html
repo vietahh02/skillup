@@ -69,6 +69,7 @@
                   'completed': course.status === 'completed',
                   'in-progress': course.status === 'in-progress',
                   'upcoming': course.status === 'upcoming',
+                  'failed': course.status === 'failed',
                   'locked': !isCourseUnlocked(course)
                 }"
                 (click)="viewCourse(course)"
@@ -121,10 +122,10 @@
                   <div class="course-actions" *ngIf="isCourseUnlocked(course) && course.status !== 'upcoming'">
                     <button
                       mat-flat-button
-                      [color]="course.status === 'in-progress' ? 'primary' : 'accent'"
+                      [color]="course.status === 'failed' ? 'warn' : (course.status === 'in-progress' ? 'primary' : 'accent')"
                       (click)="viewCourse(course)">
-                      <mat-icon>{{course.status === 'completed' ? 'replay' : 'play_arrow'}}</mat-icon>
-                      {{course.status === 'completed' ? 'Review Course' : 'Continue Learning'}}
+                      <mat-icon>{{course.status === 'completed' ? 'replay' : (course.status === 'failed' ? 'refresh' : 'play_arrow')}}</mat-icon>
+                      {{course.status === 'completed' ? 'Review Course' : (course.status === 'failed' ? 'Retake Course' : 'Continue Learning')}}
                     </button>
                   </div>
                 </div>

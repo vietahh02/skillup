@@ -1,6 +1,11 @@
 .body-skill {
     min-height: 75vh !important;
 }
+div {
+    word-break: break-word;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
 
 .d-flex {
     display: flex !important;

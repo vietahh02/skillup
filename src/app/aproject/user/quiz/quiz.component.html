@@ -17,9 +17,13 @@
       </ol>
     </div>
     <div class="quiz-meta">
-      <mat-chip color="accent" selected>
+      <mat-chip color="accent" selected *ngIf="quizDuration && quizDuration > 0">
         <mat-icon matChipAvatar>schedule</mat-icon>
         {{quizDuration}} minutes
+      </mat-chip>
+      <mat-chip color="primary" selected *ngIf="!quizDuration || quizDuration <= 0">
+        <mat-icon matChipAvatar>all_inclusive</mat-icon>
+        No time limit
       </mat-chip>
     </div>
   </div>
@@ -155,8 +159,9 @@
     <div class="col-lg-4 col-md-12">
       <mat-card class="question-navigator">
         <mat-card-content>
-          <!-- Timer Display -->
+          <!-- Timer Display (only show if timeLimit is set) -->
           <div class="timer-container-in-navigator" 
+               *ngIf="quizDuration && quizDuration > 0"
                [class.timer-warning]="isTimeWarning() && !isTimeCritical()"
                [class.timer-critical]="isTimeCritical()">
             <div class="timer-header-nav">
@@ -185,7 +190,7 @@
             </div>
           </div>
 
-          <mat-divider class="timer-divider"></mat-divider>
+          <mat-divider class="timer-divider" *ngIf="quizDuration && quizDuration > 0"></mat-divider>
           <div class="questions-grid">
             <div 
               *ngFor="let question of questions; let i = index"

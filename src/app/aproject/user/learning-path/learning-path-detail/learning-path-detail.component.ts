@@ -18,7 +18,7 @@ import {
 import { firstValueFrom } from 'rxjs';
 import { MatTooltip } from "@angular/material/tooltip";
 
-type CourseStatus = 'completed' | 'in-progress' | 'upcoming';
+type CourseStatus = 'completed' | 'in-progress' | 'upcoming' | 'failed';
 
 interface CourseWithStatus extends LearningPathItem {
   status: CourseStatus;
@@ -105,7 +105,6 @@ export class LearningPathDetail implements OnInit {
       }));
 
     } catch (error) {
-      console.error('Error loading learning path:', error);
       this.snackBar.open('Failed to load learning path', 'Close', { duration: 3000 });
     } finally {
       this.isLoading = false;
@@ -121,7 +120,7 @@ export class LearningPathDetail implements OnInit {
         e => e.learningPathId === this.learningPathId
       );
     } catch (error) {
-      console.error('Error checking enrollment:', error);
+      // Error checking enrollment
     }
   }
 
@@ -129,7 +128,9 @@ export class LearningPathDetail implements OnInit {
     // Use enrollmentStatus from backend
     if (!item.enrollmentStatus) return 'upcoming';
 
-    if (item.enrollmentStatus === 'Completed' || (item.progressPct && item.progressPct >= 100)) {
+    if (item.enrollmentStatus === 'Failed') {
+      return 'failed';
+    } else if (item.enrollmentStatus === 'Completed' || (item.progressPct && item.progressPct >= 100)) {
       return 'completed';
     } else if (item.enrollmentStatus === 'InProgress') {
       return 'in-progress';
@@ -155,8 +156,10 @@ export class LearningPathDetail implements OnInit {
   }
 
   getStatusIcon(status: CourseStatus): string {
-    return status === 'completed' ? 'check_circle' :
-           status === 'in-progress' ? 'pending' : 'radio_button_unchecked';
+    if (status === 'completed') return 'check_circle';
+    if (status === 'in-progress') return 'pending';
+    if (status === 'failed') return 'cancel';
+    return 'radio_button_unchecked';
   }
 
   getStatusClass(status: CourseStatus): string {
@@ -174,7 +177,6 @@ export class LearningPathDetail implements OnInit {
       this.snackBar.open('Successfully enrolled in learning path!', 'Close', { duration: 3000 });
       await this.loadLearningPathData();
     } catch (error) {
-      console.error('Error enrolling:', error);
       this.snackBar.open('Failed to enroll in learning path', 'Close', { duration: 3000 });
     }
   }
@@ -198,8 +200,8 @@ export class LearningPathDetail implements OnInit {
     const previousCourse = this.courses.find(c => c.orderIndex === course.orderIndex - 1);
     if (!previousCourse) return true;
 
-    // If previous course is mandatory and not completed, current course is locked
-    if (previousCourse.isMandatory && previousCourse.status !== 'completed') {
+    // If previous course is mandatory and not completed (or failed), current course is locked
+    if (previousCourse.isMandatory && previousCourse.status !== 'completed' && previousCourse.status !== 'failed') {
       return false;
     }
 

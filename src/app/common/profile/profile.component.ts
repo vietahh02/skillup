@@ -114,7 +114,6 @@ export class ProfileComponent implements OnDestroy {
 
     onSubmit() {
         this.profileForm.markAllAsTouched();
-        console.log(this.selectedFile);
         if (!this.profileForm.valid) return;
 
         // return;

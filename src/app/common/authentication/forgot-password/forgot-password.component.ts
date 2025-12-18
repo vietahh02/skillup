@@ -72,7 +72,6 @@ export class ForgotPasswordComponent {
 
         this.api.forgotPassword(this.userEmail).subscribe({
             next: (result: any) => {
-                console.log('OTP sent:', result);
                 this.isSubmitting = false;
                 this.currentStep = 'otp';
                 this.startResendCooldown();
@@ -84,7 +83,6 @@ export class ForgotPasswordComponent {
                 });
             },
             error: (err) => {
-                console.error('Send OTP error:', err);
                 this.isSubmitting = false;
                 let errorMessage = 'Gửi OTP thất bại';
 
@@ -116,7 +114,6 @@ export class ForgotPasswordComponent {
 
         this.api.verifyOtp({ email: this.userEmail, otp }).subscribe({
             next: (result: any) => {
-                console.log('OTP verified:', result);
                 this.isSubmitting = false;
                 this.resetToken = result.resetToken || result.data?.resetToken;
                 this.currentStep = 'password';
@@ -128,7 +125,6 @@ export class ForgotPasswordComponent {
                 });
             },
             error: (err) => {
-                console.error('Verify OTP error:', err);
                 this.isSubmitting = false;
                 let errorMessage = 'Mã OTP không đúng';
 
@@ -171,7 +167,6 @@ export class ForgotPasswordComponent {
 
         this.api.resetPassword({ resetToken: this.resetToken, newPassword }).subscribe({
             next: (result: any) => {
-                console.log('Password reset success:', result);
                 this.isSubmitting = false;
                 this.snack.open('Đặt lại mật khẩu thành công! Đang chuyển đến trang đăng nhập...', '', {
                     duration: 3000,
@@ -186,7 +181,6 @@ export class ForgotPasswordComponent {
                 }, 2000);
             },
             error: (err) => {
-                console.error('Reset password error:', err);
                 this.isSubmitting = false;
                 let errorMessage = 'Đặt lại mật khẩu thất bại';
 
@@ -214,7 +208,6 @@ export class ForgotPasswordComponent {
 
         this.api.forgotPassword(this.userEmail).subscribe({
             next: (result: any) => {
-                console.log('OTP resent:', result);
                 this.isSubmitting = false;
                 this.startResendCooldown();
                 this.snack.open('Mã OTP mới đã được gửi!', '', {
@@ -225,7 +218,6 @@ export class ForgotPasswordComponent {
                 });
             },
             error: (err) => {
-                console.error('Resend OTP error:', err);
                 this.isSubmitting = false;
                 this.snack.open('Gửi lại OTP thất bại', '', {
                     duration: 3000,

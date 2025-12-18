@@ -22,7 +22,6 @@ export class ManagerDashboard {
                 this.data = res;
             },
             error: (error) => {
-                console.error('Error loading statistics:', error);
                 this.data = null;
             }
         });

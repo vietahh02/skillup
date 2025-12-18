@@ -1,57 +1,42 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatCheckboxModule } from '@angular/material/checkbox';
-import { MatExpansionModule } from '@angular/material/expansion';
-import { MatMenuModule } from '@angular/material/menu';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ApiCourseServices } from '../../../services/course.service';
-import { CourseDetail } from '../../../models/course.models';
 import { CommonModule } from '@angular/common';
-import { Feedback, FeedbackComment } from '../../../models/feedback.model';
-import { ApiFeedbackServices } from '../../../services/feedback.service';
-import { ConfirmDialogComponent } from '../../../common/confirm-dialog/confirm-dialog.component';
-import { UserInfo } from '../../../models/user.models';
-import { AuthService } from '../../../context/auth.service';
-import { MatTooltip } from "@angular/material/tooltip";
-import { MatTableModule } from '@angular/material/table';
+import { ApiFeedbackServices } from '../../../../../services/feedback.service';
+import { AuthService } from '../../../../../context/auth.service';
+import { Feedback, FeedbackComment } from '../../../../../models/feedback.model';
+import { UserInfo } from '../../../../../models/user.models';
+import { ConfirmDialogComponent } from '../../../../../common/confirm-dialog/confirm-dialog.component';
 
 @Component({
-    selector: 'app-course-detail',
-    imports: [CommonModule, RouterLink, MatCardModule,MatTableModule, MatButtonModule, MatMenuModule, MatCheckboxModule, MatExpansionModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule],
-    templateUrl: './course-detail.component.html',
-    styleUrls: ['./course-detail.component.scss'],
+    selector: 'app-feedbacks-course',
+    imports: [CommonModule, MatCardModule, MatButtonModule, FormsModule, MatFormFieldModule, MatInputModule, MatIconModule],
+    templateUrl: './feedbacks-course.component.html',
+    styleUrls: ['./feedbacks-course.component.scss'],
 })
-export class CourseDetailComponent {
+export class FeedbacksCourseComponent {
     
     constructor(
-        private courseService: ApiCourseServices, 
-        private route: ActivatedRoute, 
         private feedbackService: ApiFeedbackServices,
         private dialog: MatDialog,
         private snackBar: MatSnackBar,
-        private authService: AuthService,
-        private router: Router
+        private authService: AuthService
     ) {}
 
-    documentsDisplayedColumns: string[] = ['name', 'type', 'size', 'uploadDate', 'actions'];
-    course!: CourseDetail;
-    id!: string;
-    totalDuration!: number;
+    @Input() courseId!: string | number;
+    @Input() status: string | undefined;
     feedbacks: Feedback[] = [];
     currentUser: UserInfo | null = null;
 
     totalFeedbacks: number = 0;
     page = 1;
     pageSize = 10;
-    feedbackContent: string = '';
-    maxFeedbackLength: number = 2000;
     commentContents: { [key: number]: string } = {}; // Store comment content for each feedback
     maxCommentLength: number = 1000;
 
@@ -61,57 +46,7 @@ export class CourseDetailComponent {
                 this.currentUser = user;
             }
         });
-
-        this.id = this.route.snapshot.paramMap.get('id')!;
-        this.courseService.getCourseById(Number(this.id)).subscribe((course : any) => {
-            this.checkLesson(course);
-            this.course = course;
-            this.totalDuration = this.course.lessons.reduce((acc, lesson) => acc + lesson.totalDuration, 0);
-            this.loadFeedbacks();
-        });
-    }
-
-    maxLengthText(text: string) : boolean {
-        return text.length > 20;
-    }
-
-    formatText(text: string) : string {
-        return this.maxLengthText(text) ? text.substring(0, 20) + '...' : text;
-    }
-
-    checkLesson(courseDetail: CourseDetail | null): void {
-        if (!courseDetail) {
-            this.router.navigate(['/']);
-            return;
-        }
-
-        // Allow access if:
-        // 1. Course is Approved (anyone can access)
-        // 2. Course is Rejected BUT user is enrolled (Out of Date logic - allow enrolled users to continue)
-        if (courseDetail.status === 'Approved') {
-            return; // Allow access
-        }
-
-        if (courseDetail.status === 'Rejected' && courseDetail.isEnrolled) {
-            return; // Allow access for enrolled users (Out of Date logic)
-        }
-
-        // Otherwise, redirect to home
-        this.router.navigate(['/']);
-    }
-
-    getFileTypeIcon(type: string): string {
-        switch (type) {
-            case 'pdf': return 'picture_as_pdf';
-            case 'doc': return 'description';
-            case 'excel': return 'grid_on';
-            case 'ppt': return 'slideshow';
-            default: return 'insert_drive_file';
-        }
-    }
-
-    downloadDocument(fileUrl: string): void {
-        window.open(fileUrl, '_blank');
+        this.loadFeedbacks();
     }
 
     toggleReply(feedbackId: string): void {
@@ -175,103 +110,16 @@ export class CourseDetailComponent {
         }
     }
 
-    formatSeconds(totalSeconds: number): string {
-        const hours = Math.floor(totalSeconds / 3600);
-        const minutes = Math.floor((totalSeconds % 3600) / 60);
-        const seconds = totalSeconds % 60;
-    
-        let result = "";
-    
-        if (hours > 0) result += `${hours}h`;
-        if (minutes > 0) result += `${minutes}m`;
-        if (seconds > 0 && hours === 0) result += `${seconds}s`; 
-        else if (seconds > 0 && minutes === 0) result += `${seconds}s`; 
-        else if (seconds > 0 && hours === 0 && minutes > 0) result += `${seconds}s`;
-    
-        return result || "0s";
-    }
-    
     loadFeedbacks(): void {
-        this.feedbackService.getFeedbacks(Number(this.id), this.page, this.pageSize).subscribe((feedbacks: any) => {
+        this.feedbackService.getFeedbacks(Number(this.courseId), this.page, this.pageSize).subscribe((feedbacks: any) => {
             this.feedbacks = [...this.feedbacks, ...feedbacks.items];
             this.totalFeedbacks = feedbacks.total;
-        });
-    }
-
-    enrollCourse(): void {
-        if (this.course.isEnrolled) {
-            this.router.navigate(['/course/learn', this.id]);
-            return;
-        }
-
-        const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-            data: {
-                title: 'Enroll Course',
-                message: 'Are you sure you want to enroll this course? This action cannot be undone.',
-                type: 'warning'
-            }
-        });
-
-        dialogRef.afterClosed().subscribe(result => {
-            if (!result) return;
-            this.courseService.createEnrollment({ userId: this.currentUser?.userId || '', courseId: Number(this.id) }).subscribe((enrollment: any) => {
-                this.course.isEnrolled = true;
-                this.snackBar.open('Enrollment created successfully', '', {
-                    duration: 3000,
-                    panelClass: ['success-snackbar', 'custom-snackbar'],    
-                });
-            });
         });
     }
 
     loadMoreFeedbacks(): void {
         this.page++;
         this.loadFeedbacks();
-    }
-
-    createFeedback(): void {
-        const content = this.feedbackContent.trim();
-        
-        // Validation
-        if (!content) {
-            this.snackBar.open('Please enter your feedback', '', {
-                duration: 3000,
-                panelClass: ['error-snackbar', 'custom-snackbar'],
-                horizontalPosition: 'right',
-                verticalPosition: 'top'
-            });
-            return;
-        }
-
-        if (content.length > this.maxFeedbackLength) {
-            this.snackBar.open(`Feedback cannot exceed ${this.maxFeedbackLength} characters`, '', {
-                duration: 3000,
-                panelClass: ['error-snackbar', 'custom-snackbar'],
-                horizontalPosition: 'right',
-                verticalPosition: 'top'
-            });
-            return;
-        }
-
-        this.feedbackService.createFeedback({ courseId: Number(this.id), content: content }).subscribe((feedback: Feedback) => {
-            this.feedbacks = [ feedback, ...this.feedbacks];
-            this.totalFeedbacks++;
-            this.snackBar.open('Feedback created successfully', '', {
-                duration: 3000,
-                panelClass: ['success-snackbar', 'custom-snackbar'],
-                horizontalPosition: 'right',
-                verticalPosition: 'top'
-            });
-            this.toggleWriteFeedback();
-            this.feedbackContent = '';
-        }, error => {
-            this.snackBar.open('Failed to create feedback', '', {
-                duration: 3000,
-                panelClass: ['error-snackbar', 'custom-snackbar'],
-                horizontalPosition: 'right',
-                verticalPosition: 'top'
-            });
-        });
     }
 
     createComment(feedback: Feedback): void {
@@ -322,29 +170,6 @@ export class CourseDetailComponent {
 
     canDelete(userId: number): boolean {
         return this.currentUser?.userId === userId;
-    }
-
-    toggleWriteFeedback(): void {
-        const writeElement = document.getElementById('write-feedback-input');
-        if (writeElement) {
-            if (writeElement.style.display === 'none' || writeElement.style.display === '') {
-                writeElement.style.display = 'block';
-                writeElement.classList.add('show');
-            } else {
-                writeElement.style.display = 'none';
-                writeElement.classList.remove('show');
-                this.feedbackContent = ''; // Clear content when closing
-            }
-        }
-    }
-
-    getFeedbackLength(): number {
-        return this.feedbackContent ? this.feedbackContent.length : 0;
-    }
-
-    isFeedbackValid(): boolean {
-        const content = this.feedbackContent.trim();
-        return content.length > 0 && content.length <= this.maxFeedbackLength;
     }
 
     deleteFeedback(feedbackId: number): void {

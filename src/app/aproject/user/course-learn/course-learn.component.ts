@@ -40,17 +40,29 @@ export class CourseLearnComponent implements OnDestroy {
         this.courseService.getCourseById(Number(this.id)).subscribe((course : any) => {
             this.checkLesson(course);
             this.detail = course;
-            console.log('Course detail:', this.detail);
             this.currentSubLesson = this.getNextSubLessonToLearn();
-            console.log('Current sub lesson:', this.currentSubLesson);
-            console.log('Video URL:', this.currentSubLesson?.contentUrl);
         });
     }
 
     checkLesson(courseDetail: CourseDetail | null): void {
-        if (courseDetail?.status !== 'Approved') {
+        if (!courseDetail) {
             this.router.navigate(['/']);
+            return;
         }
+
+        // Allow access if:
+        // 1. Course is Approved (anyone can access)
+        // 2. Course is Rejected BUT user is enrolled (Out of Date logic - allow enrolled users to continue)
+        if (courseDetail.status === 'Approved') {
+            return; // Allow access
+        }
+
+        if (courseDetail.status === 'Rejected' && courseDetail.isEnrolled) {
+            return; // Allow access for enrolled users (Out of Date logic)
+        }
+
+        // Otherwise, redirect to home
+        this.router.navigate(['/']);
     }
     
     getSubLesson(lessonId: number, subLessonId: number) : SubLesson | null {
@@ -97,10 +109,6 @@ export class CourseLearnComponent implements OnDestroy {
     selectSubLesson(subLesson: SubLesson): void {
         // Chỉ cho phép chọn nếu có thể học được
         if (this.isLearnNext(subLesson)) {
-            console.log('Selecting sub lesson:', subLesson.title);
-            console.log('Previous currentSubLesson:', this.currentSubLesson?.title);
-            console.log('New video URL:', subLesson.contentUrl);
-            
             this.currentSubLesson = subLesson;
             
             // Force change detection
@@ -111,14 +119,11 @@ export class CourseLearnComponent implements OnDestroy {
                 if (this.videoElement?.nativeElement) {
                     const video = this.videoElement.nativeElement;
                     video.load(); // Force reload video
-                    console.log('Video reloaded for:', subLesson.title);
                     
                     // Add timeupdate event listener to track progress
                     this.addVideoProgressListener(video, subLesson);
                 }
             }, 100);
-        } else {
-            console.log('Cannot select sub lesson:', subLesson.title, 'isCompleted:', subLesson.isCompleted, 'isLearnNext:', this.isLearnNext(subLesson));
         }
     }
 
@@ -143,7 +148,6 @@ export class CourseLearnComponent implements OnDestroy {
                     !subLesson.isCompleted && 
                     !this.completedSubLessons.has(subLesson.id)) {
                     
-                    console.log(`Video progress: ${progressPercent.toFixed(2)}% - Marking as completed`);
                     this.onSubLessonCompleted(subLesson);
                 }
             }
@@ -154,12 +158,8 @@ export class CourseLearnComponent implements OnDestroy {
         // Add to completed set to avoid multiple calls
         this.completedSubLessons.add(subLesson.id);
         
-        console.log('Completing sub lesson:', subLesson.title);
-        
         this.courseService.getProgress(subLesson.id).subscribe({
             next: (progress: any) => {
-                console.log('Sub lesson completed successfully:', progress);
-                
                 // Update the current sub lesson status
                 subLesson.isCompleted = true;
                 subLesson.completedAt = new Date().toISOString();
@@ -173,7 +173,6 @@ export class CourseLearnComponent implements OnDestroy {
                 }, 500);
             },
             error: (error: any) => {
-                console.error('Error completing sub lesson:', error);
                 // Remove from completed set on error so it can be retried
                 this.completedSubLessons.delete(subLesson.id);
             }
@@ -183,14 +182,12 @@ export class CourseLearnComponent implements OnDestroy {
     refreshCourseData(): void {
         this.courseService.getCourseById(Number(this.id)).subscribe((course: any) => {
             this.detail = course;
-            console.log('Course data refreshed');
         });
     }
 
     autoSelectNextSubLesson(): void {
         const nextSubLesson = this.getNextSubLessonToLearn();
         if (nextSubLesson && nextSubLesson.id !== this.currentSubLesson?.id) {
-            console.log('Auto-selecting next sub lesson:', nextSubLesson.title);
             this.selectSubLesson(nextSubLesson);
         }
     }
@@ -229,20 +226,18 @@ export class CourseLearnComponent implements OnDestroy {
 
     // Video event handlers
     onVideoError(event: any): void {
-        console.error('Video error:', event);
-        console.log('Video src:', this.currentSubLesson?.contentUrl);
+        // Video error
     }
 
     onVideoLoadStart(): void {
-        console.log('Video load started');
+        // Video load started
     }
 
     onVideoCanPlay(): void {
-        console.log('Video can play');
+        // Video can play
     }
 
     onVideoLoadedData(): void {
-        console.log('Video data loaded');
         // Add progress listener when video data is ready
         if (this.videoElement?.nativeElement && this.currentSubLesson) {
             this.addVideoProgressListener(this.videoElement.nativeElement, this.currentSubLesson);

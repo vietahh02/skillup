@@ -223,6 +223,19 @@
     }
   }
 
+  &.failed {
+    border-color: #ef4444;
+    background: #fef2f2;
+
+    .course-number {
+      background: #ef4444;
+    }
+
+    .course-status-badge mat-icon {
+      color: #ef4444;
+    }
+  }
+
   .course-number {
     width: 48px;
     height: 48px;

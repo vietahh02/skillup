@@ -1,16 +1,9 @@
 // Some CSS is Available on the Style.scss file because of Angular Material CSS didn't work in Component CSS.
-.tagus-card {
-    margin: auto;
-}
-
-div {
-    word-break: break-word;
-    overflow-wrap: break-word;
-    word-wrap: break-word;
-}
-
 .course-details-header {
-    padding: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: top;
+    padding: 50px;
     background-color: var(--heraBlueColor);
     margin: {
         top: -25px;
@@ -19,47 +12,11 @@ div {
     };
     video {
         width: 100%;
-        height: 400px; // Fixed height for uniform size
-        aspect-ratio: 16/9; // Standard video aspect ratio
-        object-fit: contain; // Scale video to fit container while maintaining aspect ratio
-        object-position: center; // Center the video content
+        height: auto;
         margin-bottom: 40px;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        transition: all 0.3s ease; // Smooth transitions
-        background-color: #000;
-        
-        // Hover effect for better UX
-        &:hover {
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-            transform: translateY(-2px);
-        }
-        
-        // Responsive adjustments
-        @media (max-width: 768px) {
-            height: 280px;
-        }
-        
-        @media (max-width: 480px) {
-            height: 220px;
-        }
-    }
-    
-    // Video container wrapper for consistent spacing
-    .video-container {
-        position: relative;
-        width: 100%;
-        background: #000;
-        border-radius: 8px;
-        overflow: hidden;
-        
-        video {
-            display: block;
-            margin: 0; // Remove default margin when inside container
-        }
     }
     h3 {
-        font-size: 28px;
+        font-size: 40px;
         max-width: 510px;
     }
     p {
@@ -78,9 +35,14 @@ div {
         position: absolute;
     }
 }
+
+.rounded-circle {
+    object-fit: cover;
+    width: 34px;
+    height: 34px;
+}
+
 .course-details-desc {
-    overflow-y: auto;
-    max-height: calc(100vh - 200px);
     padding: {
         left: 25px;
         right: 25px;
@@ -397,6 +359,294 @@ div {
 
 }
 
+.word-break-all {
+    word-break: break-all;
+}
+
+// Feedback Section Styles
+.feedback-section {
+    .feedback-header {
+        border-bottom: 1px solid #E7EBF5;
+        padding-bottom: 20px;
+        margin-bottom: 25px;
+        gap: 20px;
+    }
+
+    .feedback-item {
+        background: var(--whiteColor);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid #F0F3F9;
+        transition: all 0.3s ease;
+
+        &:hover {
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            border-color: #E7EBF5;
+        }
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        .feedback-header {
+            border: none;
+            padding: 0;
+            margin-bottom: 15px;
+            
+            .user-info {
+                h6 {
+                    color: var(--blackColor);
+                    font-weight: 600;
+                    margin-bottom: 5px;
+                }
+                
+                .timestamp {
+                    color: #8B9AAF;
+                    font-size: 13px;
+                }
+            }
+        }
+
+        .feedback-content {
+            color: #5A6C7D;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+        }
+
+        .reply-btn {
+            color: var(--heraBlueColor) !important;
+            font-size: 13px !important;
+            font-weight: 500 !important;
+            padding: 10px 20px !important;
+            
+            &:hover {
+                background: rgba(76, 110, 245, 0.05) !important;
+            }
+        }
+
+        .delete-feedback-btn {
+            color: #dc3545 !important;
+            font-size: 13px !important;
+            font-weight: 500 !important;
+            padding: 10px 20px !important;
+            
+            &:hover {
+                background: rgba(220, 53, 69, 0.05) !important;
+            }
+        }
+
+        .reply-input {
+            background: #F8F9FF;
+            border: 1px solid #E7EBF5;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+
+            &.show {
+                animation: slideDown 0.3s ease-out;
+            }
+
+            .reply-textarea {
+                border: 1px solid #E7EBF5;
+                border-radius: 6px;
+                padding: 12px;
+                font-size: 13px;
+                line-height: 1.5;
+                resize: vertical;
+                min-height: 80px;
+                width: 100%;
+                background: var(--whiteColor);
+                
+                &:focus {
+                    outline: none;
+                    border-color: var(--heraBlueColor);
+                    box-shadow: 0 0 0 2px rgba(76, 110, 245, 0.1);
+                }
+
+                &::placeholder {
+                    color: #8B9AAF;
+                    font-style: italic;
+                }
+            }
+
+            .reply-actions {
+                margin-top: 10px;
+                display: flex;
+                gap: 8px;
+                justify-content: flex-end;
+            }
+        }
+    }
+
+    .comments-section {
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 1px solid #F0F3F9;
+
+        .comment-item {
+            margin-bottom: 15px;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+
+            .comment-content {
+                background: #F8F9FF;
+                border: 1px solid #E7EBF5;
+                border-radius: 8px;
+                padding: 12px 15px;
+                
+                .comment-header {
+                    margin-bottom: 8px;
+                    
+                    .comment-user {
+                        font-weight: 600;
+                        color: var(--blackColor);
+                        font-size: 13px;
+                        margin-right: 10px;
+                    }
+                    
+                    .comment-time {
+                        color: #8B9AAF;
+                        font-size: 12px;
+                    }
+
+                    .comment-info {
+                        display: flex;
+                        align-items: center;
+                    }
+
+                    .delete-comment-btn {
+                        color: #dc3545 !important;
+                        opacity: 0.7;
+                        transition: all 0.2s ease;
+
+                        .small-icon {
+                            font-size: 16px !important;
+                            width: 16px !important;
+                            height: 16px !important;
+                        }
+                        
+                        &:hover {
+                            opacity: 1;
+                            background: rgba(220, 53, 69, 0.05) !important;
+                        }
+                    }
+                }
+                
+                .comment-text {
+                    color: #5A6C7D;
+                    font-size: 13px;
+                    line-height: 1.5;
+                    margin: 0;
+                    word-break: break-word;
+                    overflow-wrap: break-word;
+                    word-wrap: break-word;
+                }
+            }
+        }
+
+        .load-more-btn {
+            color: var(--heraBlueColor) !important;
+            font-size: 13px !important;
+            font-weight: 500 !important;
+            padding: 8px 12px !important;
+            
+            &:hover {
+                background: rgba(76, 110, 245, 0.05) !important;
+            }
+        }
+    }
+
+    .load-more-reviews {
+        text-align: center;
+        margin-top: 30px;
+        padding-top: 25px;
+        border-top: 1px solid #F0F3F9;
+    }
+}
+
+// Animations
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+// Dark theme support
+.component-dark-theme {
+    .feedback-section {
+        .feedback-item .reply-input {
+            background: #1a1d21;
+            border-color: #2a2d35;
+        }
+
+        .feedback-item {
+            background: #1a1d21;
+            border-color: #2a2d35;
+            
+            .feedback-header .user-info h6 {
+                color: var(--whiteColor);
+            }
+            
+            .feedback-content {
+                color: #b8c5d1;
+            }
+        }
+
+        .comments-section {
+            border-top-color: #2a2d35;
+            
+            .comment-item .comment-content {
+                background: #1a1d21;
+                border-color: #2a2d35;
+                
+                .comment-header .comment-user {
+                    color: var(--whiteColor);
+                }
+                
+                .comment-text {
+                    color: #b8c5d1;
+                }
+            }
+        }
+
+        .reply-textarea {
+            background: #1a1d21 !important;
+            color: var(--whiteColor) !important;
+            border-color: #2a2d35 !important;
+        }
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .feedback-section {
+        .feedback-item {
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .feedback-item .reply-input {
+            padding: 15px;
+        }
+
+        .comments-section {
+            margin-top: 20px;
+            padding-top: 15px;
+        }
+    }
+}
+
 @media only screen and (min-width : 768px) and (max-width : 991px) {
 
     .course-details-header {
@@ -448,67 +698,4 @@ div {
         }
     }
 
-}
-
-.mat-mdc-card {
-    padding-right: 0;
-}
-
-.disabled-link {
-  pointer-events: none;
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-ul {
-    li {
-        a {
-            font-size: 14px;
-            span {
-                i {
-                    font-size: 15px !important;
-                }
-            }
-            i {
-                font-size: 15px !important;
-            }
-        }
-        
-    }
-}
-
-// Active lesson styling
-.active-lesson {
-    background-color: #e3f2fd !important;
-    border-left: 3px solid #2196f3 !important;
-    font-weight: bold !important;
-}
-
-.disabled-link {
-    pointer-events: none !important;
-    opacity: 0.6 !important;
-}
-
-// Video container styling
-.no-video-placeholder {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 300px;
-    background-color: #f5f5f5;
-    border: 2px dashed #ccc;
-}
-
-// Debug info styling
-.alert {
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid transparent;
-    border-radius: 4px;
-}
-
-.alert-warning {
-    color: #856404;
-    background-color: #fff3cd;
-    border-color: #ffeaa7;
 }

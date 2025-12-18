@@ -17,7 +17,7 @@
         <div class="hero-stats">
           <div class="stat-box">
             <div class="stat-value">{{learningPaths.length}}</div>
-            <div class="stat-label">Available Paths</div>
+            <div class="stat-label">Total Learning Paths</div>
           </div>
           <div class="stat-box">
             <div class="stat-value">{{assignedPaths.length}}</div>
@@ -169,12 +169,11 @@
       </div>
     </div>
 
-    <!-- All Available Learning Paths -->
+    <!-- More Learning Paths (Available) -->
     <div class="available-paths-section">
       <h2 class="section-title">
         <mat-icon>explore</mat-icon>
-        <span *ngIf="enrolledPaths.length > 0">More Learning Paths</span>
-        <span *ngIf="enrolledPaths.length === 0">All Learning Paths</span>
+        More Learning Paths
       </h2>
 
       <!-- Empty State -->

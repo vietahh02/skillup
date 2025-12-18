@@ -29,7 +29,7 @@
                                 <mat-error *ngIf="loginForm.controls['email'].hasError('maxlength')">Email must be less than 255 characters</mat-error>
                             </mat-form-field>
                         </div>
-                        <div class="tagus-form-group without-icon">
+                        <div class="tagus-form-group without-icon mb-30">
                             <label class="d-block mb-12 fw-semibold gray-color">Password <span>*</span></label>
                             <mat-form-field appearance="fill">
                                 <mat-label>Enter your password</mat-label>
@@ -39,9 +39,10 @@
                                 </button>
                                 <mat-error *ngIf="loginForm.controls['password'].hasError('required')">Password is required</mat-error>
                                 <mat-error *ngIf="loginForm.controls['password'].hasError('minlength')">
-                                    Minimum 6 characters
+                                    Minimum 8 characters
                                 </mat-error>
-                                <mat-error *ngIf="loginForm.controls['password'].hasError('maxlength')">Password must be less than 255 characters</mat-error>
+                                <mat-error *ngIf="loginForm.controls['password'].hasError('maxlength')">Password must be less than 25 characters</mat-error>
+                                <mat-error *ngIf="loginForm.controls['password'].hasError('pattern')">Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character</mat-error>
                             </mat-form-field>
                         </div>
 

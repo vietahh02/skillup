@@ -39,7 +39,6 @@ export class TokenService {
       // Lấy role từ claim đúng
       return payload["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] || null;
     } catch (e) {
-      console.error('Invalid token', e);
       return null;
     }
   }
@@ -106,8 +105,6 @@ export class TokenService {
       
       // Refresh token 5 phút trước khi hết hạn
       const refreshTime = expiry - now - (2 * 60 * 1000);
-      const refreshTimeInSeconds = refreshTime / 1000;
-      console.log('refreshTime', refreshTimeInSeconds, 'seconds');
       
       if (refreshTime > 0) {
         timer(refreshTime).subscribe(() => {
@@ -117,7 +114,7 @@ export class TokenService {
         this.refreshTokenObservable$().subscribe();
       }
     } catch (error) {
-      console.error('Error setting up auto refresh:', error);
+      // Error setting up auto refresh
     } 
   }
 

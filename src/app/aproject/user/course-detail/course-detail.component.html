@@ -141,6 +141,72 @@
     </mat-card-content>
 </mat-card>
 
+  <!-- Course Documents -->
+  <mat-card class="mb-25 tagus-card" *ngIf="course.isEnrolled">
+    <mat-card-header>
+      <h4>
+        <mat-icon class="me-10">folder</mat-icon>
+        Course Documents ({{course.documents.length || 0}})
+      </h4>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="mat-elevation-z8 recentOrdersTable tagus-mat-table">
+        <table mat-table [dataSource]="course.documents || []" class="documents-table">
+          <!-- File Name Column -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>File Name</th>
+            <td mat-cell *matCellDef="let doc" style="text-align: left;">
+              <div class="document-name">
+                <mat-icon [class]="'me-10 file-icon file-' + doc.type">{{getFileTypeIcon(doc.type)}}</mat-icon>
+                {{doc.fileName}}
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- File Type Column -->
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef>Type</th>
+            <td mat-cell *matCellDef="let doc">
+              <mat-chip [ngClass]="'file-type-' + doc.type" selected>
+                {{doc.fileType.toUpperCase()}}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- File Size Column -->
+          <ng-container matColumnDef="size">
+            <th mat-header-cell *matHeaderCellDef>Size</th>
+            <td mat-cell *matCellDef="let doc">{{doc.fileSizeFormatted}}</td>
+          </ng-container>
+
+          <!-- Upload Date Column -->
+          <ng-container matColumnDef="uploadDate">
+            <th mat-header-cell *matHeaderCellDef>Upload Date</th>
+            <td mat-cell *matCellDef="let doc">{{doc.createdAt | date:'short'}}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let doc">
+              <button mat-icon-button (click)="downloadDocument(doc.fileUrl)">
+                <mat-icon>download</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="documentsDisplayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: documentsDisplayedColumns;"></tr>
+        </table>
+        
+        <div *ngIf="course.documents.length === 0" class="empty-state">
+          <mat-icon>folder_open</mat-icon>
+          <p>No documents available for this course</p>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
 <!-- User Feedback Section -->
 <mat-card class="mb-25 tagus-card">
     <mat-card-content>

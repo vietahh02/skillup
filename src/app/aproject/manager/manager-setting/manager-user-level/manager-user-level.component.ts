@@ -61,7 +61,6 @@ export class ManagerUserLevelComponent implements OnInit {
         this.data = response;
       },
       error: (error: any) => {
-        console.error('Error loading levels:', error);
         this.snackBar.open('Error loading levels', 'Close', { duration: 3000, panelClass: ['error-snackbar'] });
       }
     });
@@ -126,7 +125,6 @@ export class ManagerUserLevelComponent implements OnInit {
             this.loadLevels();
           },
           error: (error: any) => {
-            console.error(`Error ${action}ing level:`, error);
             this.snackBar.open(`Error ${action}ing level`, 'Close', { 
               duration: 3000, 
               panelClass: ['error-snackbar', 'custom-snackbar'],
@@ -162,7 +160,6 @@ export class ManagerUserLevelComponent implements OnInit {
             this.loadLevels();
           },
           error: (error: any) => {
-            console.error('Error deleting level:', error);
             this.snackBar.open('Error deleting level', 'Close', { 
               duration: 3000, 
               panelClass: ['error-snackbar', 'custom-snackbar'],
@@ -241,7 +238,6 @@ export class UserLevelDialog {
           this.close();
         },
         error: (error: any) => {
-          console.error('Error updating level:', error);
           this.snackBar.open('Error updating level', 'Close', {
             duration: 3000,
             panelClass: ['error-snackbar', 'custom-snackbar'],
@@ -266,7 +262,6 @@ export class UserLevelDialog {
           this.close();
         },
         error: (error: any) => {
-          console.error('Error creating level:', error);
           this.snackBar.open('Error creating level', 'Close', {
             duration: 3000,
             panelClass: ['error-snackbar', 'custom-snackbar'],

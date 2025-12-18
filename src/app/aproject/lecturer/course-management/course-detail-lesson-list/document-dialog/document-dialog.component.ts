@@ -46,7 +46,6 @@ export class DocumentDialog {
     getDocuments() {
       this.documentService.getDocuments(this.data.courseId).subscribe({
         next: (documents: DocumentModel[]) => {
-          console.log(documents);
           this.documents = documents;
           this.filterDocuments();
         }
@@ -113,7 +112,6 @@ export class DocumentDialog {
 
     uploadFiles() {
       if (this.selectedFiles.length === 0) return;
-      console.log(this.selectedFiles);
       
       this.isUploading = true;
       

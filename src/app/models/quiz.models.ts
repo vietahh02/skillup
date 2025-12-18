@@ -32,6 +32,7 @@ export interface QuizCreateRequest {
     title: string;
     passScore: number;
     attemptLimit: number;
+    timeLimit?: number | null; // Time limit in minutes (null = no time limit)
     questions: Question[];
 }
 
@@ -43,6 +44,7 @@ export interface QuizResponse {
     title: string;
     passScore: number;
     attemptLimit: number;
+    timeLimit?: number | null; // Time limit in minutes (null = no time limit)
     createdAt: string;
     updatedAt: string;
     questions: Question[];
@@ -132,6 +134,7 @@ export interface QuizSummary {
     courseName: string;
     passScore: number;
     attemptLimit: number;
+    timeLimit?: number | null; // Time limit in minutes (null = no time limit)
     questionCount: number;
     totalPoints: number;
     userBestScore: number;

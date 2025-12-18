@@ -93,7 +93,6 @@ export class ManagerCourseList implements AfterViewInit {
                 }
             },
             error: (error: any) => {
-                console.error('Error loading courses:', error);
                 this.snack.open(error.error?.message || error.error || 'Failed to load courses', '', {
                     duration: 3000,
                     panelClass: ['error-snackbar', 'custom-snackbar'],

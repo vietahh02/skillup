@@ -132,7 +132,6 @@ export class ManagerLearningPathComponent implements OnInit {
         });
       },
       error: (error) => {
-        console.error('Error exporting to Excel:', error);
         this.isLoadingProgress = false;
         this.snackBar.open('Failed to export Excel file', 'Close', {
           duration: 3000,
@@ -155,7 +154,6 @@ export class ManagerLearningPathComponent implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error loading learning paths:', error);
         this.snackBar.open('Failed to load learning paths', 'Close', { duration: 3000 });
         this.isLoading = false;
       }
@@ -171,7 +169,6 @@ export class ManagerLearningPathComponent implements OnInit {
         this.averageCompletionRate = stats.averageCompletionRate;
       },
       error: (error) => {
-        console.error('Error loading statistics:', error);
         this.snackBar.open('Failed to load statistics', 'Close', { duration: 3000 });
       }
     });
@@ -203,7 +200,6 @@ export class ManagerLearningPathComponent implements OnInit {
         this.isLoadingProgress = false;
       },
       error: (error) => {
-        console.error('Error loading user progress:', error);
         this.snackBar.open('Failed to load user progress', 'Close', { duration: 3000 });
         this.isLoadingProgress = false;
       }
@@ -276,7 +272,6 @@ export class ManagerLearningPathComponent implements OnInit {
       this.loadLearningPaths();
       this.loadStats();
     } catch (error) {
-      console.error(`Error ${action}ing learning path:`, error);
       this.snackBar.open(`Failed to ${action} learning path`, 'Close', { duration: 3000 });
     }
   }
@@ -297,7 +292,6 @@ export class ManagerLearningPathComponent implements OnInit {
       this.loadLearningPaths();
       this.loadStats();
     } catch (error) {
-      console.error('Error deleting learning path:', error);
       this.snackBar.open('Failed to delete learning path', 'Close', { duration: 3000 });
     }
   }
@@ -378,7 +372,6 @@ export class ManagerLearningPathComponent implements OnInit {
       this.snackBar.open('User unenrolled successfully', 'Close', { duration: 3000 });
       this.loadUserProgress();
     } catch (error) {
-      console.error('Error unenrolling user:', error);
       this.snackBar.open('Failed to unenroll user', 'Close', { duration: 3000 });
     }
   }

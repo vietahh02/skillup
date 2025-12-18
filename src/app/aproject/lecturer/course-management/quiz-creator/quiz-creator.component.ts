@@ -53,6 +53,7 @@ export class QuizCreatorComponent implements OnInit {
   isSubmitting = false;
   isPopulatingForm = false; // Flag to prevent duplicate answers during form population
   private lastSubmitTime = 0; // Track last submit timestamp
+  private originalQuestions: Map<number, any> = new Map(); // Store original question data including answerOptions
 
   questionTypes = [
     { value: QuestionType.SINGLE_CHOICE, label: 'One answer correct' },
@@ -75,7 +76,6 @@ export class QuizCreatorComponent implements OnInit {
         case 2: return QuestionType.TRUE_FALSE;      // 'true_false'
         case 3: return QuestionType.TEXT;            // 'text'
         default:
-          console.warn('Unknown questionType number:', questionType);
           return QuestionType.SINGLE_CHOICE;
       }
     }
@@ -89,7 +89,6 @@ export class QuizCreatorComponent implements OnInit {
     }
 
     // Default fallback
-    console.warn('Unknown questionType format:', questionType);
     return QuestionType.SINGLE_CHOICE;
   }
 
@@ -111,7 +110,6 @@ export class QuizCreatorComponent implements OnInit {
       case QuestionType.TRUE_FALSE:      return 2;
       case QuestionType.TEXT:            return 3;
       default:
-        console.warn('Unknown questionType string:', questionType);
         return 0; // Default to SINGLE_CHOICE
     }
   }
@@ -128,6 +126,7 @@ export class QuizCreatorComponent implements OnInit {
       title: ['', Validators.required],
       attemptLimit: [1, [Validators.required, Validators.min(1)]],
       passScore: [70, [Validators.required, Validators.min(0), Validators.max(100)]],
+      timeLimit: [null, [Validators.min(1)]], // Optional: time limit in minutes (null = no time limit)
       questions: this.fb.array([])
     });
   }
@@ -152,7 +151,6 @@ export class QuizCreatorComponent implements OnInit {
     this.isLoading = true;
     this.quizService.getQuizByCourseId(this.courseId).subscribe({
       next: (quiz) => {
-        console.log('Existing quiz found:', quiz);
         this.existingQuizId = quiz.quizId;
         this.isEditMode = true;
         this.populateForm(quiz);
@@ -161,10 +159,8 @@ export class QuizCreatorComponent implements OnInit {
       error: (error) => {
         // 404 means no quiz exists yet (CREATE mode)
         if (error.status === 404) {
-          console.log('No existing quiz found. CREATE mode.');
           this.isEditMode = false;
         } else {
-          console.error('Error loading quiz:', error);
           this.snackBar.open('⚠️ Error loading quiz. You can still create a new one.', 'Close', {
             duration: 5000,
             panelClass: ['error-snackbar']
@@ -185,7 +181,8 @@ export class QuizCreatorComponent implements OnInit {
     this.quizForm.patchValue({
       title: quiz.title,
       passScore: quiz.passScore,
-      attemptLimit: quiz.attemptLimit
+      attemptLimit: quiz.attemptLimit,
+      timeLimit: quiz.timeLimit || null // Load timeLimit from backend, null if not set
     });
 
     // Clear existing questions
@@ -193,11 +190,21 @@ export class QuizCreatorComponent implements OnInit {
       this.questions.removeAt(0);
     }
 
+    // Clear original questions map
+    this.originalQuestions.clear();
+
     // Populate questions
     if (quiz.questions && quiz.questions.length > 0) {
       quiz.questions.forEach((q: any, index: number) => {
         const normalizedType = this.normalizeQuestionType(q.questionType);
-        console.log(`Loading Q${index + 1}: type="${q.questionType}" → normalized="${normalizedType}", title="${q.title}"`);
+
+        // Store original question data including answerOptions
+        if (q.questionId) {
+          this.originalQuestions.set(q.questionId, {
+            answerOptions: q.answerOptions ? [...q.answerOptions] : [],
+            textAnswer: normalizedType === QuestionType.TEXT && q.answerOptions?.[0]?.content ? q.answerOptions[0].content : ''
+          });
+        }
 
         const questionGroup = this.fb.group({
           questionId: [q.questionId], // Store question ID for update/delete
@@ -211,20 +218,29 @@ export class QuizCreatorComponent implements OnInit {
         this.questions.push(questionGroup);
         const questionIndex = this.questions.length - 1;
 
-        // Populate answers
-        if (q.answerOptions && q.answerOptions.length > 0) {
-          q.answerOptions.forEach((option: any) => {
-            const answerGroup = this.fb.group({
-              text: [option.content, Validators.required],
-              isCorrect: [option.isCorrect]
-            });
-            this.getAnswers(questionIndex).push(answerGroup);
-          });
-
-          // For text questions, set textAnswer
-          if (q.questionType === QuestionType.TEXT && q.answerOptions[0]) {
+        // Handle Text questions separately (don't populate answers array)
+        if (normalizedType === QuestionType.TEXT) {
+          // Ensure answers array is empty for Text questions
+          const answersArray = this.getAnswers(questionIndex);
+          while (answersArray.length > 0) {
+            answersArray.removeAt(0);
+          }
+          
+          // Set textAnswer if available
+          if (q.answerOptions && q.answerOptions.length > 0) {
             questionGroup.patchValue({
               textAnswer: q.answerOptions[0].content
+            });
+          }
+        } else {
+          // Populate answers (only for non-TEXT questions)
+          if (q.answerOptions && q.answerOptions.length > 0) {
+            q.answerOptions.forEach((option: any) => {
+              const answerGroup = this.fb.group({
+                text: [option.content, Validators.required],
+                isCorrect: [option.isCorrect]
+              });
+              this.getAnswers(questionIndex).push(answerGroup);
             });
           }
         }
@@ -262,12 +278,8 @@ export class QuizCreatorComponent implements OnInit {
     this.questions.push(questionGroup);
     const newQuestionIndex = this.questions.length - 1;
 
-    console.log(`✅ Added Question ${newQuestionIndex + 1}`);
-
     this.addAnswer(newQuestionIndex, '', true);
     this.addAnswer(newQuestionIndex);
-
-    console.log(`   Initial answers added: ${this.getAnswers(newQuestionIndex).length}`);
   }
 
   removeQuestion(index: number): void {
@@ -419,14 +431,12 @@ export class QuizCreatorComponent implements OnInit {
   onSubmit(): void {
     // Prevent double submit
     if (this.isSubmitting) {
-      console.log('Submit already in progress, ignoring...');
       return;
     }
 
     // Debounce: Prevent multiple submits within 1 second
     const now = Date.now();
     if (now - this.lastSubmitTime < 1000) {
-      console.log('Submitting too fast, ignoring...');
       return;
     }
     this.lastSubmitTime = now;
@@ -443,13 +453,6 @@ export class QuizCreatorComponent implements OnInit {
       this.isSubmitting = true;
       const formValue = this.quizForm.value;
 
-      // DEBUG: Log form data before submit
-      console.log('📋 Form value before submit:', formValue);
-      console.log('📋 Total questions in form:', formValue.questions.length);
-      formValue.questions.forEach((q: any, idx: number) => {
-        console.log(`   Q${idx + 1}: ${q.question} | Answers: ${q.answers?.length || 0} | QuestionId: ${q.questionId}`);
-      });
-
       if (this.isEditMode && this.existingQuizId) {
         // EDIT MODE: Update quiz info + update each question separately
         this.updateExistingQuiz(formValue);
@@ -460,14 +463,12 @@ export class QuizCreatorComponent implements OnInit {
           title: formValue.title,
           passScore: formValue.passScore,
           attemptLimit: formValue.attemptLimit,
+          timeLimit: formValue.timeLimit && formValue.timeLimit > 0 ? formValue.timeLimit : null,
           questions: this.transformQuestionsToAPI(formValue.questions)
         };
 
-        console.log('Creating quiz:', quizRequest);
-
         this.quizService.createQuiz(quizRequest).subscribe({
           next: (response) => {
-            console.log('✅ Quiz created successfully:', response);
             this.isSubmitting = false;
 
             this.snackBar.open(
@@ -477,14 +478,9 @@ export class QuizCreatorComponent implements OnInit {
             );
 
             // Navigate back to course detail immediately
-            console.log(`🔄 Navigating to: /lecturer/courses/${this.courseId}`);
-            this.router.navigate(['/lecturer/courses', this.courseId]).then(
-              success => console.log('✅ Navigation success:', success),
-              error => console.error('❌ Navigation error:', error)
-            );
+            this.router.navigate(['/lecturer/courses', this.courseId]);
           },
           error: (error) => {
-            console.error('Error creating quiz:', error);
             this.isSubmitting = false;
 
             const errorMessage = error.error?.message || error.message || 'Failed to create quiz';
@@ -530,10 +526,7 @@ export class QuizCreatorComponent implements OnInit {
    * Step 3: Use batch API to update existing questions and create new questions
    */
   private updateExistingQuiz(formValue: any): void {
-    console.log('🚀 NEW CODE: Using batch API for CREATE, individual UPDATE');
-
     if (!this.existingQuizId) {
-      console.error('No quiz ID for update');
       this.isSubmitting = false;
       return;
     }
@@ -544,42 +537,33 @@ export class QuizCreatorComponent implements OnInit {
       title: formValue.title,
       passScore: formValue.passScore,
       attemptLimit: formValue.attemptLimit,
+      timeLimit: formValue.timeLimit && formValue.timeLimit > 0 ? formValue.timeLimit : null,
       questions: [] // Backend expects this but won't update it
     };
 
-    console.log('Step 1: Updating quiz info:', quizInfoUpdate);
-
     this.quizService.updateQuiz(this.existingQuizId, quizInfoUpdate).subscribe({
       next: async (quizResponse) => {
-        console.log('✅ Quiz info updated:', quizResponse);
-
         // Step 2: Handle add/update/delete questions
         const formQuestions = formValue.questions;
         const existingQuestionIds = quizResponse.questions.map((q: any) => q.questionId);
         const formQuestionIds = formQuestions.map((q: any) => q.questionId).filter((id: any) => id != null);
 
-        console.log('Step 2: Syncing questions...');
-        console.log('Existing question IDs:', existingQuestionIds);
-        console.log('Form question IDs:', formQuestionIds);
-
         try {
           // 1. Delete removed questions (individual DELETE calls)
           const questionsToDelete = existingQuestionIds.filter(id => !formQuestionIds.includes(id));
           if (questionsToDelete.length > 0) {
-            console.log(`Deleting ${questionsToDelete.length} questions:`, questionsToDelete);
             const deletePromises = questionsToDelete.map(questionId =>
               firstValueFrom(this.quizService.deleteQuestion(questionId))
             );
             await Promise.all(deletePromises);
-            console.log('✅ Deleted questions successfully');
           }
 
-          // 2. Separate questions into UPDATE vs CREATE
-          const questionsToUpdate: Question[] = [];
-          const questionsToCreate: Question[] = [];
+        // 2. Separate questions into UPDATE vs CREATE
+        const questionsToUpdate: Question[] = [];
+        const questionsToCreate: Question[] = [];
 
-          formQuestions.forEach((formQ: any, index: number) => {
-            const questionData = this.transformSingleQuestionToAPI(formQ, index);
+        formQuestions.forEach((formQ: any, index: number) => {
+          const questionData = this.transformSingleQuestionToAPI(formQ, index);
 
             if (formQ.questionId) {
               // Existing question - UPDATE
@@ -593,71 +577,31 @@ export class QuizCreatorComponent implements OnInit {
             }
           });
 
-          console.log(`Step 3: Batch updating ${questionsToUpdate.length} questions and creating ${questionsToCreate.length} questions`);
-
           // 3. Use individual UPDATE API for existing questions (not batch)
           // Reason: Batch API handles both CREATE and UPDATE, but we need them separate to avoid duplicates
           if (questionsToUpdate.length > 0) {
-            console.log(`Updating ${questionsToUpdate.length} existing questions individually:`);
             const updatePromises = questionsToUpdate.map(question => {
-              console.log(`  UPDATE Request - Question ${question.questionId}:`);
-              console.log(`    - Title: ${question.title}`);
-              console.log(`    - QuestionType: ${question.questionType} (type: ${typeof question.questionType})`);
-              console.log(`    - Answers: ${question.answerOptions?.length || 0}`);
-              console.log(`    - Full Question Object:`, question);
-              console.log(`    - Answer Options:`, question.answerOptions);
               return firstValueFrom(this.quizService.updateQuestion(question.questionId!, question));
             });
 
-            const updateResponses = await Promise.all(updatePromises);
-
-            console.log('✅ Updated existing questions successfully');
-            updateResponses.forEach((response: any, idx: number) => {
-              console.log(`  UPDATE Response Q${idx + 1}: ID=${response.questionId}, Answers=${response.answerOptions?.length || 0}`);
-            });
+            await Promise.all(updatePromises);
           }
 
           // 4. Use individual CREATE API for new questions (WORKAROUND: batch API has duplicate bug)
           if (questionsToCreate.length > 0) {
-            console.log(`Creating ${questionsToCreate.length} new questions individually (batch API has duplicate bug):`);
-            questionsToCreate.forEach((q, idx) => {
-              console.log(`  New Q${idx + 1}:`, {
-                title: q.title,
-                type: q.questionType,
-                answersCount: q.answerOptions.length,
-                answers: q.answerOptions
-              });
-            });
-
-            const createPromises = questionsToCreate.map(async (question, idx) => {
-              console.log(`  Creating question ${idx + 1}:`, question);
+            const createPromises = questionsToCreate.map(async (question) => {
               try {
                 const response = await firstValueFrom(this.quizService.createQuestion(this.existingQuizId!, question));
-                console.log(`  ✅ Question ${idx + 1} created successfully:`, response);
                 return response;
               } catch (error: any) {
-                console.error(`  ❌ Failed to create question ${idx + 1}:`, error);
-                console.error(`  Error details:`, {
-                  status: error.status,
-                  statusText: error.statusText,
-                  message: error.error?.message || error.message,
-                  errors: error.error?.errors,
-                  fullError: error.error
-                });
                 throw error;
               }
             });
 
-            const createResponses = await Promise.all(createPromises);
-
-            console.log('✅ Individual create responses from backend:', createResponses);
-            createResponses.forEach((q: any, idx: number) => {
-              console.log(`  Response Q${idx + 1}: ID=${q.questionId}, Answers=${q.answerOptions?.length || 0}`);
-            });
+            await Promise.all(createPromises);
           }
 
           // All done!
-          console.log('✅ All questions synced successfully');
           this.isSubmitting = false;
 
           this.snackBar.open(
@@ -667,14 +611,9 @@ export class QuizCreatorComponent implements OnInit {
           );
 
           // Navigate back to course detail
-          console.log(`🔄 Navigating to: /lecturer/courses/${this.courseId}`);
-          this.router.navigate(['/lecturer/courses', this.courseId]).then(
-            success => console.log('✅ Navigation success:', success),
-            error => console.error('❌ Navigation error:', error)
-          );
+          this.router.navigate(['/lecturer/courses', this.courseId]);
 
         } catch (error: any) {
-          console.error('Error updating questions:', error);
           this.isSubmitting = false;
 
           const errorMessage = error?.error?.message || error?.message || 'Failed to update questions';
@@ -685,7 +624,6 @@ export class QuizCreatorComponent implements OnInit {
         }
       },
       error: (error) => {
-        console.error('Error updating quiz info:', error);
         this.isSubmitting = false;
 
         const errorMessage = error.error?.message || error.message || 'Failed to update quiz';
@@ -711,10 +649,44 @@ export class QuizCreatorComponent implements OnInit {
 
     // Transform answers to API format
     if (formQuestion.type === QuestionType.TEXT) {
-      question.answerOptions = [{
-        content: formQuestion.textAnswer || '',
-        isCorrect: true
-      }];
+      // For Text questions, check if textAnswer has changed
+      const currentTextAnswer = (formQuestion.textAnswer || '').trim();
+      
+      // If this is an existing question (has questionId), check if textAnswer changed
+      if (formQuestion.questionId) {
+        const originalData = this.originalQuestions.get(formQuestion.questionId);
+        
+        if (originalData) {
+          const originalTextAnswer = (originalData.textAnswer || '').trim();
+          
+          // If textAnswer hasn't changed or is empty, use original answerOptions
+          if (currentTextAnswer === originalTextAnswer || currentTextAnswer === '') {
+            // Use original answerOptions to preserve correct answer
+            question.answerOptions = originalData.answerOptions.map((opt: any) => ({
+              content: opt.content,
+              isCorrect: opt.isCorrect
+            }));
+          } else {
+            // TextAnswer has changed, use new value
+            question.answerOptions = [{
+              content: currentTextAnswer,
+              isCorrect: true
+            }];
+          }
+        } else {
+          // No original data found, use current value (shouldn't happen, but fallback)
+          question.answerOptions = currentTextAnswer ? [{
+            content: currentTextAnswer,
+            isCorrect: true
+          }] : [];
+        }
+      } else {
+        // New question, use current textAnswer
+        question.answerOptions = currentTextAnswer ? [{
+          content: currentTextAnswer,
+          isCorrect: true
+        }] : [];
+      }
     } else {
       question.answerOptions = formQuestion.answers.map((answer: any) => ({
         content: answer.text,
@@ -752,14 +724,6 @@ export class QuizCreatorComponent implements OnInit {
           isCorrect: answer.isCorrect
         }));
       }
-
-      // Debug log to check for duplicates
-      console.log(`Question ${index}:`, {
-        title: question.title,
-        type: question.questionType,
-        answersCount: question.answerOptions.length,
-        answers: question.answerOptions
-      });
 
       return question;
     });
@@ -989,8 +953,6 @@ export class AIGenQuizDialog {
         this.quizService.generateQuizFromCourse(this.data.courseId, numberOfQuestions)
       );
 
-      console.log('AI Gen Response:', response);
-
       // Check if response has questionsJson
       if (!response || !response.questionsJson) {
         throw new Error('Invalid response from server: missing questionsJson');
@@ -1019,8 +981,6 @@ export class AIGenQuizDialog {
           throw new Error('Invalid response format: expected array of questions');
         }
 
-        console.log('Parsed questions:', questions);
-
         // Transform BE format to FE format
         questions = questions.map((q: any) => {
           // Handle both BE format and FE format
@@ -1039,11 +999,7 @@ export class AIGenQuizDialog {
             }))
           };
         });
-
-        console.log('Transformed questions:', questions);
       } catch (parseError) {
-        console.error('JSON Parse Error:', parseError);
-        console.log('questionsJson value:', response.questionsJson);
         throw new Error(`Failed to parse questions: ${response.questionsJson.substring(0, 100)}`);
       }
 
@@ -1061,8 +1017,6 @@ export class AIGenQuizDialog {
       this.dialogRef.close({ questions });
 
     } catch (error: any) {
-      console.error('AI Gen Quiz Error:', error);
-
       // Display error message with better details
       if (error.status === 404) {
         this.errorMessage = 'Course not found. Please check the course ID.';

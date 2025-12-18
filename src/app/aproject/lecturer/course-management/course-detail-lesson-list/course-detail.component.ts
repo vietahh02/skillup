@@ -25,12 +25,13 @@ import { ConfirmDialogComponent } from '../../../../common/confirm-dialog/confir
 import { VideoPlayerDialog } from './video-player-dialog/video-player-dialog';
 import { QuizResponse } from '../../../../models/quiz.models';
 import { QuizService } from '../../../../services/quiz.service';
+import { FeedbacksCourseComponent } from "./feedbacks-course/feedbacks-course.component";
 
 @Component({
   selector: 'app-drag-table',
   templateUrl: './course-detail.component.html',
   styleUrls: ['./course-detail.component.scss'],
-  imports: [MatCardModule, MatButtonModule, MatMenuModule, MatTableModule, MatPaginatorModule, MatIcon, DragDropModule, CommonModule, FormsModule, RouterLink, MatDialogModule, MatFormFieldModule, MatInputModule, MatDividerModule, MatTooltipModule, MatExpansionModule, MatChipsModule, ReactiveFormsModule]
+  imports: [MatCardModule, MatButtonModule, MatMenuModule, MatTableModule, MatPaginatorModule, MatIcon, DragDropModule, CommonModule, FormsModule, RouterLink, MatDialogModule, MatFormFieldModule, MatInputModule, MatDividerModule, MatTooltipModule, MatExpansionModule, MatChipsModule, ReactiveFormsModule, FeedbacksCourseComponent]
 })
 export class LecturerCourseDetail {
   constructor(public dialog: MatDialog, public router: Router, 
@@ -171,6 +172,10 @@ export class LecturerCourseDetail {
     return this.courseDetail?.status === 'Draft' || this.courseDetail?.status === 'Rejected';
   }
 
+  isDraftPending(): boolean {
+    return this.courseDetail?.status === 'Draft' || this.courseDetail?.status === 'Pending';
+  }
+
   dropLesson(event: CdkDragDrop<Lesson[]>) {
     // Lưu orderIndex của 2 lesson cần swap
     const prev = this.lessons[event.previousIndex];
@@ -218,16 +223,39 @@ export class LecturerCourseDetail {
       const previousOrderIndex = lesson.subLessons[event.previousIndex].orderIndex;
       const currentOrderIndex = lesson.subLessons[event.currentIndex].orderIndex;
       
-      // Move items in array
-      moveItemInArray(lesson.subLessons, event.previousIndex, event.currentIndex);
-      
       // Swap orderIndex của 2 sub-lesson
       if (previousOrderIndex !== undefined && currentOrderIndex !== undefined) {
         lesson.subLessons[event.currentIndex].orderIndex = previousOrderIndex;
         lesson.subLessons[event.previousIndex].orderIndex = currentOrderIndex;
       }
       
-      this.lessons = [...this.lessons];
+      // Move items in array
+      moveItemInArray(lesson.subLessons, event.previousIndex, event.currentIndex);
+
+      this.courseService.reorderSubLessons({
+        lessonId: lesson.lessonId as number,
+        subLessons: lesson.subLessons.map((subLesson: SubLesson) => ({
+          subLessonId: subLesson.id as number,
+          orderIndex: subLesson.orderIndex as number
+        }))
+      }).subscribe({
+        next: () => {
+          this.snack.open('Sub lessons reordered successfully', '', {
+            duration: 3000,
+            panelClass: ['success-snackbar', 'custom-snackbar'],
+            horizontalPosition: 'right',
+            verticalPosition: 'top'
+          });
+        },
+        error: (error: any) => {
+          this.snack.open('Failed to reorder sub lessons', '', {
+            duration: 3000,
+            panelClass: ['error-snackbar', 'custom-snackbar'],
+            horizontalPosition: 'right',
+            verticalPosition: 'top'
+          });
+        }
+      });
     }
   }
 
@@ -252,7 +280,6 @@ export class LecturerCourseDetail {
         });
       },
       error: (error) => {
-        console.error('Error loading quiz details:', error);
         this.snack.open('Error loading quiz details', 'Close', {
           duration: 3000,
           panelClass: ['error-snackbar'],

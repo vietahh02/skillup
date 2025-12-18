@@ -20,7 +20,7 @@ export class AuthService {
           this.loadUserInfo();
         },
         (error: any) => {
-          console.error('Error refreshing token:', error);
+          // Error refreshing token
           // this.tokenService.clearTokens();
         });
     }else {
@@ -52,11 +52,10 @@ export class AuthService {
   loadUserInfo() : void {
     this.apiAuthService.getUserInfo().subscribe(
       (userInfo: UserInfo) => {
-        console.log('userInfo', userInfo);
         this.currentUserSubject.next(userInfo);
       },
       error => {
-        console.error('Error loading user info:', error);
+        // Error loading user info
         // this.clearTokens();
       }
     );

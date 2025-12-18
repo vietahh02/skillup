@@ -42,7 +42,6 @@ export interface AssignLearningPathDialogData {
 export class AssignLearningPathDialogComponent implements OnInit {
   learningPaths: LearningPath[] = [];
   selectedLearningPathId: number | null = null;
-  notes: string = '';
   isLoading = false;
   isLoadingPaths = false;
   searchTerm = '';
@@ -67,7 +66,6 @@ export class AssignLearningPathDialogComponent implements OnInit {
       // Chỉ lấy các Learning Path có status = 'Active'
       this.learningPaths = response.items.filter(path => path.status === 'Active');
     } catch (error) {
-      console.error('Error loading learning paths:', error);
       this.snackBar.open('Failed to load learning paths', 'Close', { duration: 3000 });
     } finally {
       this.isLoadingPaths = false;
@@ -89,8 +87,7 @@ export class AssignLearningPathDialogComponent implements OnInit {
       await firstValueFrom(
         this.learningPathService.assignLearningPath(
           this.data.userId,
-          this.selectedLearningPathId,
-          this.notes || undefined
+          this.selectedLearningPathId
         )
       );
 
@@ -105,8 +102,6 @@ export class AssignLearningPathDialogComponent implements OnInit {
 
       this.dialogRef.close(true);
     } catch (error: any) {
-      console.error('Error assigning learning path:', error);
-      
       // Handle specific error types from BE
       let errorMessage = 'Failed to assign learning path';
       

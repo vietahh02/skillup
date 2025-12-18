@@ -66,15 +66,12 @@ export class QuizListComponent implements OnInit {
     this.isLoading = true;
     this.quizService.getQuizzes(this.currentPage, this.pageSize, this.searchTerm).subscribe({
       next: (response) => {
-        console.log('=== API Response ===');
-        console.log('Response:', response);
         this.data = response.items || [];
         // Backend might return 'total' instead of 'totalCount'
         this.totalItems = response.totalCount || response.total || 0;
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error loading quizzes:', error);
         this.snackBar.open('Error loading quizzes', 'Close', {
           duration: 3000,
           panelClass: ['error-snackbar']
@@ -108,7 +105,6 @@ export class QuizListComponent implements OnInit {
         });
       },
       error: (error) => {
-        console.error('Error loading quiz details:', error);
         this.snackBar.open('Error loading quiz details', 'Close', {
           duration: 3000,
           panelClass: ['error-snackbar']
@@ -140,8 +136,8 @@ export class QuizListComponent implements OnInit {
             this.loadQuizzes();
           },
           error: (error) => {
-            console.error('Error deleting quiz:', error);
-            this.snackBar.open('Error deleting quiz', 'Close', {
+            const errorMessage = error?.error?.message || 'Error deleting quiz';
+            this.snackBar.open(errorMessage, 'Close', {
               duration: 3000,
               panelClass: ['error-snackbar']
             });
@@ -295,7 +291,7 @@ export class DeleteQuizDialog {
       <h2 mat-dialog-title class="dialog-title">
         <div class="title-content">
           <mat-icon>quiz</mat-icon>
-          <span>{{ data.title }}</span>
+          <span class="value">{{ data.title }}</span>
         </div>
         <button mat-icon-button (click)="onClose()">
           <mat-icon>close</mat-icon>
@@ -373,12 +369,24 @@ export class DeleteQuizDialog {
 
               <!-- Answer Options -->
               <div *ngIf="question.answerOptions && question.answerOptions.length > 0" class="answer-options">
-                <div *ngFor="let option of question.answerOptions; let j = index"
-                     class="answer-option"
-                     [class.correct]="option.isCorrect">
-                  <span class="option-label">{{ getLetter(j) }}</span>
-                  <span class="option-content word-break-all">{{ option.content }}</span>
-                  <mat-icon *ngIf="option.isCorrect" class="correct-icon">check_circle</mat-icon>
+                <!-- Text Question: Show only answer without label -->
+                <div *ngIf="isTextQuestion(question.questionType)" class="text-answer">
+                  <div class="text-answer-label">
+                    <mat-icon>check_circle</mat-icon>
+                    <span>Correct Answer:</span>
+                  </div>
+                  <div class="text-answer-content word-break-all">{{ question.answerOptions[0].content }}</div>
+                </div>
+                
+                <!-- Other Question Types: Show with A, B, C labels -->
+                <div *ngIf="!isTextQuestion(question.questionType)">
+                  <div *ngFor="let option of question.answerOptions; let j = index"
+                       class="answer-option"
+                       [class.correct]="option.isCorrect">
+                    <span class="option-label">{{ getLetter(j) }}</span>
+                    <span class="option-content word-break-all">{{ option.content }}</span>
+                    <mat-icon *ngIf="option.isCorrect" class="correct-icon">check_circle</mat-icon>
+                  </div>
                 </div>
               </div>
             </div>
@@ -397,8 +405,8 @@ export class DeleteQuizDialog {
   styles: [`
   .value {
     word-break: break-word;
-                    overflow-wrap: break-word;
-                    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
   }
   .word-break-all {
     word-break: break-all;
@@ -604,6 +612,35 @@ export class DeleteQuizDialog {
                 gap: 10px;
                 margin-top: 16px;
 
+                .text-answer {
+                  padding: 16px;
+                  background: #dcfce7;
+                  border-radius: 8px;
+                  border: 2px solid #22c55e;
+
+                  .text-answer-label {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    margin-bottom: 8px;
+                    font-weight: 600;
+                    font-size: 13px;
+                    color: #166534;
+
+                    mat-icon {
+                      color: #22c55e;
+                      font-size: 20px;
+                    }
+                  }
+
+                  .text-answer-content {
+                    font-size: 15px;
+                    color: #1e293b;
+                    font-weight: 500;
+                    padding-left: 28px;
+                  }
+                }
+
                 .answer-option {
                   display: flex;
                   align-items: center;
@@ -721,5 +758,13 @@ export class ViewQuizDialog {
 
   getLetter(index: number): string {
     return String.fromCharCode(65 + index); // A, B, C, D...
+  }
+
+  /**
+   * Check if question is Text type
+   */
+  isTextQuestion(questionType: string | number): boolean {
+    const typeString = this.getQuestionTypeClass(questionType);
+    return typeString === 'text';
   }
 }

@@ -149,7 +149,6 @@ export class ChatBoxComponent implements OnInit, AfterViewChecked, OnDestroy {
     this.apiAiServices.getAiChat(payload).subscribe((response) => {
       this.addBotMessage(response.response, new Date(response.timestamp));
     }, error => {
-      console.error('Error getting bot response:', error);
       this.addBotMessage('Xin lỗi, tôi không thể trả lời câu hỏi của bạn.', new Date());
     });
   }
@@ -165,7 +164,7 @@ export class ChatBoxComponent implements OnInit, AfterViewChecked, OnDestroy {
           this.messagesContainer.nativeElement.scrollHeight;
       }
     } catch (err) {
-      console.error('Error scrolling to bottom:', err);
+      // Error scrolling to bottom
     }
   }
 

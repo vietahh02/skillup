@@ -27,7 +27,6 @@ export class AcBoardComponent {
 
     ngOnChanges(changes: SimpleChanges) {
         if (changes['data']) {
-            console.log(this.data);
             this.getTopCourses();
             this.getTopLearningPaths();
             this.getTopLecturers();

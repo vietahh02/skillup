@@ -59,7 +59,7 @@ export const API_URLS = {
 
   //API SubLesson
   SUB_LESSON: BASE_POINTS.SUB_LESSON,
-
+  REORDER_SUB_LESSONS: BASE_POINTS.SUB_LESSON + "/reorder",
   //API Course
   GET_COURSES_CREATOR_ADMIN_MANAGER: BASE_POINTS.COURSE + "/creator-admin-manager",
   GET_COURSES_CREATOR_LECTURER: BASE_POINTS.COURSE + "/lecturer/me",
@@ -171,6 +171,9 @@ export const API_URLS = {
   // Settings Management (Manager only)
   GET_COURSE_MANAGER_TYPES: BASE_POINTS.SETTINGS + "/course-types", // GET /api/settings/course-types
   GET_USER_MANAGER_LEVELS: BASE_POINTS.SETTINGS + "/user-levels", // GET /api/settings/user-levels
+
+  //API Course Count
+  GET_COURSE_COUNT: BASE_POINTS.COURSE + "/pending/count", // GET /api/Course/pending/count
 
   //API Report
   GET_USER_REPORT: BASE_POINTS.USER + "/employees/detail-statistics", // GET /api/Users/employees/detail-statistics

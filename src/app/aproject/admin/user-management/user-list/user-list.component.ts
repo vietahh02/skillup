@@ -236,7 +236,6 @@ export class CreateUserDialog {
           this.close();
         },
         (error: any) => {
-          console.error('Error creating user:', error);
           this.snack.open('Failed to create user. Please try again.', '', { duration: 3000, panelClass: ['error-snackbar', 'custom-snackbar'], horizontalPosition: 'right', verticalPosition: 'top' });
         }
       );

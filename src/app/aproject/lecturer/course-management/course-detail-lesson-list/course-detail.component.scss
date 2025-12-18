@@ -163,6 +163,7 @@
               flex: 1;
               
               .lesson-title {
+                word-break: break-word;
                 font-size: 18px;
                 font-weight: 600;
                 color: #2d3748;
@@ -171,6 +172,7 @@
               }
               
               .lesson-description {
+                word-break: break-word;
                 font-size: 14px;
                 color: #4a5568;
                 margin: 0;
@@ -306,6 +308,7 @@
           flex: 1;
           
           .sub-lesson-name {
+            word-break: break-word;
             font-size: 16px;
             font-weight: 600;
             color: #2d3748;
@@ -314,6 +317,7 @@
           }
           
           .sub-lesson-description {
+            word-break: break-word;
             font-size: 13px;
             color: #4a5568;
             margin: 0 0 8px 0;

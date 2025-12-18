@@ -209,7 +209,7 @@ export class LearningPathService {
    * POST /api/learning-path-enrollments
    * BE sẽ tự động set enrollmentType = "assigned" khi Manager enroll user khác
    */
-  assignLearningPath(userId: number, learningPathId: number, notes?: string): Observable<LearningPathEnrollment> {
+  assignLearningPath(userId: number, learningPathId: number): Observable<LearningPathEnrollment> {
     const body: EnrollLearningPathRequest = {
       userId,
       learningPathId,

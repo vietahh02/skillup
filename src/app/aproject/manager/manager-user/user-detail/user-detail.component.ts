@@ -267,7 +267,6 @@ export class ManagerUserDetail {
                 }
             },
             error: (error) => {
-                console.error('Error loading learning paths:', error);
             },
             complete: () => {
                 this.isLoadingAssignments = false;

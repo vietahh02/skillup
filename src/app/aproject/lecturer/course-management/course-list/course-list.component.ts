@@ -161,7 +161,6 @@ export class LecturerCourseList {
             });
           },
           error: (error) => {
-            console.error('Error deleting course:', error);
             // Could show error snackbar here if needed
             this.snack.open(error.error || 'Failed to delete course', '', {
               duration: 3000,

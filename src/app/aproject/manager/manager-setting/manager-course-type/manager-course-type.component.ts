@@ -61,7 +61,6 @@ export class ManagerCourseTypeComponent implements OnInit {
         this.data = response;
       },
       error: (error: any) => {
-        console.error('Error loading course types:', error);
         this.snackBar.open('Error loading course types', 'Close', { duration: 3000, panelClass: ['error-snackbar'] });
       }
     });
@@ -126,7 +125,6 @@ export class ManagerCourseTypeComponent implements OnInit {
             this.loadCourseTypes();
           },
           error: (error: any) => {
-            console.error(`Error ${action}ing course type:`, error);
             this.snackBar.open(`Error ${action}ing course type`, 'Close', { 
               duration: 3000, 
               panelClass: ['error-snackbar', 'custom-snackbar'],
@@ -162,7 +160,6 @@ export class ManagerCourseTypeComponent implements OnInit {
             this.loadCourseTypes();
           },
           error: (error: any) => {
-            console.error('Error deleting course type:', error);
             this.snackBar.open('Error deleting course type', 'Close', { 
               duration: 3000, 
               panelClass: ['error-snackbar', 'custom-snackbar'],
@@ -241,7 +238,6 @@ export class CourseTypeDialog {
           this.close();
         },
         error: (error: any) => {
-          console.error('Error updating course type:', error);
           this.snackBar.open('Error updating course type', 'Close', {
             duration: 3000,
             panelClass: ['error-snackbar', 'custom-snackbar'],
@@ -266,7 +262,6 @@ export class CourseTypeDialog {
           this.close();
         },
         error: (error: any) => {
-          console.error('Error creating course type:', error);
           this.snackBar.open('Error creating course type', 'Close', {
             duration: 3000,
             panelClass: ['error-snackbar', 'custom-snackbar'],

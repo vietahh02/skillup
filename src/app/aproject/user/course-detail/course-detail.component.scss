@@ -359,6 +359,12 @@
 
 }
 
+div {
+    word-break: break-word;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
 .word-break-all {
     word-break: break-all;
 }

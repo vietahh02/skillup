@@ -27,7 +27,7 @@ export interface LearningPathItem {
   orderIndex: number;            // Thứ tự trong path (0, 1, 2, ...)
   isMandatory: boolean;          // Bắt buộc hay optional
   progressPct?: number;          // Progress của course này (0-100) - từ backend
-  enrollmentStatus?: 'NotStarted' | 'InProgress' | 'Completed';  // Enrollment status - từ backend
+  enrollmentStatus?: 'NotStarted' | 'InProgress' | 'Completed' | 'Failed';  // Enrollment status - từ backend
 }
 
 // Paginated Learning Paths Response
@@ -103,7 +103,7 @@ export interface LearningPathProgressSummary {
   mandatoryCourses: number;
   completedMandatory: number;
   overallProgress: number;  // Percentage
-  status: 'NotStarted' | 'InProgress' | 'Completed';
+  status: 'NotStarted' | 'InProgress' | 'Completed' | 'Failed';
 }
 
 export interface LearningPathStatistics {
@@ -130,7 +130,7 @@ export interface DetailedEnrollment {
   learningPathId: number;
   learningPathName: string;
   progressPct: number;
-  status: 'NotStarted' | 'InProgress' | 'Completed';
+  status: 'NotStarted' | 'InProgress' | 'Completed' | 'Failed';
   startedAt: string;
   completedAt?: string;
   totalCourses: number;

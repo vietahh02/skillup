@@ -112,7 +112,6 @@ export class LearningPathFormComponent implements OnInit {
     try {
       this.levels = await firstValueFrom(this.lookupService.getLevels());
     } catch (error) {
-      console.error('Error loading levels:', error);
       this.snackBar.open('Failed to load levels', 'Close', { duration: 3000 });
     }
   }
@@ -135,7 +134,6 @@ export class LearningPathFormComponent implements OnInit {
       // Load available courses after form is populated with levelId
       await this.loadAvailableCourses();
     } catch (error) {
-      console.error('Error loading learning path:', error);
       this.snackBar.open('Failed to load learning path', 'Close', { duration: 3000 });
       this.router.navigate(['/manager/learning-paths']);
     } finally {
@@ -152,7 +150,6 @@ export class LearningPathFormComponent implements OnInit {
       );
       this.filterAvailableCourses();
     } catch (error) {
-      console.error('Error loading path items:', error);
       this.snackBar.open('Failed to load courses in path', 'Close', { duration: 3000 });
     }
   }
@@ -180,7 +177,6 @@ export class LearningPathFormComponent implements OnInit {
 
       this.filterAvailableCourses();
     } catch (error) {
-      console.error('Error loading courses:', error);
       this.snackBar.open('Failed to load available courses', 'Close', { duration: 3000 });
     }
   }
@@ -227,6 +223,13 @@ export class LearningPathFormComponent implements OnInit {
           this.learningPathService.updateLearningPath(this.pathId, formData)
         );
         this.snackBar.open('Learning path updated successfully', 'Close', { duration: 3000 });
+        
+        // Redirect to list page after successful update (if has courses)
+        if (this.pathItems.length > 0) {
+          setTimeout(() => {
+            this.router.navigate(['/manager/learning-paths']);
+          }, 3000);
+        }
       } else {
         // Create new path
         const newPath = await firstValueFrom(
@@ -240,9 +243,19 @@ export class LearningPathFormComponent implements OnInit {
 
         this.snackBar.open('Learning path created successfully. Now you can add courses.', 'Close', { duration: 3000 });
       }
-    } catch (error) {
-      console.error('Error saving learning path:', error);
-      this.snackBar.open('Failed to save learning path', 'Close', { duration: 3000 });
+    } catch (error: any) {
+     
+      // 1. Plain text response: error.error = "message"
+      // 2. JSON object: error.error.message = "message"
+      let errorMessage = 'Failed to save learning path';
+      
+      if (typeof error?.error === 'string') {
+        errorMessage = error.error; // Plain text response
+      } else if (error?.error?.message) {
+        errorMessage = error.error.message; // JSON object
+      }
+      
+      this.snackBar.open(errorMessage, 'Close', { duration: 3000 });
     } finally {
       this.isSaving = false;
     }
@@ -281,7 +294,6 @@ export class LearningPathFormComponent implements OnInit {
 
       this.snackBar.open('Course added to path', 'Close', { duration: 2000 });
     } catch (error) {
-      console.error('Error adding course:', error);
       this.snackBar.open('Failed to add course', 'Close', { duration: 3000 });
     }
   }
@@ -297,7 +309,6 @@ export class LearningPathFormComponent implements OnInit {
 
       this.snackBar.open('Course removed from path', 'Close', { duration: 2000 });
     } catch (error) {
-      console.error('Error removing course:', error);
       this.snackBar.open('Failed to remove course', 'Close', { duration: 3000 });
     }
   }
@@ -326,7 +337,6 @@ export class LearningPathFormComponent implements OnInit {
     } catch (error) {
       // Revert on error
       this.pathItems = previousOrder;
-      console.error('Error reordering course:', error);
       this.snackBar.open('Failed to reorder course', 'Close', { duration: 3000 });
     }
   }
@@ -351,7 +361,6 @@ export class LearningPathFormComponent implements OnInit {
         { duration: 2000 }
       );
     } catch (error) {
-      console.error('Error updating course:', error);
       this.snackBar.open('Failed to update course', 'Close', { duration: 3000 });
     }
   }

@@ -49,7 +49,6 @@ export class SettingsComponent implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error loading AI API key:', error);
         this.snackBar.open('Failed to load API key', 'Close', { duration: 3000 });
         this.isLoading = false;
       }
@@ -74,7 +73,6 @@ export class SettingsComponent implements OnInit {
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error updating AI API key:', error);
         this.snackBar.open('Failed to update API key', 'Close', { duration: 3000 });
         this.isLoading = false;
       }

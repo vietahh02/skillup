@@ -49,7 +49,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email, Validators.maxLength(255)]],
-      password: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(255)]],
+      password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(25), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/)]],
       rememberMe: [true],
     });
   }
@@ -139,8 +139,6 @@ export class LoginComponent implements OnInit, OnDestroy {
 
     this.api.loginWithGoogle(idToken).subscribe(
       (result: any) => {
-        console.log('Google login success:', result);
-
         // Close the modal popup if it exists
         const modal = document.getElementById('google-signin-button')?.closest('div[style*="position: fixed"]');
         const overlay = document.querySelector('div[style*="position: fixed"][style*="background-color: rgba(0, 0, 0, 0.5)"]');
@@ -167,8 +165,6 @@ export class LoginComponent implements OnInit, OnDestroy {
         });
       },
       (err) => {
-        console.error('Google login error:', err);
-
         // Close the modal popup if it exists
         const modal = document.getElementById('google-signin-button')?.closest('div[style*="position: fixed"]');
         const overlay = document.querySelector('div[style*="position: fixed"][style*="background-color: rgba(0, 0, 0, 0.5)"]');
@@ -228,8 +224,6 @@ export class LoginComponent implements OnInit, OnDestroy {
         email: email, 
         password: password
     }).subscribe((result: any) => {
-        console.log(result);
-        
         // Lưu access token 
         if (result.accessToken) {
           this.tokenService.setToken(result.accessToken, result.accessTokenExpiry);
@@ -246,7 +240,6 @@ export class LoginComponent implements OnInit, OnDestroy {
           horizontalPosition: 'right', 
           verticalPosition: 'top' 
         });
-        console.error('Login error:', err);
     });
   }
 

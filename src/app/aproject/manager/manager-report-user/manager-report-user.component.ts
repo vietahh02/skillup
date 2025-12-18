@@ -76,7 +76,6 @@ export class ManagerReportUserComponent implements AfterViewInit {
                 this.isLoading = false;
             },
             error: (error) => {
-                console.error('Error loading user report:', error);
                 this.isLoading = false;
             }
         });
@@ -167,7 +166,6 @@ export class ManagerReportUserComponent implements AfterViewInit {
                 });
             },
             error: (error) => {
-                console.error('Error exporting user report:', error);
                 this.isLoading = false;
                 this.snack.open('Không thể xuất file Excel', '', {
                     duration: 3000,
