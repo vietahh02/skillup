@@ -16,12 +16,6 @@
         <div class="mat-elevation-z8 recentOrdersTable tagus-mat-table">
             <table mat-table [dataSource]="data">
 
-                <!-- Quiz ID Column -->
-                <ng-container matColumnDef="quizId">
-                    <th mat-header-cell *matHeaderCellDef>ID</th>
-                    <td mat-cell *matCellDef="let element">{{element.quizId}}</td>
-                </ng-container>
-
                 <!-- Quiz Title Column -->
                 <ng-container matColumnDef="title">
                     <th mat-header-cell *matHeaderCellDef>Quiz Title</th>

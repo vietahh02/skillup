@@ -87,6 +87,48 @@
         font-size: 14px;
         opacity: 0.9;
       }
+      
+      .stat-hint {
+        font-size: 11px;
+        opacity: 0.7;
+        margin-top: 4px;
+      }
+    }
+  }
+  
+  .failed-alert {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 16px 20px;
+    background: #ef4444;
+    border: 1px solid #dc2626;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    
+    mat-icon {
+      color: white;
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+      flex-shrink: 0;
+    }
+    
+    .alert-content {
+      color: white;
+      
+      strong {
+        display: block;
+        font-size: 16px;
+        margin-bottom: 4px;
+        color: white;
+      }
+      
+      p {
+        margin: 0;
+        font-size: 14px;
+        color: rgba(255, 255, 255, 0.9);
+      }
     }
   }
 
@@ -96,6 +138,14 @@
     mat-progress-bar {
       height: 10px;
       border-radius: 5px;
+      resize: none;
+      overflow: hidden;
+
+      ::ng-deep .mdc-linear-progress {
+        height: 10px !important;
+        min-height: 10px !important;
+        max-height: 10px !important;
+      }
 
       ::ng-deep .mdc-linear-progress__bar-inner {
         border-top-width: 10px;
@@ -334,7 +384,7 @@
     }
 
     .optional-chip {
-      background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+      background: #9ca3af;
       color: white;
       font-weight: 600;
       font-size: 13px;
@@ -344,13 +394,19 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
       transition: all 0.3s ease;
-
-      &:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+      
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
       }
+    }
+    
+    .optional-note {
+      font-size: 12px;
+      color: #9ca3af;
+      font-style: italic;
     }
   }
 
@@ -478,6 +534,11 @@
     mat-icon {
       font-size: 24px;
     }
+    
+    &.failed {
+      background: #fee2e2;
+      color: #ef4444;
+    }
   }
 
   .status-content {
@@ -493,6 +554,22 @@
       font-size: 16px;
       font-weight: 700;
       color: #1f2937;
+      
+      &.status-completed {
+        color: #10b981;
+      }
+      
+      &.status-inprogress {
+        color: #3b82f6;
+      }
+      
+      &.status-failed {
+        color: #ef4444;
+      }
+      
+      &.status-notstarted {
+        color: #9ca3af;
+      }
     }
   }
 }

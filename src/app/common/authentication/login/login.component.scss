@@ -95,6 +95,17 @@
         }
     }
 }
+
+::ng-deep {
+    .mat-form-field-wrapper {
+        padding-bottom: 0 !important;
+    }
+
+    .mat-mdc-form-field-error-wrapper {
+        margin-top: -15px !important;
+        position: static !important;
+    }
+}
 .component-dark-theme {
     .tagus-form {
         .login-with-socials {

@@ -36,7 +36,6 @@ import { ApiCourseServices } from '../../../../services/course.service';
 })
 export class AdminCourseList implements AfterViewInit {
     displayedColumns: string[] = [
-        'id',
         'name',
         'type',
         'createdBy',

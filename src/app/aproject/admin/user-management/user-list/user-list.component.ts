@@ -45,7 +45,6 @@ export class AdminUserList implements OnInit, AfterViewInit {
     constructor(private router: Router, private apiUserService: ApiUserServices, private snack: MatSnackBar, private dialog: MatDialog) {}
 
     displayedColumns: string[] = [
-        'id',
         'name',
         'email',
         'role',

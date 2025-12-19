@@ -35,6 +35,7 @@ export class ProfileComponent implements OnDestroy {
         location: ['', [Validators.maxLength(255)]],
         dateOfBirth: [null as Date | null, [Validators.required, this.minAgeValidator(18)]],
         gender: ['', [Validators.required]],
+        level: [{value: '', disabled: true}],
     });
 
     minAgeValidator(minAge: number): ValidatorFn {
@@ -106,6 +107,7 @@ export class ProfileComponent implements OnDestroy {
                 location: userProfile.location,
                 dateOfBirth: userProfile.dateOfBirth ? new Date(userProfile.dateOfBirth) : null,
                 gender: userProfile.gender || '',
+                level: userProfile.level || '',
             });
             this.previewUrl = null;
             this.selectedFile = null;

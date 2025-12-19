@@ -39,11 +39,11 @@ import { MatTooltip } from "@angular/material/tooltip";
 })
 export class ManagerCourseList implements AfterViewInit {
     displayedColumns: string[] = [
-        'id',
         'name',
         'type',
         'createdBy',
         'createdAt',
+        'level',
         'status',
         'action',
     ];

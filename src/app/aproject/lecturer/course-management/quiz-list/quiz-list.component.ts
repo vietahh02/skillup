@@ -34,7 +34,7 @@ import { QuizResponse, Question } from '../../../../models/quiz.models';
   styleUrls: ['./quiz-list.component.scss']
 })
 export class QuizListComponent implements OnInit {
-  displayedColumns: string[] = ['quizId', 'title', 'courseName', 'questionsCount', 'passScore', 'attemptLimit', 'createdAt', 'action'];
+  displayedColumns: string[] = ['title', 'courseName', 'questionsCount', 'passScore', 'attemptLimit', 'createdAt', 'action'];
   data: QuizResponse[] = [];
 
   searchTerm: string = '';

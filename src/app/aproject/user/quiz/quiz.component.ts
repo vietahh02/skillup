@@ -98,7 +98,26 @@ export class QuizComponent implements OnInit, OnDestroy {
   }
 
   get progress(): number {
-    return ((this.currentQuestionIndex + 1) / this.questions.length) * 100;
+    // Tính theo số câu đã trả lời (dùng cùng logic với getQuestionStatus)
+    if (this.questions.length === 0) return 0;
+    
+    let answeredCount = 0;
+    for (let i = 0; i < this.questions.length; i++) {
+      const question = this.questions[i];
+      const userAnswer = this.userAnswers.find(a => a.questionId === question.id);
+      
+      if (question.type === 'text') {
+        if (userAnswer?.textAnswer && userAnswer.textAnswer.trim().length > 0) {
+          answeredCount++;
+        }
+      } else {
+        if (userAnswer?.answerIds && userAnswer.answerIds.length > 0) {
+          answeredCount++;
+        }
+      }
+    }
+    
+    return (answeredCount / this.questions.length) * 100;
   }
 
   get isFirstQuestion(): boolean {
@@ -278,6 +297,25 @@ export class QuizComponent implements OnInit, OnDestroy {
     this.isTimerRunning = false;
   }
 
+  // Resume timer from current timeRemaining (không reset)
+  resumeTimer() {
+    if (!this.quizDuration || this.quizDuration <= 0 || this.timeRemaining <= 0) {
+      return;
+    }
+
+    this.isTimerRunning = true;
+    this.isTimeUp = false;
+
+    this.timerInterval = setInterval(() => {
+      if (this.timeRemaining > 0) {
+        this.timeRemaining--;
+      } else {
+        this.stopTimer();
+        this.autoSubmit();
+      }
+    }, 1000);
+  }
+
   getFormattedTime(): string {
     const hours = Math.floor(this.timeRemaining / 3600);
     const minutes = Math.floor((this.timeRemaining % 3600) / 60);
@@ -405,8 +443,8 @@ export class QuizComponent implements OnInit, OnDestroy {
 
       const confirmed = await firstValueFrom(dialogRef.afterClosed());
       if (!confirmed) {
-        // Restart timer if user cancels
-        this.startTimer();
+        // Resume timer if user cancels (không reset thời gian)
+        this.resumeTimer();
         return;
       }
     }
@@ -786,100 +824,260 @@ export class QuizResultDialog {
   ],
   template: `
     <div class="submit-confirm-dialog">
-      <h2 mat-dialog-title>
-        <mat-icon>warning</mat-icon>
-        Submit Quiz?
-      </h2>
-
-      <mat-dialog-content>
-        <p class="message">Are you sure you want to submit your quiz?</p>
-        <p class="warning">You will not be able to make changes after submission.</p>
-
-        <div class="progress-info">
-          <mat-icon>assignment</mat-icon>
-          <span>You have answered <strong>{{data.answeredCount}}</strong> out of <strong>{{data.totalCount}}</strong> questions.</span>
+      <div class="dialog-header">
+        <div class="icon-wrapper">
+          <mat-icon>quiz</mat-icon>
         </div>
-      </mat-dialog-content>
+        <h2>Nộp bài kiểm tra?</h2>
+        <p class="subtitle">Bạn có chắc chắn muốn nộp bài?</p>
+      </div>
 
-      <mat-dialog-actions align="end">
-        <button mat-button (click)="cancel()">
-          <mat-icon>close</mat-icon>
-          Cancel
+      <div class="dialog-body">
+        <div class="warning-box">
+          <mat-icon>info</mat-icon>
+          <span>Bạn sẽ không thể thay đổi câu trả lời sau khi nộp.</span>
+        </div>
+
+        <div class="progress-box">
+          <div class="progress-header">
+            <mat-icon>assignment_turned_in</mat-icon>
+            <span>Tiến độ làm bài</span>
+          </div>
+          <div class="progress-stats">
+            <div class="stat">
+              <span class="number">{{data.answeredCount}}</span>
+              <span class="label">Đã trả lời</span>
+            </div>
+            <div class="divider"></div>
+            <div class="stat">
+              <span class="number">{{data.totalCount}}</span>
+              <span class="label">Tổng câu hỏi</span>
+            </div>
+            <div class="divider"></div>
+            <div class="stat" [class.complete]="data.answeredCount === data.totalCount" [class.incomplete]="data.answeredCount !== data.totalCount">
+              <span class="number">{{getPercentage()}}%</span>
+              <span class="label">Hoàn thành</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="unanswered-warning" *ngIf="data.answeredCount < data.totalCount">
+          <mat-icon>warning</mat-icon>
+          <span>Bạn còn <strong>{{data.totalCount - data.answeredCount}}</strong> câu chưa trả lời!</span>
+        </div>
+      </div>
+
+      <div class="dialog-actions">
+        <button mat-stroked-button (click)="cancel()">
+          <mat-icon>arrow_back</mat-icon>
+          Quay lại
         </button>
         <button mat-raised-button color="primary" (click)="confirm()">
           <mat-icon>send</mat-icon>
-          Submit Quiz
+          Nộp bài
         </button>
-      </mat-dialog-actions>
+      </div>
     </div>
   `,
   styles: [`
     .submit-confirm-dialog {
-      h2 {
+      padding: 24px;
+      min-width: 400px;
+      max-width: 450px;
+    }
+
+    .dialog-header {
+      text-align: center;
+      margin-bottom: 24px;
+
+      .icon-wrapper {
+        width: 64px;
+        height: 64px;
+        margin: 0 auto 16px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 50%;
         display: flex;
         align-items: center;
-        gap: 12px;
-        margin: 0;
-        color: #f59e0b;
+        justify-content: center;
 
         mat-icon {
-          font-size: 28px;
-          width: 28px;
-          height: 28px;
+          font-size: 32px;
+          width: 32px;
+          height: 32px;
+          color: white;
         }
       }
 
-      mat-dialog-content {
-        padding: 24px 0;
-        min-width: 350px;
+      h2 {
+        margin: 0 0 8px 0;
+        font-size: 22px;
+        font-weight: 700;
+        color: #1e293b;
+      }
 
-        .message {
-          font-size: 16px;
-          margin: 0 0 8px 0;
-          color: #1e293b;
+      .subtitle {
+        margin: 0;
+        font-size: 15px;
+        color: #64748b;
+      }
+    }
+
+    .dialog-body {
+      margin-bottom: 24px;
+    }
+
+    .warning-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: #fef3c7;
+      border: 1px solid #fcd34d;
+      border-radius: 10px;
+      margin-bottom: 16px;
+
+      mat-icon {
+        color: #d97706;
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+        flex-shrink: 0;
+      }
+
+      span {
+        font-size: 14px;
+        color: #92400e;
+        line-height: 1.4;
+      }
+    }
+
+    .progress-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+
+      .progress-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e2e8f0;
+
+        mat-icon {
+          color: #3b82f6;
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
         }
 
-        .warning {
+        span {
           font-size: 14px;
-          color: #ef4444;
-          margin: 0 0 20px 0;
-          font-weight: 500;
-        }
-
-        .progress-info {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          padding: 12px;
-          background: #f1f5f9;
-          border-radius: 8px;
-          font-size: 14px;
+          font-weight: 600;
           color: #475569;
-
-          mat-icon {
-            color: #3b82f6;
-            font-size: 20px;
-            width: 20px;
-            height: 20px;
-          }
-
-          strong {
-            color: #1e293b;
-          }
         }
       }
 
-      mat-dialog-actions {
-        padding: 16px 0 0 0;
+      .progress-stats {
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
 
-        button {
-          mat-icon {
-            margin-right: 6px;
-            font-size: 18px;
-            width: 18px;
-            height: 18px;
+        .stat {
+          text-align: center;
+          padding: 8px 12px;
+
+          .number {
+            display: block;
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e293b;
+            line-height: 1;
+            margin-bottom: 4px;
+          }
+
+          .label {
+            font-size: 12px;
+            color: #64748b;
+          }
+
+          &.complete .number {
+            color: #10b981;
+          }
+
+          &.incomplete .number {
+            color: #f59e0b;
           }
         }
+
+        .divider {
+          width: 1px;
+          height: 40px;
+          background: #e2e8f0;
+        }
+      }
+    }
+
+    .unanswered-warning {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 10px;
+
+      mat-icon {
+        color: #ef4444;
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        flex-shrink: 0;
+      }
+
+      span {
+        font-size: 14px;
+        color: #991b1b;
+
+        strong {
+          color: #dc2626;
+        }
+      }
+    }
+
+    .dialog-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+
+      button {
+        min-width: 120px;
+        height: 44px;
+        border-radius: 8px;
+        font-weight: 600;
+
+        mat-icon {
+          margin-right: 6px;
+          font-size: 18px;
+          width: 18px;
+          height: 18px;
+        }
+      }
+
+      button[mat-stroked-button] {
+        border: 2px solid #e2e8f0;
+        color: #64748b;
+
+        &:hover {
+          background: #f8fafc;
+          border-color: #cbd5e1;
+        }
+      }
+
+      button[mat-raised-button] {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       }
     }
   `]
@@ -896,5 +1094,9 @@ export class SubmitConfirmDialog {
 
   confirm() {
     this.dialogRef.close(true);
+  }
+
+  getPercentage(): number {
+    return Math.round((this.data.answeredCount / this.data.totalCount) * 100);
   }
 }

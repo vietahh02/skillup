@@ -45,7 +45,6 @@ import { MatTooltip } from "@angular/material/tooltip";
 })
 export class LecturerCourseList {
     displayedColumns: string[] = [
-        'courseId',
         'name',
         'courseType',
         'duration',

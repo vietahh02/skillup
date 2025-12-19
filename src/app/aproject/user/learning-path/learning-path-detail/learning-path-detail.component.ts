@@ -125,17 +125,19 @@ export class LearningPathDetail implements OnInit {
   }
 
   getCourseStatus(item: LearningPathItem): CourseStatus {
-    // Use enrollmentStatus from backend
-    if (!item.enrollmentStatus) return 'upcoming';
+    // Use enrollmentStatus from backend - trust backend status, not progressPct
+    if (!item.enrollmentStatus || item.enrollmentStatus === 'NotStarted') return 'upcoming';
 
-    if (item.enrollmentStatus === 'Failed') {
-      return 'failed';
-    } else if (item.enrollmentStatus === 'Completed' || (item.progressPct && item.progressPct >= 100)) {
-      return 'completed';
-    } else if (item.enrollmentStatus === 'InProgress') {
-      return 'in-progress';
-    } else {
-      return 'upcoming';
+    // Backend status is the source of truth
+    switch (item.enrollmentStatus) {
+      case 'Failed':
+        return 'failed';
+      case 'Completed':
+        return 'completed';
+      case 'InProgress':
+        return 'in-progress';
+      default:
+        return 'upcoming';
     }
   }
 
@@ -155,6 +157,24 @@ export class LearningPathDetail implements OnInit {
     return this.courses.find(c => c.status === 'in-progress');
   }
 
+  // Mandatory courses stats
+  get mandatoryTotal(): number {
+    return this.progressSummary?.mandatoryCourses || this.courses.filter(c => c.isMandatory).length;
+  }
+
+  get mandatoryCompleted(): number {
+    return this.progressSummary?.completedMandatory || this.courses.filter(c => c.isMandatory && c.status === 'completed').length;
+  }
+
+  // Optional courses stats
+  get optionalTotal(): number {
+    return this.courses.filter(c => !c.isMandatory).length;
+  }
+
+  get optionalCompleted(): number {
+    return this.courses.filter(c => !c.isMandatory && c.status === 'completed').length;
+  }
+
   getStatusIcon(status: CourseStatus): string {
     if (status === 'completed') return 'check_circle';
     if (status === 'in-progress') return 'pending';
@@ -162,8 +182,35 @@ export class LearningPathDetail implements OnInit {
     return 'radio_button_unchecked';
   }
 
-  getStatusClass(status: CourseStatus): string {
+  getStatusClass(status: CourseStatus | string): string {
     return status;
+  }
+
+  // Learning Path status helpers
+  getLPStatusClass(): CourseStatus {
+    const status = this.progressSummary?.status;
+    if (status === 'Completed') return 'completed';
+    if (status === 'InProgress') return 'in-progress';
+    if (status === 'Failed') return 'failed';
+    return 'upcoming';
+  }
+
+  getLPStatusIcon(): string {
+    const status = this.progressSummary?.status;
+    if (status === 'Completed') return 'check_circle';
+    if (status === 'InProgress') return 'pending';
+    if (status === 'Failed') return 'cancel';
+    return 'schedule';
+  }
+
+  getStatusText(status: string): string {
+    const statusMap: { [key: string]: string } = {
+      'NotStarted': 'Chưa bắt đầu',
+      'InProgress': 'Đang học',
+      'Completed': 'Hoàn thành',
+      'Failed': 'Thất bại'
+    };
+    return statusMap[status] || status;
   }
 
   async enrollNow(): Promise<void> {

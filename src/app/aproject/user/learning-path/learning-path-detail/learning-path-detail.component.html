@@ -21,14 +21,24 @@
             <div class="stat-box">
               <div class="stat-value">{{overallProgress}}%</div>
               <div class="stat-label">Overall Progress</div>
+              <div class="stat-hint">(Based on mandatory courses)</div>
             </div>
             <div class="stat-box">
-              <div class="stat-value">{{completedCourses}}/{{totalCourses}}</div>
-              <div class="stat-label">Courses Completed</div>
+              <div class="stat-value">{{mandatoryCompleted}}/{{mandatoryTotal}}</div>
+              <div class="stat-label">Mandatory Completed</div>
             </div>
-            <div class="stat-box" *ngIf="currentCourse">
-              <div class="stat-value">{{currentCourse.progress}}%</div>
-              <div class="stat-label">Current Course</div>
+            <div class="stat-box" *ngIf="optionalTotal > 0">
+              <div class="stat-value">{{optionalCompleted}}/{{optionalTotal}}</div>
+              <div class="stat-label">Optional Completed</div>
+            </div>
+          </div>
+          
+          <!-- Failed Alert -->
+          <div class="failed-alert" *ngIf="progressSummary?.status === 'Failed'">
+            <mat-icon>warning</mat-icon>
+            <div class="alert-content">
+              <strong>Learning Path Failed</strong>
+              <p>You did not complete one or more mandatory courses. Please contact your manager for assistance.</p>
             </div>
           </div>
 
@@ -109,6 +119,7 @@
                       <mat-icon>check_circle_outline</mat-icon>
                       <span>Optional</span>
                     </div>
+                    <span *ngIf="!course.isMandatory" class="optional-note">(Does not affect LP progress)</span>
                   </div>
 
                   <div class="course-progress" *ngIf="isEnrolled">
@@ -181,6 +192,16 @@
                 </div>
               </div>
             </div>
+            
+            <mat-divider *ngIf="optionalTotal > 0"></mat-divider>
+            
+            <div class="info-item" *ngIf="optionalTotal > 0">
+              <mat-icon>check_circle_outline</mat-icon>
+              <div class="info-content">
+                <div class="info-label">Optional Courses</div>
+                <div class="info-value">{{optionalCompleted}}/{{optionalTotal}}</div>
+              </div>
+            </div>
           </mat-card-content>
         </mat-card>
 
@@ -212,12 +233,14 @@
             </div>
 
             <div class="status-item">
-              <div class="status-icon upcoming">
-                <mat-icon>schedule</mat-icon>
+              <div class="status-icon" [ngClass]="getStatusClass(getLPStatusClass())">
+                <mat-icon>{{getLPStatusIcon()}}</mat-icon>
               </div>
               <div class="status-content">
                 <div class="status-label">Status</div>
-                <div class="status-value">{{progressSummary.status}}</div>
+                <div class="status-value" [ngClass]="'status-' + progressSummary.status.toLowerCase()">
+                  {{getStatusText(progressSummary.status)}}
+                </div>
               </div>
             </div>
           </mat-card-content>

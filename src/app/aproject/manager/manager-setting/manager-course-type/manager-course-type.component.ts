@@ -38,7 +38,7 @@ import { CourseType } from '../../../../models/lookup.model';
   styleUrls: ['./manager-course-type.component.scss']
 })
 export class ManagerCourseTypeComponent implements OnInit {
-  displayedColumns: string[] = ['courseTypeId', 'name', 'isActive', 'action'];
+  displayedColumns: string[] = ['name', 'isActive', 'action'];
   data: CourseType[] = [];
   courseType: CourseType[] = [];
 
