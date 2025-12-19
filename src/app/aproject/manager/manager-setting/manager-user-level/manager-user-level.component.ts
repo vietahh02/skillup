@@ -38,7 +38,7 @@ import { CourseType, Level } from '../../../../models/lookup.model';
   styleUrls: ['./manager-user-level.component.scss']
 })
 export class ManagerUserLevelComponent implements OnInit {
-  displayedColumns: string[] = ['name', 'isActive', 'action'];
+  displayedColumns: string[] = ['id', 'name', 'isActive', 'action'];
   data: Level[] = [];
   levels: Level[] = [];
 
