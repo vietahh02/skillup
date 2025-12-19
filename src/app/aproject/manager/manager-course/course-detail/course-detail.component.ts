@@ -20,6 +20,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { QuestionType } from '../../../../enums/api.enums';
 import { DialogService } from '../../../../services/dialog.service';
 import { InputDialogComponent, InputDialogData } from '../../../../common/input-dialog/input-dialog.component';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 @Component({
     selector: 'app-manager-course-detail',
@@ -37,7 +38,8 @@ import { InputDialogComponent, InputDialogData } from '../../../../common/input-
       MatBadgeModule,
       MatExpansionModule,
       MatDialogModule,
-      MatIconModule
+      MatIconModule,
+      MatTooltipModule
     ],
     templateUrl: './course-detail.component.html',
     styleUrls: ['./course-detail.component.scss'],
@@ -47,7 +49,7 @@ export class ManagerCourseDetail implements OnInit {
     courseId!: string;
     courseDetail: CourseDetail | null = null;
 
-    documentsDisplayedColumns: string[] = ['name', 'type', 'size', 'uploadDate'];
+    documentsDisplayedColumns: string[] = ['name', 'type', 'size', 'uploadDate', 'actions'];
 
     constructor(
         private route: ActivatedRoute,
@@ -281,6 +283,34 @@ export class ManagerCourseDetail implements OnInit {
             case 'text': return '';
             default: return '';
         }
+    }
+
+    downloadDocument(doc: any): void {
+        if (!doc.fileUrl) {
+            this.snackBar.open('Document URL not available', '', {
+                duration: 3000,
+                panelClass: ['error-snackbar', 'custom-snackbar'],
+                horizontalPosition: 'right',
+                verticalPosition: 'top'
+            });
+            return;
+        }
+
+        // Create a temporary anchor element to trigger download
+        const link = document.createElement('a');
+        link.href = doc.fileUrl;
+        link.download = doc.fileName || 'document';
+        link.target = '_blank';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        this.snackBar.open('Download started', '', {
+            duration: 2000,
+            panelClass: ['success-snackbar', 'custom-snackbar'],
+            horizontalPosition: 'right',
+            verticalPosition: 'top'
+        });
     }
 }
 
