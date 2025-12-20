@@ -767,7 +767,7 @@ export class QuizCreatorComponent implements OnInit {
 
       <mat-dialog-content>
         <p class="dialog-description">
-          Let AI generate quiz questions automatically from your course content.
+          Let AI (powered by OpenRouter) generate quiz questions automatically from your course content.
         </p>
 
         <form [formGroup]="genForm">

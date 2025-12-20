@@ -148,6 +148,7 @@ export const API_URLS = {
   CREATE_LEARNING_PATH_ENROLLMENT: BASE_POINTS.LEARNING_PATH_ENROLLMENT, // POST /api/learning-path-enrollments
   GET_MY_LEARNING_PATH_ENROLLMENTS: BASE_POINTS.LEARNING_PATH_ENROLLMENT + "/my-enrollments", // GET /api/learning-path-enrollments/my-enrollments
   DELETE_LEARNING_PATH_ENROLLMENT: BASE_POINTS.LEARNING_PATH_ENROLLMENT, // DELETE /api/learning-path-enrollments/{id}
+  TOGGLE_ENROLLMENT_ACTIVE: BASE_POINTS.LEARNING_PATH_ENROLLMENT, // PATCH /api/learning-path-enrollments/{id}/toggle-active
   GET_LEARNING_PATH_PROGRESS_SUMMARY: BASE_POINTS.LEARNING_PATH, // GET /api/learning-paths/{learningPathId}/progress/summary
   GET_LEARNING_PATH_STATISTICS: BASE_POINTS.LEARNING_PATH + "/statistics", // GET /api/learning-paths/statistics
 

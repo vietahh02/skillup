@@ -51,7 +51,7 @@ export class ChatBoxComponent implements OnInit, AfterViewChecked, OnDestroy {
       this.shouldShowChat = user !== null;
       
       if (user !== null && this.messages.length === 0) {
-        this.addBotMessage('Xin chào! Tôi là trợ lý ảo của SkillUp. Tôi có thể giúp gì cho bạn hôm nay?');
+        this.addBotMessage('Xin chào! Tôi là trợ lý ảo của SkillUp (powered by OpenRouter AI). Tôi có thể giúp gì cho bạn hôm nay?');
       }
     });
   }

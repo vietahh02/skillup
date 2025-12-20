@@ -375,10 +375,10 @@
               </button>
               <button
                 mat-icon-button
-                color="warn"
-                matTooltip="Unenroll User"
+                [ngClass]="(element.isActive === true) ? 'mat-primary' : 'mat-warn'"
+                [matTooltip]="(element.isActive === true) ? 'Unenroll User' : 'Re-enroll User'"
                 (click)="unenrollUser(element)">
-                <mat-icon>person_remove</mat-icon>
+                <mat-icon>{{(element.isActive === true) ? 'person_remove' : 'person_add'}}</mat-icon>
               </button>
             </div>
           </td>
@@ -394,7 +394,7 @@
               <mat-icon>analytics</mat-icon>
               <p>No enrollment data found</p>
               <small class="muted-color">
-                Note: This feature requires additional backend APIs to be implemented.
+                No active enrollments available at the moment.
               </small>
             </div>
           </td>

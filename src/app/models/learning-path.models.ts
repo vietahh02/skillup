@@ -88,6 +88,7 @@ export interface LearningPathEnrollment {
   createdAt: string;
   updatedAt: string;
   enrollmentType?: 'assigned' | 'self-enrolled'; // Added from BE
+  isActive?: boolean; // Added from BE - toggle enrollment active/inactive
   items?: LearningPathItem[];
 }
 
@@ -136,6 +137,7 @@ export interface DetailedEnrollment {
   totalCourses: number;
   completedCourses: number;
   enrollmentType?: 'assigned' | 'self-enrolled'; // Added from BE
+  isActive?: boolean; // Added from BE - toggle enrollment active/inactive
 }
 
 // Paginated Response for Detailed Enrollments

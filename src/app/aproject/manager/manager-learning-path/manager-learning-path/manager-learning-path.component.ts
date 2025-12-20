@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -15,9 +15,11 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
+import { MatDialogModule } from '@angular/material/dialog';
 import { LearningPathService } from '../../../../services/learning-path.service';
 import { LearningPath, DetailedEnrollment } from '../../../../models/learning-path.models';
 import { firstValueFrom } from 'rxjs';
+import { DialogService } from '../../../../services/dialog.service';
 
 @Component({
   selector: 'app-manager-learning-path',
@@ -37,7 +39,8 @@ import { firstValueFrom } from 'rxjs';
     MatMenuModule,
     MatDividerModule,
     MatFormFieldModule,
-    MatSelectModule
+    MatSelectModule,
+    MatDialogModule
   ],
   templateUrl: './manager-learning-path.component.html',
   styleUrls: ['./manager-learning-path.component.scss']
@@ -79,7 +82,9 @@ export class ManagerLearningPathComponent implements OnInit {
   constructor(
     private router: Router,
     private learningPathService: LearningPathService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private cdr: ChangeDetectorRef,
+    private dialogService: DialogService
   ) {}
 
   ngOnInit(): void {
@@ -180,12 +185,23 @@ export class ManagerLearningPathComponent implements OnInit {
     // Load with larger pageSize to get all data for filtering
     this.learningPathService.getAllEnrollments(1, 1000, this.progressSearchTerm).subscribe({
       next: (response) => {
+        // Ensure response and items exist
+        if (!response || !response.items) {
+          this.progressDataSource = [];
+          this.progressTotal = 0;
+          this.isLoadingProgress = false;
+          return;
+        }
+
+        // Backend now returns both active and inactive enrollments
+        // FE will display all and change icon color based on isActive
+        let filteredItems = response.items || [];
+        
         // Filter by enrollment type if needed
-        let filteredItems = response.items;
         if (this.progressFilterType === 'assigned') {
-          filteredItems = response.items.filter(item => item.enrollmentType === 'assigned');
+          filteredItems = filteredItems.filter(item => item.enrollmentType === 'assigned');
         } else if (this.progressFilterType === 'self-enrolled') {
-          filteredItems = response.items.filter(item => item.enrollmentType === 'self-enrolled');
+          filteredItems = filteredItems.filter(item => item.enrollmentType === 'self-enrolled');
         }
         
         // Apply pagination to filtered results
@@ -200,6 +216,8 @@ export class ManagerLearningPathComponent implements OnInit {
         this.isLoadingProgress = false;
       },
       error: (error) => {
+        this.progressDataSource = [];
+        this.progressTotal = 0;
         this.snackBar.open('Failed to load user progress', 'Close', { duration: 3000 });
         this.isLoadingProgress = false;
       }
@@ -340,6 +358,8 @@ export class ManagerLearningPathComponent implements OnInit {
         return 'text-soft-info';
       case 'NotStarted':
         return 'text-soft-secondary';
+      case 'Failed':
+        return 'text-soft-danger';
       default:
         return '';
     }
@@ -361,18 +381,53 @@ export class ManagerLearningPathComponent implements OnInit {
   }
 
   async unenrollUser(enrollment: DetailedEnrollment): Promise<void> {
-    if (!confirm(`Are you sure you want to unenroll "${enrollment.userName}" from "${enrollment.learningPathName}"?`)) {
+    // BE now always returns isActive field (bool)
+    const isActive = enrollment.isActive === true;
+    const action = isActive ? 'unenroll' : 're-enroll';
+    const actionText = isActive ? 'Unenroll' : 'Re-enroll';
+    
+    // Show Material Dialog instead of browser confirm
+    const confirmed = await firstValueFrom(
+      this.dialogService.confirm({
+        type: 'confirm',
+        title: `${actionText} User`,
+        message: `Are you sure you want to ${action} "${enrollment.userName}" from "${enrollment.learningPathName}"?`,
+        confirmText: actionText,
+        cancelText: 'Cancel',
+        destructive: isActive // Unenroll is destructive
+      })
+    );
+
+    if (!confirmed) {
       return;
+    }
+
+    // Optimistic update: update local state immediately
+    const enrollmentIndex = this.progressDataSource.findIndex(
+      e => e.learningPathEnrollmentId === enrollment.learningPathEnrollmentId
+    );
+    if (enrollmentIndex !== -1) {
+      this.progressDataSource[enrollmentIndex].isActive = !isActive;
+      // Force change detection to update UI immediately
+      this.cdr.detectChanges();
     }
 
     try {
       await firstValueFrom(
-        this.learningPathService.unenrollFromLearningPath(enrollment.learningPathEnrollmentId)
+        this.learningPathService.toggleEnrollmentActive(enrollment.learningPathEnrollmentId, !isActive)
       );
-      this.snackBar.open('User unenrolled successfully', 'Close', { duration: 3000 });
-      this.loadUserProgress();
+      this.snackBar.open(`User ${action}ed successfully`, 'Close', { duration: 3000 });
+      
+      // Don't reload immediately - keep the updated state visible
+      // Only reload when user performs other actions (search, filter, pagination)
+      // This way the color change stays visible
     } catch (error) {
-      this.snackBar.open('Failed to unenroll user', 'Close', { duration: 3000 });
+      // Revert optimistic update on error
+      if (enrollmentIndex !== -1) {
+        this.progressDataSource[enrollmentIndex].isActive = isActive;
+        this.cdr.detectChanges();
+      }
+      this.snackBar.open(`Failed to ${action} user`, 'Close', { duration: 3000 });
     }
   }
 }

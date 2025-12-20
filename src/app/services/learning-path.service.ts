@@ -161,11 +161,21 @@ export class LearningPathService {
   }
 
   /**
-   * Unenroll from a learning path
+   * Unenroll from a learning path (DEPRECATED - use toggleEnrollmentActive instead)
    * DELETE /api/learning-path-enrollments/{enrollmentId}
    */
   unenrollFromLearningPath(enrollmentId: number): Observable<any> {
     return this.http.delete(`${API_URLS.DELETE_LEARNING_PATH_ENROLLMENT}/${enrollmentId}`);
+  }
+
+  /**
+   * Toggle enrollment active/inactive (new API)
+   * PATCH /api/learning-path-enrollments/{enrollmentId}/toggle-active
+   * @param enrollmentId - The enrollment ID
+   * @param isActive - true to activate, false to deactivate (unenroll)
+   */
+  toggleEnrollmentActive(enrollmentId: number, isActive: boolean): Observable<any> {
+    return this.http.patch(`${API_URLS.TOGGLE_ENROLLMENT_ACTIVE}/${enrollmentId}/toggle-active`, { isActive });
   }
 
   /**

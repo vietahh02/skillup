@@ -61,7 +61,7 @@ export class SettingsComponent implements OnInit {
       return;
     }
 
-    if (!confirm('Update AI API Key?')) {
+    if (!confirm('Update OpenRouter API Key?')) {
       return;
     }
 
@@ -69,7 +69,7 @@ export class SettingsComponent implements OnInit {
     this.settingsService.updateAiKey(this.aiApiKey).subscribe({
       next: (data) => {
         this.aiApiKey = data.apiKey;
-        this.snackBar.open('AI API Key updated successfully', 'Close', { duration: 3000 });
+        this.snackBar.open('OpenRouter API Key updated successfully', 'Close', { duration: 3000 });
         this.isLoading = false;
       },
       error: (error) => {
