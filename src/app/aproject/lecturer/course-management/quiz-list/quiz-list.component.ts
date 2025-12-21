@@ -69,6 +69,8 @@ export class QuizListComponent implements OnInit {
         this.data = response.items || [];
         // Backend might return 'total' instead of 'totalCount'
         this.totalItems = response.totalCount || response.total || 0;
+        this.currentPage = response.page ;
+        this.pageSize = response.pageSize ;
         this.isLoading = false;
       },
       error: (error) => {
@@ -88,7 +90,21 @@ export class QuizListComponent implements OnInit {
 
   onPaginatorChange(event: PageEvent): void {
     this.pageSize = event.pageSize;
-    this.currentPage = event.pageIndex + 1;
+    if (event.pageSize !== this.pageSize) {
+      this.onPageSizeChange(event.pageSize);
+    } else {
+      this.onPageChange(event.pageIndex + 1);
+    }
+  }
+
+  onPageSizeChange(s: number) {
+    this.pageSize = s;
+    this.currentPage = 1;
+    this.loadQuizzes();
+  }
+  
+  onPageChange(p: number) {
+    this.currentPage = p;
     this.loadQuizzes();
   }
 

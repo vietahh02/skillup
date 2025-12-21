@@ -30,7 +30,7 @@ export class QuizService {
    */
   getQuizzes(page: number = 1, pageSize: number = 10, searchTerm?: string): Observable<any> {
     let params = new HttpParams()
-      .set('pageNumber', page.toString())
+      .set('page', page.toString())
       .set('pageSize', pageSize.toString());
 
     if (searchTerm && searchTerm.trim()) {
