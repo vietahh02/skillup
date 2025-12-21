@@ -51,7 +51,13 @@ export class ChatBoxComponent implements OnInit, AfterViewChecked, OnDestroy {
       this.shouldShowChat = user !== null;
       
       if (user !== null && this.messages.length === 0) {
-        this.addBotMessage('Xin chào! Tôi là trợ lý ảo của SkillUp (powered by OpenRouter AI). Tôi có thể giúp gì cho bạn hôm nay?');
+        const greetingMessage = `Xin chào! Tôi là trợ lý ảo của SkillUp (powered by OpenRouter AI). 🎓
+
+Tôi có thể giúp bạn:
+• 🔍 Tìm khóa học phù hợp với chat: "cho tôi khóa học [tên ngôn ngữ lập trình]" (ví dụ: "cho tôi khóa học java")
+• 💡 Tư vấn học tập
+• ❓ Giải đáp thắc mắc`;
+        this.addBotMessage(greetingMessage);
       }
     });
   }
