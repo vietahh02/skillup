@@ -100,3 +100,7 @@ table.loading {
   opacity: 0.5;
   pointer-events: none;
 }
+
+table {
+  word-break: auto-phrase;
+}
