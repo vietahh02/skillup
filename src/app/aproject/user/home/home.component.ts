@@ -6,6 +6,7 @@ import { ApiCourseServices } from '../../../services/course.service';
 import { CourseUserView } from '../../../models/course.models';
 import { CommonModule } from '@angular/common';
 import { MatTooltip } from "@angular/material/tooltip";
+import { finalize } from 'rxjs/operators';
 
 @Component({
     selector: 'app-home',
@@ -17,13 +18,20 @@ export class Home {
     courses: CourseUserView[] = [];
     constructor(private router: Router, private courseService: ApiCourseServices) {}
 
+    totalItems = 0;
+    currentPage = 1;
+    pageSize = 16;
+    isLoading = false;
+
     ngOnInit() {
-        this.courseService.getCoursesUserView().subscribe((courses) => {
-            this.courses = courses;
+        this.courseService.getCoursesUserView(this.currentPage, this.pageSize).subscribe((courses) => {
+            this.courses = this.courses.concat(courses.items as CourseUserView[]);
+            this.totalItems = courses.total;
+            this.currentPage = courses.page;
+            this.pageSize = courses.pageSize;
         });
     }
 
-    
     maxLengthText(text: string) : boolean {
         return text.length > 20;
     }
@@ -49,6 +57,17 @@ export class Home {
         const minutes = Math.floor((duration % 3600) / 60);
         const seconds = duration % 60;
         return `${hours}h${minutes}m${seconds}s`;
+    }
+
+    loadMore() {
+        this.isLoading = true;
+        this.currentPage++;
+        this.courseService.getCoursesUserView(this.currentPage, this.pageSize).pipe(finalize(() => {
+            this.isLoading = false;
+        })).subscribe((courses) => {
+            this.courses = this.courses.concat(courses.items as CourseUserView[]);
+            this.totalItems = courses.total;
+        });
     }
 
 }
