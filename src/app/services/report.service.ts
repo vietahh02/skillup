@@ -22,11 +22,19 @@ export class ReportService {
     return this.http.get<any>(API_URLS.GET_USER_REPORT, { params });
   }
 
-  exportUserReportExcel(searchTerm: string = ''): Observable<Blob> {
+  exportUserReportExcel(searchTerm: string = '', dateFrom?: string, dateTo?: string): Observable<Blob> {
     let params = new HttpParams();
     
     if (searchTerm && searchTerm.trim()) {
       params = params.set('searchTerm', searchTerm.trim());
+    }
+
+    if (dateFrom) {
+      params = params.set('dateFrom', dateFrom);
+    }
+
+    if (dateTo) {
+      params = params.set('dateTo', dateTo);
     }
 
     return this.http.get(API_URLS.EXPORT_USER_REPORT_EXCEL, { 

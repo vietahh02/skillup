@@ -10,9 +10,41 @@
 
 .box-button {
     display: flex;
+    align-items: center !important;
     gap: 10px;
+    
     button {
         transform: scale(0.9);
+        align-self: center;
+        height: fit-content;
+    }
+    
+    mat-form-field.filter-field {
+        margin-bottom: 0 !important;
+        margin-top: 0 !important;
+        align-self: center;
+        
+        ::ng-deep {
+            .mat-mdc-form-field-subscript-wrapper {
+                margin-top: 0 !important;
+                position: absolute;
+            }
+            
+            .mat-mdc-text-field-wrapper {
+                padding-bottom: 0 !important;
+            }
+            
+            .mat-mdc-form-field-bottom-align {
+                min-height: 0 !important;
+                height: 0 !important;
+            }
+            
+            .mat-mdc-form-field-infix {
+                min-height: 48px;
+                display: flex;
+                align-items: center;
+            }
+        }
     }
 }
 

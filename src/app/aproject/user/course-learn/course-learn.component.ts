@@ -41,6 +41,18 @@ export class CourseLearnComponent implements OnDestroy {
             this.checkLesson(course);
             this.detail = course;
             this.currentSubLesson = this.getNextSubLessonToLearn();
+            
+            // Debug: Check quiz attempts data
+            if (course?.quiz) {
+                console.log('Quiz data:', {
+                    quizId: course.quiz.quizId,
+                    attemptLimit: course.quiz.attemptLimit,
+                    userAttemptCount: course.quiz.userAttemptCount,
+                    remainingAttempts: course.quiz.remainingAttempts,
+                    isCompleted: course.quiz.isCompleted,
+                    userScore: course.quiz.userScore
+                });
+            }
         });
     }
 

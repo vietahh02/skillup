@@ -16,6 +16,9 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDialogModule } from '@angular/material/dialog';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatInputModule } from '@angular/material/input';
+import { provideNativeDateAdapter } from '@angular/material/core';
 import { LearningPathService } from '../../../../services/learning-path.service';
 import { LearningPath, DetailedEnrollment } from '../../../../models/learning-path.models';
 import { firstValueFrom } from 'rxjs';
@@ -40,8 +43,11 @@ import { DialogService } from '../../../../services/dialog.service';
     MatDividerModule,
     MatFormFieldModule,
     MatSelectModule,
-    MatDialogModule
+    MatDialogModule,
+    MatDatepickerModule,
+    MatInputModule
   ],
+  providers: [provideNativeDateAdapter()],
   templateUrl: './manager-learning-path.component.html',
   styleUrls: ['./manager-learning-path.component.scss']
 })
@@ -77,6 +83,8 @@ export class ManagerLearningPathComponent implements OnInit {
   progressPageSize = 10;
   progressSearchTerm = '';
   progressFilterType: 'all' | 'assigned' | 'self-enrolled' = 'all';
+  progressDateFrom: Date | null = null;
+  progressDateTo: Date | null = null;
   isLoadingProgress = false;
 
   constructor(
@@ -101,12 +109,31 @@ export class ManagerLearningPathComponent implements OnInit {
       return this.maxLengthText(text) ? text.substring(0, 20) + '...' : text;
   }
 
+  formatDateForAPI(date: Date): string {
+    // Format to YYYY-MM-DD
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  clearDateFilters(): void {
+    this.progressDateFrom = null;
+    this.progressDateTo = null;
+  }
+
   exportToExcel(): void {
     this.isLoadingProgress = true;
     
+    // Format dates to ISO string (YYYY-MM-DD) or null
+    const dateFrom = this.progressDateFrom ? this.formatDateForAPI(this.progressDateFrom) : undefined;
+    const dateTo = this.progressDateTo ? this.formatDateForAPI(this.progressDateTo) : undefined;
+    
     this.learningPathService.exportUserProgressExcel(
       this.progressSearchTerm,
-      this.progressFilterType
+      this.progressFilterType,
+      dateFrom,
+      dateTo
     ).subscribe({
       next: (blob: Blob) => {
         // Create download link

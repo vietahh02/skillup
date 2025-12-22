@@ -143,11 +143,22 @@
                             <!-- Failed - Can retake -->
                             <li *ngIf="detail?.quiz?.isCompleted && (detail?.quiz?.userScore ?? 0) < (detail?.quiz?.passScore ?? 70)">
                                 <div class="d-flex align-items-center justify-content-space-between">
-                                    <span class="d-block gray-color fw-medium position-relative">
-                                        <i class="ri-close-circle-fill" style="color: #ef4444;"></i>
-                                        Quiz: {{detail?.quiz?.title || 'Final Quiz'}}
-                                    </span>
-                                    <div class="d-flex align-items-center gap-2">
+                                    <div class="d-flex flex-column">
+                                        <span class="d-block gray-color fw-medium position-relative">
+                                            <i class="ri-close-circle-fill" style="color: #ef4444;"></i>
+                                            Quiz: {{detail?.quiz?.title || 'Final Quiz'}}
+                                        </span>
+                                        <!-- Attempts info for failed quiz -->
+                                        <span *ngIf="detail?.quiz?.attemptLimit && (detail?.quiz?.attemptLimit ?? 0) > 0" 
+                                              style="color: #ef4444; font-size: 11px; font-weight: 500; margin-top: 4px; margin-left: 24px;">
+                                            <i class="ri-error-warning-line"></i>
+                                            Attempts remaining: {{detail?.quiz?.remainingAttempts ?? detail?.quiz?.attemptLimit}}/{{detail?.quiz?.attemptLimit}}
+                                            <span *ngIf="(detail?.quiz?.remainingAttempts ?? 0) === 0" style="color: #dc2626; font-weight: 600;">
+                                                (No attempts left)
+                                            </span>
+                                        </span>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2" style="flex-shrink: 0;">
                                         <span class="badge" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
                                                                     color: white;
                                                                     padding: 4px 12px;
@@ -158,7 +169,8 @@
                                         </span>
                                         <a routerLink="/quiz/{{detail?.quiz?.quizId}}"
                                            class="btn btn-sm btn-outline-primary"
-                                           style="padding: 4px 12px; font-size: 12px;">
+                                           style="padding: 4px 12px; font-size: 12px; white-space: nowrap;"
+                                           *ngIf="(detail?.quiz?.remainingAttempts ?? 0) > 0">
                                             <i class="ri-refresh-line"></i> Retake
                                         </a>
                                     </div>

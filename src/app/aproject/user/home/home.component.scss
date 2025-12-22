@@ -1,3 +1,39 @@
+.tagus-search-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    background-color: #f5f5f5;
+    padding: 15px;
+    border-radius: 8px;
+    
+    .input-search {
+        flex: 1;
+        padding: 12px 16px;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        font-size: 14px;
+        outline: none;
+        background-color: white;
+        
+        &:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+    }
+    
+    .tagus {
+        background: #667eea;
+        color: white;
+        border-radius: 8px;
+        padding: 12px 20px;
+        
+        &:hover {
+            background: #5a6fd8;
+        }
+    }
+}
+
 .btn-box {
     margin-top: 10px;
 

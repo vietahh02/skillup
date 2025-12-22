@@ -287,7 +287,12 @@ export class LearningPathService {
    * Export User Progress Tracking to Excel
    * GET /api/learning-path-enrollments/export-excel
    */
-  exportUserProgressExcel(searchTerm?: string, enrollmentType?: 'all' | 'assigned' | 'self-enrolled'): Observable<Blob> {
+  exportUserProgressExcel(
+    searchTerm?: string, 
+    enrollmentType?: 'all' | 'assigned' | 'self-enrolled',
+    dateFrom?: string,
+    dateTo?: string
+  ): Observable<Blob> {
     let params = new HttpParams();
     
     if (searchTerm && searchTerm.trim()) {
@@ -296,6 +301,14 @@ export class LearningPathService {
     
     if (enrollmentType && enrollmentType !== 'all') {
       params = params.set('enrollmentType', enrollmentType);
+    }
+
+    if (dateFrom) {
+      params = params.set('dateFrom', dateFrom);
+    }
+
+    if (dateTo) {
+      params = params.set('dateTo', dateTo);
     }
 
     return this.http.get(API_URLS.EXPORT_USER_PROGRESS_EXCEL, {

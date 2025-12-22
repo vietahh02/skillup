@@ -9,6 +9,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { provideNativeDateAdapter } from '@angular/material/core';
 import { ReportService } from '../../../services/report.service';
 import { UserReport } from '../../../models/report.models';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -26,8 +30,12 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
         MatProgressBarModule,
         MatIconModule,
         MatTooltipModule,
-        MatSnackBarModule
+        MatSnackBarModule,
+        MatFormFieldModule,
+        MatInputModule,
+        MatDatepickerModule
     ],
+    providers: [provideNativeDateAdapter()],
     templateUrl: './manager-report-user.component.html',
     styleUrls: ['./manager-report-user.component.scss']
 })
@@ -39,6 +47,8 @@ export class ManagerReportUserComponent implements AfterViewInit {
     displayedColumns: string[] = ['user', 'level', 'courses', 'progress', 'completionRate', 'learningTime', 'quizScore', 'lastActive', 'status'];
     dataSource = new MatTableDataSource<UserReport>([]);
     searchTerm = '';
+    dateFrom: Date | null = null;
+    dateTo: Date | null = null;
     
     totalItems = 0;
     currentPage = 1;
@@ -135,9 +145,27 @@ export class ManagerReportUserComponent implements AfterViewInit {
         return this.maxLengthText(text) ? text.substring(0, 20) + '...' : text;
     }
 
+    formatDateForAPI(date: Date): string {
+        // Format to YYYY-MM-DD
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    clearDateFilters(): void {
+        this.dateFrom = null;
+        this.dateTo = null;
+    }
+
     exportToExcel() {
         this.isLoading = true;
-        this.reportService.exportUserReportExcel(this.searchTerm).subscribe({
+        
+        // Format dates to ISO string (YYYY-MM-DD) or null
+        const dateFrom = this.dateFrom ? this.formatDateForAPI(this.dateFrom) : undefined;
+        const dateTo = this.dateTo ? this.formatDateForAPI(this.dateTo) : undefined;
+        
+        this.reportService.exportUserReportExcel(this.searchTerm, dateFrom, dateTo).subscribe({
             next: (blob: Blob) => {
                 // Create download link
                 const url = window.URL.createObjectURL(blob);

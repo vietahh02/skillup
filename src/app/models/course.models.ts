@@ -184,6 +184,8 @@ export interface DocumentItem {
     title: string;
     passScore: number;
     attemptLimit: number;
+    userAttemptCount?: number;
+    remainingAttempts?: number;
     createdAt: string;
     updatedAt: string;
     questions: Question[];

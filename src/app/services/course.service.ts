@@ -127,10 +127,15 @@ export class ApiCourseServices {
     return this.http.delete<void>(`${API_URLS.SUB_LESSON}/${subLessonId}`);
   }
 
-  getCoursesUserView(page: number = 1, pageSize: number = 16): Observable<any> {    
+  getCoursesUserView(page: number = 1, pageSize: number = 16, searchTerm?: string): Observable<any> {    
     let params = new HttpParams()
       .set('page', page.toString())
       .set('pageSize', pageSize.toString());
+    
+    if (searchTerm && searchTerm.trim()) {
+      params = params.set('search', searchTerm.trim());
+    }
+    
     return this.http.get<any>(API_URLS.GET_COURSES_USER_VIEW, { params });
   }
 

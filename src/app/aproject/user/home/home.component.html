@@ -1,5 +1,12 @@
+<div class="mb-25">
+    <div class="tagus-search-box">
+        <input type="text" class="input-search border-radius" placeholder="Search courses..." [(ngModel)]="searchTerm" (keyup.enter)="search()">
+        <button mat-flat-button class="tagus" (click)="search()"><i class="ri-search-line"></i></button>
+    </div>
+</div>
+
 <div class="row">
-    <div class="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 d-flex" *ngFor="let course of courses">
+    <div class="col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-3 d-flex" *ngFor="let course of displayedCourses">
         <mat-card class="mb-25 text-center tagus-card w-100">
             <mat-card-content>
                 <div>
@@ -32,7 +39,7 @@
     </div>
 
     <div class="col-12 text-center">
-        <button mat-flat-button class="gray" (click)="loadMore()" *ngIf="totalItems > courses.length" class="load-more-btn">
+        <button mat-flat-button class="gray" (click)="loadMore()" *ngIf="totalItems > displayedCourses.length" class="load-more-btn">
             <span *ngIf="!isLoading">Load More</span>
             <span *ngIf="isLoading">Loading...</span>
         </button>
