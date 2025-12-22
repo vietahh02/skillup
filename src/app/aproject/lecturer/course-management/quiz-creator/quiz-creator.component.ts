@@ -126,7 +126,7 @@ export class QuizCreatorComponent implements OnInit {
       title: ['', Validators.required],
       attemptLimit: [1, [Validators.required, Validators.min(1)]],
       passScore: [70, [Validators.required, Validators.min(0), Validators.max(100)]],
-      timeLimit: [null, [Validators.min(1)]], // Optional: time limit in minutes (null = no time limit)
+      timeLimit: [null, [Validators.required, Validators.min(1), Validators.max(1000)]], // Optional: time limit in minutes (null = no time limit)
       questions: this.fb.array([])
     });
   }

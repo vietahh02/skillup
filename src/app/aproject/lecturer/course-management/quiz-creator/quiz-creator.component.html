@@ -55,8 +55,14 @@
               <mat-label>Time Limit (minutes)</mat-label>
               <input matInput formControlName="timeLimit" type="number" min="1" placeholder="e.g. 30 (optional)">
               <mat-hint>Leave empty for no time limit</mat-hint>
+              <mat-error *ngIf="quizForm.get('timeLimit')?.hasError('required')">
+                Time limit is required
+              </mat-error>
               <mat-error *ngIf="quizForm.get('timeLimit')?.hasError('min')">
                 Time limit must be at least 1 minute
+              </mat-error>
+              <mat-error *ngIf="quizForm.get('timeLimit')?.hasError('max')">
+                Time limit must be less than 1000 minutes
               </mat-error>
             </mat-form-field>
           </div>
