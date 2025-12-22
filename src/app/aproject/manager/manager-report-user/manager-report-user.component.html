@@ -5,15 +5,17 @@
         <div class="box-button d-flex align-items-center gap-2">
             <mat-form-field appearance="outline" class="filter-field mb-0" style="min-width: 150px;">
                 <mat-label>From Date</mat-label>
-                <input matInput [matDatepicker]="pickerFrom" [(ngModel)]="dateFrom" placeholder="Start date">
+                <input matInput [matDatepicker]="pickerFrom" [(ngModel)]="dateFrom" (dateChange)="onDateFilterChange()" placeholder="Start date">
                 <mat-datepicker-toggle matIconSuffix [for]="pickerFrom"></mat-datepicker-toggle>
-                <mat-datepicker #pickerFrom></mat-datepicker>
+                <mat-datepicker #pickerFrom (closed)="onDateFilterChange()"></mat-datepicker>
+                <mat-error *ngIf="isDateRangeInvalid">From Date must be before or equal to To Date</mat-error>
             </mat-form-field>
             <mat-form-field appearance="outline" class="filter-field mb-0" style="min-width: 150px;">
                 <mat-label>To Date</mat-label>
-                <input matInput [matDatepicker]="pickerTo" [(ngModel)]="dateTo" placeholder="End date">
+                <input matInput [matDatepicker]="pickerTo" [(ngModel)]="dateTo" (dateChange)="onDateFilterChange()" placeholder="End date">
                 <mat-datepicker-toggle matIconSuffix [for]="pickerTo"></mat-datepicker-toggle>
-                <mat-datepicker #pickerTo></mat-datepicker>
+                <mat-datepicker #pickerTo (closed)="onDateFilterChange()"></mat-datepicker>
+                <mat-error *ngIf="isDateRangeInvalid">To Date must be after or equal to From Date</mat-error>
             </mat-form-field>
             <button mat-icon-button (click)="clearDateFilters()" matTooltip="Clear date filters" *ngIf="dateFrom || dateTo">
                 <mat-icon>close</mat-icon>

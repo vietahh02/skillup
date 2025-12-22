@@ -69,8 +69,18 @@ export class ManagerReportUserComponent implements AfterViewInit {
     }
 
     loadData() {
+        // Don't load if date range is invalid
+        if (this.isDateRangeInvalid) {
+            return;
+        }
+        
         this.isLoading = true;
-        this.reportService.getUserReport(this.currentPage, this.pageSize, this.searchTerm).subscribe({
+        
+        // Format dates to ISO string (YYYY-MM-DD) or undefined
+        const dateFrom = this.dateFrom ? this.formatDateForAPI(this.dateFrom) : undefined;
+        const dateTo = this.dateTo ? this.formatDateForAPI(this.dateTo) : undefined;
+        
+        this.reportService.getUserReport(this.currentPage, this.pageSize, this.searchTerm, dateFrom, dateTo).subscribe({
             next: (data: any) => {
                 this.dataSource.data = data.items || [];
                 this.totalItems = data.total || 0;
@@ -153,12 +163,46 @@ export class ManagerReportUserComponent implements AfterViewInit {
         return `${year}-${month}-${day}`;
     }
 
+    get isDateRangeInvalid(): boolean {
+        if (!this.dateFrom || !this.dateTo) {
+            return false;
+        }
+        return this.dateFrom > this.dateTo;
+    }
+
     clearDateFilters(): void {
         this.dateFrom = null;
         this.dateTo = null;
+        this.currentPage = 1;
+        if (this.paginator) {
+            this.paginator.pageIndex = 0;
+        }
+        this.loadData();
+    }
+
+    onDateFilterChange(): void {
+        if (this.isDateRangeInvalid) {
+            return; // Don't load if date range is invalid
+        }
+        this.currentPage = 1;
+        if (this.paginator) {
+            this.paginator.pageIndex = 0;
+        }
+        this.loadData();
     }
 
     exportToExcel() {
+        // Don't export if date range is invalid
+        if (this.isDateRangeInvalid) {
+            this.snack.open('Invalid date range: From Date must be before or equal to To Date', '', {
+                duration: 3000,
+                panelClass: ['error-snackbar', 'custom-snackbar'],
+                horizontalPosition: 'right',
+                verticalPosition: 'top'
+            });
+            return;
+        }
+        
         this.isLoading = true;
         
         // Format dates to ISO string (YYYY-MM-DD) or null

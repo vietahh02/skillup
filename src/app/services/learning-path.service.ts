@@ -198,15 +198,29 @@ export class LearningPathService {
 
   /**
    * Get all enrollments with details (for Manager user progress table)
-   * GET /api/learning-path-enrollments/all?page=1&pageSize=10&search=query
+   * GET /api/learning-path-enrollments/all?page=1&pageSize=10&search=query&dateFrom=YYYY-MM-DD&dateTo=YYYY-MM-DD
    */
-  getAllEnrollments(page: number = 1, pageSize: number = 10, search: string = ''): Observable<DetailedEnrollmentsResponse> {
+  getAllEnrollments(
+    page: number = 1, 
+    pageSize: number = 10, 
+    search: string = '',
+    dateFrom?: string,
+    dateTo?: string
+  ): Observable<DetailedEnrollmentsResponse> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('pageSize', pageSize.toString());
 
     if (search) {
       params = params.set('search', search);
+    }
+
+    if (dateFrom) {
+      params = params.set('dateFrom', dateFrom);
+    }
+
+    if (dateTo) {
+      params = params.set('dateTo', dateTo);
     }
 
     return this.http.get<DetailedEnrollmentsResponse>(API_URLS.GET_ALL_ENROLLMENTS, { params });

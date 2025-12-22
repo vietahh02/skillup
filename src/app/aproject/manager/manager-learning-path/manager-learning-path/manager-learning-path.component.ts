@@ -117,12 +117,40 @@ export class ManagerLearningPathComponent implements OnInit {
     return `${year}-${month}-${day}`;
   }
 
+  get isDateRangeInvalid(): boolean {
+    if (!this.progressDateFrom || !this.progressDateTo) {
+      return false;
+    }
+    return this.progressDateFrom > this.progressDateTo;
+  }
+
   clearDateFilters(): void {
     this.progressDateFrom = null;
     this.progressDateTo = null;
+    this.progressCurrentPage = 1;
+    this.loadUserProgress();
+  }
+
+  onDateFilterChange(): void {
+    if (this.isDateRangeInvalid) {
+      return; // Don't load if date range is invalid
+    }
+    this.progressCurrentPage = 1;
+    this.loadUserProgress();
   }
 
   exportToExcel(): void {
+    // Don't export if date range is invalid
+    if (this.isDateRangeInvalid) {
+      this.snackBar.open('Invalid date range: From Date must be before or equal to To Date', 'Close', {
+        duration: 3000,
+        panelClass: ['error-snackbar', 'custom-snackbar'],
+        horizontalPosition: 'right',
+        verticalPosition: 'top'
+      });
+      return;
+    }
+    
     this.isLoadingProgress = true;
     
     // Format dates to ISO string (YYYY-MM-DD) or null
@@ -208,9 +236,19 @@ export class ManagerLearningPathComponent implements OnInit {
 
 
   loadUserProgress(): void {
+    // Don't load if date range is invalid
+    if (this.isDateRangeInvalid) {
+      return;
+    }
+    
     this.isLoadingProgress = true;
+    
+    // Format dates to ISO string (YYYY-MM-DD) or undefined
+    const dateFrom = this.progressDateFrom ? this.formatDateForAPI(this.progressDateFrom) : undefined;
+    const dateTo = this.progressDateTo ? this.formatDateForAPI(this.progressDateTo) : undefined;
+    
     // Load with larger pageSize to get all data for filtering
-    this.learningPathService.getAllEnrollments(1, 1000, this.progressSearchTerm).subscribe({
+    this.learningPathService.getAllEnrollments(1, 1000, this.progressSearchTerm, dateFrom, dateTo).subscribe({
       next: (response) => {
         // Ensure response and items exist
         if (!response || !response.items) {
