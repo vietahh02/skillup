@@ -54,7 +54,7 @@ export class ChatBoxComponent implements OnInit, AfterViewChecked, OnDestroy {
         const greetingMessage = `Xin chào! Tôi là trợ lý ảo của SkillUp (powered by OpenRouter AI). 🎓
 
 Tôi có thể giúp bạn:
-• 🔍 Tìm khóa học phù hợp với chat: "cho tôi khóa học [tên ngôn ngữ lập trình]" (ví dụ: "cho tôi khóa học java")
+• 🔍 Tìm khóa học phù hợp với chat: "cho tôi khóa học [tên khóa học lập trình]" (ví dụ: "cho tôi khóa học java")
 • 💡 Tư vấn học tập
 • ❓ Giải đáp thắc mắc`;
         this.addBotMessage(greetingMessage);

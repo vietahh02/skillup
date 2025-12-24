@@ -316,6 +316,7 @@ export class ManagerUserDetail {
     getStatusClass(status: string): string {
         if (status === 'Completed') return 'text-soft-success';
         if (status === 'InProgress') return 'text-soft-primary';
+        if (status === 'Failed') return 'text-soft-danger';
         return 'text-soft-secondary';
     }
 
