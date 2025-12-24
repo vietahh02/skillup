@@ -220,6 +220,13 @@ export class CourseDetailComponent {
                     duration: 3000,
                     panelClass: ['success-snackbar', 'custom-snackbar'],    
                 });
+            }, error => {
+                this.snackBar.open(error.error.message || 'Failed to enroll course', '', {
+                    duration: 3000,
+                    panelClass: ['error-snackbar', 'custom-snackbar'],
+                    horizontalPosition: 'right',
+                    verticalPosition: 'top'
+                });
             });
         });
     }
